@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLab.Common", "src\HomeLab.Common\HomeLab.Common.csproj", "{C91664B7-0AC1-4BDE-B780-8B0CD122C8A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.Common", "src\HomeLabManager.Common\HomeLabManager.Common.csproj", "{C91664B7-0AC1-4BDE-B780-8B0CD122C8A5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1E8B47A-0DDC-41A8-B904-9775A37A15F9}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,15 +17,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{92A51926-5B5B-4F09-91F5-E14F8CEEB711}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLab.SSHTests", "tests\HomeLab.SSHTests\HomeLab.SSHTests.csproj", "{68D0384A-0800-4107-B89B-722203A6A0B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.DockerTests", "tests\HomeLabManager.DockerTests\HomeLabManager.DockerTests.csproj", "{37B55AC4-1372-4178-A72F-2F6E8B17C35F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLab.DockerTests", "tests\HomeLab.DockerTests\HomeLab.DockerTests.csproj", "{37B55AC4-1372-4178-A72F-2F6E8B17C35F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.DataTests", "tests\HomeLabManager.ConfigurationTests\HomeLabManager.DataTests.csproj", "{F7711BEE-AD46-45CD-8322-9FB8B4D546FD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C91664B7-0AC1-4BDE-B780-8B0CD122C8A5} = {C91664B7-0AC1-4BDE-B780-8B0CD122C8A5}
+	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLab.ConfigurationTests", "tests\HomeLab.ConfigurationTests\HomeLab.ConfigurationTests.csproj", "{F7711BEE-AD46-45CD-8322-9FB8B4D546FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.BackupTool", "src\HomeLabManager.BackupTool\HomeLabManager.BackupTool.csproj", "{85197BB5-1096-4BD2-AB29-8ECAB1A23ED2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLab.BackupTool", "src\HomeLab.BackupTool\HomeLab.BackupTool.csproj", "{85197BB5-1096-4BD2-AB29-8ECAB1A23ED2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.Manager", "src\HomelabManager.LabManager\HomeLabManager.Manager.csproj", "{0E7EC3E2-2CF6-4B27-95F2-F5C01A073CE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLab.LabManager", "src\Homelab.LabManager\HomeLab.LabManager.csproj", "{0E7EC3E2-2CF6-4B27-95F2-F5C01A073CE1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestData", "TestData", "{B27841B1-C63C-4BCE-B622-9F251DFEB7B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +40,6 @@ Global
 		{C91664B7-0AC1-4BDE-B780-8B0CD122C8A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C91664B7-0AC1-4BDE-B780-8B0CD122C8A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C91664B7-0AC1-4BDE-B780-8B0CD122C8A5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{68D0384A-0800-4107-B89B-722203A6A0B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{68D0384A-0800-4107-B89B-722203A6A0B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{68D0384A-0800-4107-B89B-722203A6A0B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{68D0384A-0800-4107-B89B-722203A6A0B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37B55AC4-1372-4178-A72F-2F6E8B17C35F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{37B55AC4-1372-4178-A72F-2F6E8B17C35F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37B55AC4-1372-4178-A72F-2F6E8B17C35F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -62,9 +61,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{68D0384A-0800-4107-B89B-722203A6A0B9} = {92A51926-5B5B-4F09-91F5-E14F8CEEB711}
 		{37B55AC4-1372-4178-A72F-2F6E8B17C35F} = {92A51926-5B5B-4F09-91F5-E14F8CEEB711}
 		{F7711BEE-AD46-45CD-8322-9FB8B4D546FD} = {92A51926-5B5B-4F09-91F5-E14F8CEEB711}
+		{B27841B1-C63C-4BCE-B622-9F251DFEB7B5} = {C1E8B47A-0DDC-41A8-B904-9775A37A15F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7A27280-66BF-4B43-9E13-A1ED2138C45A}

@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-namespace Homelab.LabManager
+namespace Homelab.Manager
 {
     public partial class App : Application
     {

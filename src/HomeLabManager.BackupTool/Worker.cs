@@ -1,4 +1,4 @@
-namespace HomeLab.BackupTool;
+namespace HomeLabManager.BackupTool;
 
 public class Worker : BackgroundService
 {

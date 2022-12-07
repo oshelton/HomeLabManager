@@ -1,6 +1,6 @@
-using HomeLab.BackupTool;
+using HomeLabManager.BackupTool;
 
-namespace HomeLab.BackupTool;
+namespace HomeLabManager.BackupTool;
 
 public static class Program
 {

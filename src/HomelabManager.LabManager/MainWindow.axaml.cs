@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace Homelab.LabManager
+namespace Homelab.Manager
 {
     public partial class MainWindow : Window
     {
