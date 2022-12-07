@@ -4,57 +4,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:views="clr-namespace:HomeLabManager.Manager.Views"
         mc:Ignorable="d" 
         MinWidth="800" 
         MinHeight="600"
-        x:Class="Homelab.Manager.MainWindow"
-        Title="Homelab.LabManager">
-  <DockPanel>
-    <materialControls:SnackbarHost HostName="Root">
-      <!--Navigation Drawer-->
-      <materialControls:NavigationDrawer Name="LeftDrawer"
-                                   LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch, Path=IsChecked, Mode=TwoWay}">
-        <materialControls:NavigationDrawer.LeftDrawerContent>
-          <StackPanel>
-            <ListBox Classes="NoScroll" Name="DrawerList" Focusable="{Binding ElementName=LeftDrawer, Path=LeftDrawerOpened}">
-              <ListBox.Styles>
-                <Style Selector="ListBoxItem">
-                  <Setter Property="Height" Value="48" />
-                  <Setter Property="Padding" Value="16,0" />
-                  <Setter Property="VerticalContentAlignment" Value="Center" />
-                  <Setter Property="IsEnabled" Value="{Binding $self.Content.IsEnabled}" />
-                </Style>
-              </ListBox.Styles>
-              <TextBlock Classes="Body2" Text="Home" />
-              <TextBlock Classes="Body2" Text="Containers" />
-              <TextBlock Classes="Body2" Text="Images" />
-              <TextBlock Classes="Body2" Text="Volumes" />
-              <TextBlock Classes="Body2" Text="Tools" />
-            </ListBox>
-          </StackPanel>
-        </materialControls:NavigationDrawer.LeftDrawerContent>
-
-        <!--Main Application Content-->
-        <materialControls:ColorZone Name="PART_AppBarContainer" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                  DockPanel.Dock="Top"
-                                  Height="56" Mode="PrimaryMid" ZIndex="1">
-          <Grid Margin="16">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="24" />
-              <ColumnDefinition Width="32" />
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition Width="32" />
-              <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <ToggleButton Name="NavDrawerSwitch"
-                          Foreground="{DynamicResource MaterialDesignBody}"
-                          Width="32" Height="32" Padding="4">
-              <materialIcons:MaterialIcon Kind="Menu" Width="24" Height="24" />
-            </ToggleButton>
-            <TextBlock Grid.Column="2" Classes="Headline6" Text="Selected View Mode" VerticalAlignment="Center" />
-          </Grid>
-        </materialControls:ColorZone>
-      </materialControls:NavigationDrawer>
-    </materialControls:SnackbarHost>
-  </DockPanel>
+        x:Class="HomeLabManager.Manager.MainWindow"
+        Title="Lab Manager">
+  <Carousel Margin="24" Name="ContentHost">
+    <views:HomeView/>
+  </Carousel>
 </Window>
