@@ -38,13 +38,13 @@ public sealed class CoreConfigurationManagerTests
         manager.DisableConfigurationCaching = true;
         var coreConfig = manager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
         {
-            HostDataPath = _testGitDirectory,
+            HomeLabRepoDataPath = _testGitDirectory,
             GitConfigFilePath = _testGitConfigFilePath,
             GithubUserName = "owen",
             GithubPat = "pat"
         });
 
-        Assert.That(coreConfig.HostDataPath, Is.EqualTo(_testGitDirectory));
+        Assert.That(coreConfig.HomeLabRepoDataPath, Is.EqualTo(_testGitDirectory));
         Assert.That(coreConfig.GitConfigFilePath, Is.EqualTo(_testGitConfigFilePath));
         Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
         Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));
@@ -57,14 +57,14 @@ public sealed class CoreConfigurationManagerTests
         manager.DisableConfigurationCaching = true;
         manager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
         {
-            HostDataPath = _testGitDirectory,
+            HomeLabRepoDataPath = _testGitDirectory,
             GitConfigFilePath = _testGitConfigFilePath,
             GithubUserName = "owen",
             GithubPat = "pat"
         });
         var coreConfig = manager.GetCoreConfiguration();
 
-        Assert.That(coreConfig.HostDataPath, Is.EqualTo(_testGitDirectory));
+        Assert.That(coreConfig.HomeLabRepoDataPath, Is.EqualTo(_testGitDirectory));
         Assert.That(coreConfig.GitConfigFilePath, Is.EqualTo(_testGitConfigFilePath));
         Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
         Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));
@@ -77,7 +77,7 @@ public sealed class CoreConfigurationManagerTests
         manager.DisableConfigurationCaching = true;
         var coreConfig = manager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
         {
-            HostDataPath = _testGitDirectory,
+            HomeLabRepoDataPath = _testGitDirectory,
             GitConfigFilePath = _testGitConfigFilePath,
             GithubUserName = "owen",
             GithubPat = "pat"
@@ -88,7 +88,7 @@ public sealed class CoreConfigurationManagerTests
 
         var newConfig = manager.GetCoreConfiguration();
 
-        Assert.That(newConfig.HostDataPath, Is.EqualTo(_testGitDirectory));
+        Assert.That(newConfig.HomeLabRepoDataPath, Is.EqualTo(_testGitDirectory));
         Assert.That(newConfig.GitConfigFilePath, Is.EqualTo(_testGitConfigFilePath));
         Assert.That(newConfig.GithubUserName, Is.EqualTo(coreConfig.GithubUserName));
         Assert.That(newConfig.GithubPat, Is.EqualTo("pat"));
@@ -100,7 +100,7 @@ public sealed class CoreConfigurationManagerTests
         var manager = new CoreConfigurationManager(_testDirectory);
         manager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
         {
-            HostDataPath = _testGitDirectory,
+            HomeLabRepoDataPath = _testGitDirectory,
             GitConfigFilePath = _testGitConfigFilePath,
             GithubUserName = "owen",
             GithubPat = "pat"
@@ -110,7 +110,7 @@ public sealed class CoreConfigurationManagerTests
 
         var coreConfig = manager.GetCoreConfiguration();
 
-        Assert.That(coreConfig.HostDataPath, Is.EqualTo(_testGitDirectory));
+        Assert.That(coreConfig.HomeLabRepoDataPath, Is.EqualTo(_testGitDirectory));
         Assert.That(coreConfig.GitConfigFilePath, Is.EqualTo(_testGitConfigFilePath));
         Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
         Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));

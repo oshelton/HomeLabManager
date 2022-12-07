@@ -114,8 +114,8 @@ public class CoreConfigurationManager
     {
         if (config is null)
             throw new ArgumentNullException(nameof(config));
-        if (!Directory.Exists(config.HostDataPath))
-            throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.HostDataPath)} must be a directory that exsts.");
+        if (!Directory.Exists(config.HomeLabRepoDataPath))
+            throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.HomeLabRepoDataPath)} must be a directory that exsts.");
         if (!File.Exists(config.GitConfigFilePath))
             throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.GitConfigFilePath)} must be a file that exsts.");
         if (string.IsNullOrEmpty(config.GithubUserName))
