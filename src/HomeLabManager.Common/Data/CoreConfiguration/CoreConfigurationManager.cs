@@ -46,17 +46,14 @@ public class CoreConfigurationManager
             if (!DisableConfigurationCaching)
                 _cachedCoreConfiguration = defaultConfiguration;
 
-            var serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
+            var serializer = Utils.CreateBasicYamlSerializer();
+
             File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
             return defaultConfiguration;
         }
         else
         {
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build();
+            var deserializer = Utils.CreateBasicYamlDeserializer();
 
             var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
             _cachedCoreConfiguration = readConfiguration;
@@ -73,9 +70,8 @@ public class CoreConfigurationManager
         if (_cachedCoreConfiguration is not null && !DisableConfigurationCaching)
             return _cachedCoreConfiguration;
 
-        var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
+        var deserializer = Utils.CreateBasicYamlDeserializer();
+
         var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
         _cachedCoreConfiguration = readConfiguration;
         return readConfiguration;
@@ -90,9 +86,7 @@ public class CoreConfigurationManager
         if (!DisableConfigurationCaching)
             _cachedCoreConfiguration = updatedConfiguration;
 
-        var serializer = new SerializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
+        var serializer = Utils.CreateBasicYamlSerializer();
         File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
     }
 
