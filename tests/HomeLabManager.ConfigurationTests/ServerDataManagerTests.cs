@@ -11,7 +11,7 @@ using YamlDotNet.Serialization;
 
 namespace HomeLabManager.DataTests;
 
-public sealed class GitDataManagerTests
+public sealed class ServerDataManagerTests
 {
     [SetUp]
     public void SetUp() 
@@ -23,8 +23,9 @@ public sealed class GitDataManagerTests
         var serializer = Common.Data.Utils.CreateBasicYamlSerializer();
         foreach (var metadata in _metadataDtos)
         {
-            Directory.CreateDirectory(Path.Combine(Utils.TestGitDirectory, GitDataManager.ServersDirectoryName, metadata.Name!));
-            File.WriteAllText(Path.Combine(Utils.TestGitDirectory, GitDataManager.ServersDirectoryName, metadata.Name!, GitDataManager.ServerMetadataFileName), serializer.Serialize(metadata));
+            var directoryName = Guid.NewGuid().ToString("D")!;
+            Directory.CreateDirectory(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, directoryName));
+            File.WriteAllText(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, directoryName, ServerDataManager.ServerMetadataFileName), serializer.Serialize(metadata));
         }
 
         File.WriteAllText(Utils.TestGitConfigFilePath, @"[user]\n\tname = Owen Shelton\n\temail = jowenshelton@gmail.com");
@@ -43,16 +44,15 @@ public sealed class GitDataManagerTests
     [Test]
     public void GetServerMetadata()
     {
-        var gitManager = new GitDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
 
-        var servers = gitManager.GetServers();
+        var servers = serverManager.GetServers();
 
         Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length));
 
-        for (int i = 0; i < servers.Count; i++)
+        foreach (var retrievedServer in servers)
         {
-            var testMetadata = _metadataDtos[i];
-            var retrievedServer = servers[i];
+            var testMetadata = _metadataDtos.First(x => x.Name == retrievedServer.Metadata?.Name);
              
             Assert.That(retrievedServer.Metadata?.DisplayName, Is.EqualTo(testMetadata.DisplayName));
             Assert.That(retrievedServer.Metadata?.Name, Is.EqualTo(testMetadata.Name));
@@ -82,14 +82,15 @@ public sealed class GitDataManagerTests
             Configuration = null, //TODO: FIll in when server configuration support is added.
         };
 
-        var gitManager = new GitDataManager(Utils.CreateCoreConfigurationManager(false).manager);
-        gitManager.AddNewServer(testNewServer);
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+        serverManager.AddNewServer(testNewServer);
+        Assert.That(testNewServer.UniqueId, Is.Not.Null);
 
-        var servers = gitManager.GetServers();
+        var servers = serverManager.GetServers();
 
         Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length + 1));
 
-        var newlyAddedServer = servers.FirstOrDefault(x => x.Metadata?.Name == testNewServer.Metadata.Name);
+        var newlyAddedServer = servers.FirstOrDefault(x => x.UniqueId == testNewServer.UniqueId);
         Assert.That(newlyAddedServer, Is.Not.Null);
 
         Assert.That(newlyAddedServer.Metadata?.DisplayName, Is.EqualTo(testNewServer.Metadata?.DisplayName));
@@ -100,6 +101,50 @@ public sealed class GitDataManagerTests
 
         //TODO: Fill in when docker compose support is added.
         //TODO: FIll in when server configuration support is added.
+    }
+
+    [Test]
+    public void UpdateExistingServer()
+    {
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+
+        var servers = serverManager.GetServers();
+
+        var toUpdate = servers[0];
+        toUpdate = toUpdate with 
+        { 
+            Metadata = toUpdate.Metadata! with { Name = "Updated Server Name" }
+        };
+
+        serverManager.UpdateServer(toUpdate);
+
+        servers = serverManager.GetServers();
+
+        var matchingServer = servers.First(x => x.UniqueId == toUpdate.UniqueId);
+
+        Assert.That(matchingServer.Metadata!.Name, Is.EqualTo(toUpdate.Metadata.Name));
+
+        //TODO: Fill in when docker compose support is added.
+        //TODO: FIll in when server configuration support is added.
+    }
+
+    [Test]
+    public void DeleteServer()
+    {
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+
+        var servers = serverManager.GetServers();
+
+        Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length));
+
+        var toDelete = servers[0];
+
+        serverManager.DeleteServer(toDelete);
+
+        servers = serverManager.GetServers();
+
+        Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length - 1));
+        Assert.That(servers.All(x => x.UniqueId != toDelete.UniqueId), Is.True);
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ namespace HomeLabManager.Common.Data.Git;
 /// <summary>
 /// Class for accessing and updating the data stored in a Home Lab Git Repo.
 /// </summary>
-public sealed class GitDataManager
+public sealed class ServerDataManager
 {
     /// <summary>
     /// Name of the directory that server information lives in.
@@ -39,7 +39,7 @@ public sealed class GitDataManager
     /// <summary>
     /// Construct a new GitDataManager with the core configuration manager to use.
     /// </summary>
-    public GitDataManager(CoreConfigurationManager coreConfigurationManager)
+    public ServerDataManager(CoreConfigurationManager coreConfigurationManager)
     {
         if (coreConfigurationManager is null)
             throw new ArgumentNullException(nameof(coreConfigurationManager));
@@ -76,6 +76,7 @@ public sealed class GitDataManager
 
             foundServerDtos.Add(new ServerDto()
             {
+                UniqueId = Guid.Parse(Path.GetFileName(serverDirectory)!),
                 Metadata = metadata,
                 DockerCompose = docker,
                 Configuration = configuration
@@ -93,28 +94,90 @@ public sealed class GitDataManager
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
-        if (server?.Metadata is null)
+        if (server.Metadata is null)
             throw new InvalidDataException("Server must at least have metadata assigned to it.");
-        if (server?.Metadata.Name is null)
-            throw new InvalidDataException("Server to be added must have a name.");
+        if (server.UniqueId is not null)
+            throw new InvalidDataException("This server already has an Id and should be updated, not added.");
 
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
         if (Directory.GetDirectories(serversDirectory).Any(x => Path.GetDirectoryName(x) == server.Metadata?.Name))
             throw new InvalidDataException("A server already exists with this name; try another.");
 
-        var newServerDirectory = Path.Combine(serversDirectory, server.Metadata?.Name!);
+        server.UniqueId = Guid.NewGuid();
+
+        var newServerDirectory = Path.Combine(serversDirectory, server.UniqueIdToDirectoryName()!);
         Directory.CreateDirectory(newServerDirectory);
+
+        WriteServerDtoToFile(server, newServerDirectory);
+    }
+
+    /// <summary>
+    /// Add a new server to the repo.
+    /// </summary>
+    public void UpdateServer(ServerDto server)
+    {
+        if (server is null)
+            throw new ArgumentNullException(nameof(server));
+
+        if (server.Metadata is null)
+            throw new InvalidDataException("Server must at least have metadata assigned to it.");
+        if (server.Metadata?.Name is null)
+            throw new InvalidDataException("Server to be added must have a name.");
+        if (server.UniqueId is null)
+            throw new InvalidDataException("This server doess not have an Id and should be added, not updated.");
+
+        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName()!);
+
+        if (!Directory.Exists(serverDirectory))
+            Directory.CreateDirectory(serverDirectory);
+
+        WriteServerDtoToFile(server, serverDirectory);
+    }
+
+    /// <summary>
+    /// Delete the passed in server.
+    /// </summary>
+    public void DeleteServer(ServerDto server)
+    {
+        if (server is null)
+            throw new ArgumentNullException(nameof(server));
+
+        if (server.UniqueId is null)
+            throw new InvalidDataException("This server doess not have an Id and should be added, not updated.");
+
+        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName()!);
+
+        if (!Directory.Exists(serverDirectory))
+            throw new InvalidOperationException("The directory for this server does not exist and cannot be deleted.");
+
+        Directory.Delete(serverDirectory, true);
+    }
+
+    /// <summary>
+    /// Write the passed in server dto to the passed in directory.
+    /// </summary>
+    private static void WriteServerDtoToFile(ServerDto server, string serverDirectoryPath)
+    {
+        if (server is null)
+            throw new ArgumentNullException(nameof(server));
+        if (serverDirectoryPath is null)
+            throw new ArgumentNullException(nameof(serverDirectoryPath));
+
+        if (!Directory.Exists(serverDirectoryPath))
+            throw new InvalidDataException($"{serverDirectoryPath} must refer to an existing directory in the filesystem.");
 
         var serializer = Utils.CreateBasicYamlSerializer();
 
-        File.WriteAllText(Path.Combine(newServerDirectory, ServerMetadataFileName), serializer.Serialize(server.Metadata!));
+        File.WriteAllText(Path.Combine(serverDirectoryPath, ServerMetadataFileName), serializer.Serialize(server.Metadata!));
 
         if (server.DockerCompose is not null)
-            File.WriteAllText(Path.Combine(newServerDirectory, ServerDockerFileName), serializer.Serialize(server.DockerCompose!));
+            File.WriteAllText(Path.Combine(serverDirectoryPath, ServerDockerFileName), serializer.Serialize(server.DockerCompose!));
 
         if (server.Configuration is not null)
-            File.WriteAllText(Path.Combine(newServerDirectory, ServerDockerFileName), serializer.Serialize(server.Configuration!));
+            File.WriteAllText(Path.Combine(serverDirectoryPath, ServerDockerFileName), serializer.Serialize(server.Configuration!));
     }
 
     private readonly CoreConfigurationManager _coreConfigurationManager;

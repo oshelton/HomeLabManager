@@ -21,6 +21,11 @@ public enum ServerKind
 public sealed record ServerDto
 {
     /// <summary>
+    /// Unique id of this server, is the name of the directory the server lives in.
+    /// </summary>
+    public Guid? UniqueId { get; internal set; }
+
+    /// <summary>
     /// Metadata for this server.
     /// </summary>
     public ServerMetadataDto? Metadata { get; init; }
@@ -32,6 +37,12 @@ public sealed record ServerDto
     /// Server configuration details of the server.
     /// </summary>
     public ServerConfigurationDto? Configuration { get; init; }
+
+    /// <summary>
+    /// Convert the Server's unique ID to a string capable of being used as a directory name.
+    /// </summary>
+    /// <returns>A directory safe string or null if the server has no unique ID.</returns>
+    public string? UniqueIdToDirectoryName() => UniqueId?.ToString("D");
 }
 
 /// <summary>
