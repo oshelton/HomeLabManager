@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:pages="using:HomeLabManager.Manager.Pages"
+             >
+  <Design.PreviewWith>
+    <ContentControl Width="800" Height="600" ContentTemplate="{DynamicResource HomePageTemplate}">
+      <ContentControl.Content>
+        <pages:HomeViewModel />
+      </ContentControl.Content>
+    </ContentControl>
+  </Design.PreviewWith>
+
+  <DataTemplate x:Key="HomePageTemplate" DataType="{x:Type pages:HomeViewModel}">
+    <DockPanel>
+      <UniformGrid 
+        DockPanel.Dock="Bottom" 
+        HorizontalAlignment="Center" 
+        Columns="4">
+        <materialControls:FloatingButton
+          Margin="0, 0, 6, 0"
+          IsExtended="True"
+          Classes="Outline">
+          <StackPanel Orientation="Horizontal">
+            <materialIcons:MaterialIcon Classes="ButtonIcon" Kind="Web" />
+
+            <TextBlock Classes="Headline6">Servers</TextBlock>
+          </StackPanel>
+        </materialControls:FloatingButton>
+
+        <materialControls:FloatingButton 
+          Margin="6, 0, 6, 0"
+          IsExtended="True">
+          <StackPanel Orientation="Horizontal">
+            <materialIcons:MaterialIcon Classes="ButtonIcon" Kind="Console" />
+
+            <TextBlock Classes="Headline6">Commands</TextBlock>
+          </StackPanel>
+        </materialControls:FloatingButton>
+
+        <materialControls:FloatingButton 
+          Margin="6, 0, 0, 0"
+          IsExtended="True">
+          <StackPanel Orientation="Horizontal">
+            <materialIcons:MaterialIcon Classes="ButtonIcon" Kind="Toolbox" />
+
+            <TextBlock Classes="Headline6">Tools</TextBlock>
+          </StackPanel>
+        </materialControls:FloatingButton>
+
+        <materialControls:FloatingButton
+          Margin="6, 0, 0, 0"
+          IsExtended="True">
+          <StackPanel Orientation="Horizontal">
+            <materialIcons:MaterialIcon Classes="ButtonIcon" Kind="CogOutline" />
+
+            <TextBlock Classes="Headline6">Settings</TextBlock>
+          </StackPanel>
+        </materialControls:FloatingButton>
+      </UniformGrid>
+
+      <TextBlock DockPanel.Dock="Top">At a glance list.</TextBlock>
+    </DockPanel>
+  </DataTemplate>
+</ResourceDictionary>

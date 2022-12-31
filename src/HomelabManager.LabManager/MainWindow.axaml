@@ -4,13 +4,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-        xmlns:views="clr-namespace:HomeLabManager.Manager.Views"
+        xmlns:local="using:HomeLabManager.Manager"
+        xmlns:pages="using:HomeLabManager.Manager.Pages"
         mc:Ignorable="d" 
         MinWidth="800" 
         MinHeight="600"
         x:Class="HomeLabManager.Manager.MainWindow"
-        Title="Lab Manager">
-  <Carousel Margin="24" Name="ContentHost">
-    <views:HomeView/>
-  </Carousel>
+        Title="Home Lab Manager">
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source='/Pages/Home.axaml'/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+
+  <Window.DataContext>
+    <local:MainWindowViewModel />
+  </Window.DataContext>
+
+  <DockPanel Margin="24">
+    <DockPanel DockPanel.Dock="Top">
+      <materialControls:FloatingButton Name="BackButton" 
+        Margin="0, 0, 8, 0"
+        Classes="Mini"
+        IsEnabled="{Binding CanNavigateBack}"
+        ToolTip.Tip="Navigate to the previous page.">
+        <materialIcons:MaterialIcon Classes="ButtonIcon" Kind="NavigateBefore" />
+      </materialControls:FloatingButton>
+
+      <TextBlock Classes="Headline4" Text="{Binding CurrentPage.Title}" />
+    </DockPanel>
+
+    <Carousel
+      Name="ContentHost"
+      Margin="0, 24, 0, 0"
+      DockPanel.Dock="Bottom"
+      Items="{Binding Pages}" 
+      SelectedItem="{Binding CurrentPage}">
+      <Carousel.DataTemplates>
+        <StaticResource ResourceKey="HomePageTemplate" />
+      </Carousel.DataTemplates>
+    </Carousel>
+  </DockPanel>
 </Window>
