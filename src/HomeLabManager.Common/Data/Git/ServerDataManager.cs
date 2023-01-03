@@ -12,7 +12,7 @@ namespace HomeLabManager.Common.Data.Git;
 /// <summary>
 /// Class for accessing and updating the data stored in a Home Lab Git Repo.
 /// </summary>
-public sealed class ServerDataManager
+public sealed class ServerDataManager : IServerDataManager
 {
     /// <summary>
     /// Name of the directory that server information lives in.
