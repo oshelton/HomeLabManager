@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
+
+[assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
 namespace HomeLabManager.Common.Data.Git;
 
@@ -14,28 +10,6 @@ namespace HomeLabManager.Common.Data.Git;
 /// </summary>
 public sealed class ServerDataManager : IServerDataManager
 {
-    /// <summary>
-    /// Name of the directory that server information lives in.
-    /// </summary>
-    /// /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
-    public const string ServersDirectoryName = "servers";
-
-    /// <summary>
-    /// File name of the server metadata file.
-    /// </summary>
-    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
-    public const string ServerMetadataFileName = "metadata.yaml";
-    /// <summary>
-    /// File name of the server docker compose file.
-    /// </summary>
-    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
-    public const string ServerDockerFileName = "docker.yaml";
-    /// <summary>
-    /// File name of the server configuration file.
-    /// </summary>
-    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
-    public const string ServerConfigurationFileName = "config.yaml";
-
     /// <summary>
     /// Construct a new GitDataManager with the core configuration manager to use.
     /// </summary>
@@ -63,8 +37,8 @@ public sealed class ServerDataManager : IServerDataManager
             var configurationPath = Path.Combine(serverDirectory, ServerConfigurationFileName);
 
             ServerMetadataDto metadata = File.Exists(metadataPath)
-                ? deserializer.Deserialize<ServerMetadataDto>(File.ReadAllText(metadataPath))
-                : new ServerMetadataDto() { Name = Path.GetDirectoryName(serverDirectory) };
+                ? deserializer.Deserialize<ServerMetadataDto>(File.ReadAllText(metadataPath)) with { FileName = metadataPath }
+                : new ServerMetadataDto() { Name = Path.GetDirectoryName(serverDirectory), FileName = metadataPath };
 
             DockerComposeDto? docker = File.Exists(dockerPath)
                 ? deserializer.Deserialize<DockerComposeDto>(File.ReadAllText(dockerPath))
@@ -76,6 +50,7 @@ public sealed class ServerDataManager : IServerDataManager
 
             foundServerDtos.Add(new ServerDto()
             {
+                Directory = serverDirectory,
                 UniqueId = Guid.Parse(Path.GetFileName(serverDirectory)!),
                 Metadata = metadata,
                 DockerCompose = docker,
@@ -155,6 +130,28 @@ public sealed class ServerDataManager : IServerDataManager
 
         Directory.Delete(serverDirectory, true);
     }
+
+    /// <summary>
+    /// Name of the directory that server information lives in.
+    /// </summary>
+    /// /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
+    internal const string ServersDirectoryName = "servers";
+
+    /// <summary>
+    /// File name of the server metadata file.
+    /// </summary>
+    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
+    internal const string ServerMetadataFileName = "metadata.yaml";
+    /// <summary>
+    /// File name of the server docker compose file.
+    /// </summary>
+    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
+    internal const string ServerDockerFileName = "docker.yaml";
+    /// <summary>
+    /// File name of the server configuration file.
+    /// </summary>
+    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
+    internal const string ServerConfigurationFileName = "config.yaml";
 
     /// <summary>
     /// Write the passed in server dto to the passed in directory.

@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Data.Git;
-using LibGit2Sharp;
-using YamlDotNet.Serialization;
+﻿using HomeLabManager.Common.Data.Git;
 
 namespace HomeLabManager.DataTests;
 
@@ -21,11 +12,11 @@ public sealed class ServerDataManagerTests
         Directory.CreateDirectory(Utils.TestGitDirectory);
 
         var serializer = Common.Data.Utils.CreateBasicYamlSerializer();
-        foreach (var metadata in _metadataDtos)
+        foreach (var server in _servers)
         {
-            var directoryName = Guid.NewGuid().ToString("D")!;
+            var directoryName = server.UniqueId?.ToString("D")!;
             Directory.CreateDirectory(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, directoryName));
-            File.WriteAllText(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, directoryName, ServerDataManager.ServerMetadataFileName), serializer.Serialize(metadata));
+            File.WriteAllText(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, directoryName, ServerDataManager.ServerMetadataFileName), serializer.Serialize(server.Metadata!));
         }
 
         File.WriteAllText(Utils.TestGitConfigFilePath, @"[user]\n\tname = Owen Shelton\n\temail = jowenshelton@gmail.com");
@@ -48,17 +39,19 @@ public sealed class ServerDataManagerTests
 
         var servers = serverManager.GetServers();
 
-        Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length));
+        Assert.That(servers.Count, Is.EqualTo(_servers.Length));
 
         foreach (var retrievedServer in servers)
         {
-            var testMetadata = _metadataDtos.First(x => x.Name == retrievedServer.Metadata?.Name);
-             
-            Assert.That(retrievedServer.Metadata?.DisplayName, Is.EqualTo(testMetadata.DisplayName));
-            Assert.That(retrievedServer.Metadata?.Name, Is.EqualTo(testMetadata.Name));
-            Assert.That(retrievedServer.Metadata?.IPAddress, Is.EqualTo(testMetadata.IPAddress));
-            Assert.That(retrievedServer.Metadata?.Description, Is.EqualTo(testMetadata.Description));
-            Assert.That(retrievedServer.Metadata?.Kind, Is.EqualTo(testMetadata.Kind));
+            var testServer = _servers.First(x => x.UniqueId == retrievedServer.UniqueId);
+
+            Assert.That(retrievedServer.Directory, Is.EqualTo(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, testServer.UniqueId!.ToString()!)));
+            Assert.That(retrievedServer.Metadata?.FileName, Is.EqualTo(Path.Combine(Utils.TestGitDirectory, ServerDataManager.ServersDirectoryName, testServer.UniqueId!.ToString()!, ServerDataManager.ServerMetadataFileName)));
+            Assert.That(retrievedServer.Metadata?.DisplayName, Is.EqualTo(testServer.Metadata?.DisplayName));
+            Assert.That(retrievedServer.Metadata?.Name, Is.EqualTo(testServer.Metadata?.Name));
+            Assert.That(retrievedServer.Metadata?.IPAddress, Is.EqualTo(testServer.Metadata?.IPAddress));
+            Assert.That(retrievedServer.Metadata?.Description, Is.EqualTo(testServer.Metadata?.Description));
+            Assert.That(retrievedServer.Metadata?.Kind, Is.EqualTo(testServer.Metadata?.Kind));
         }
     }
 
@@ -88,7 +81,7 @@ public sealed class ServerDataManagerTests
 
         var servers = serverManager.GetServers();
 
-        Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length + 1));
+        Assert.That(servers.Count, Is.EqualTo(_servers.Length + 1));
 
         var newlyAddedServer = servers.FirstOrDefault(x => x.UniqueId == testNewServer.UniqueId);
         Assert.That(newlyAddedServer, Is.Not.Null);
@@ -135,7 +128,7 @@ public sealed class ServerDataManagerTests
 
         var servers = serverManager.GetServers();
 
-        Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length));
+        Assert.That(servers.Count, Is.EqualTo(_servers.Length));
 
         var toDelete = servers[0];
 
@@ -143,38 +136,50 @@ public sealed class ServerDataManagerTests
 
         servers = serverManager.GetServers();
 
-        Assert.That(servers.Count, Is.EqualTo(_metadataDtos.Length - 1));
+        Assert.That(servers.Count, Is.EqualTo(_servers.Length - 1));
         Assert.That(servers.All(x => x.UniqueId != toDelete.UniqueId), Is.True);
     }
 
     /// <summary>
-    /// Testing server metadata.
+    /// Testing server dtos.
     /// </summary>
-    private static readonly ServerMetadataDto[] _metadataDtos = new[]
+    private static readonly ServerDto[] _servers = new[]
     {
-        new ServerMetadataDto()
+        new ServerDto()
         {
-            DisplayName = "server 1",
-            Name = "server1",
-            IPAddress = "192.168.1.1",
-            Description = "Server 1 Description",
-            Kind = ServerKind.WindowsWSL,
+            UniqueId = Guid.NewGuid(),
+            Metadata = new ServerMetadataDto()
+            {
+                DisplayName = "server 1",
+                Name = "server1",
+                IPAddress = "192.168.1.1",
+                Description = "Server 1 Description",
+                Kind = ServerKind.WindowsWSL,
+            },
         },
-        new ServerMetadataDto()
+        new ServerDto()
         {
-            DisplayName = "server 2",
-            Name = "server2",
-            IPAddress = "192.168.1.2",
-            Description = "Server 2 Description",   
-            Kind = ServerKind.Ubuntu,
+            UniqueId = Guid.NewGuid(),
+            Metadata = new ServerMetadataDto()
+            {
+                DisplayName = "server 2",
+                Name = "server2",
+                IPAddress = "192.168.1.2",
+                Description = "Server 2 Description",
+                Kind = ServerKind.Ubuntu,
+            },
         },
-        new ServerMetadataDto()
+        new ServerDto()
         {
-            DisplayName = "server 3",
-            Name = "server3",
-            IPAddress = "192.168.1.3",
-            Description = "Server 3 Description",
-            Kind = ServerKind.WindowsWSL,
+            UniqueId = Guid.NewGuid(),
+            Metadata = new ServerMetadataDto()
+            {
+                DisplayName = "server 3",
+                Name = "server3",
+                IPAddress = "192.168.1.3",
+                Description = "Server 3 Description",
+                Kind = ServerKind.WindowsWSL,
+            },
         },
     };
 }

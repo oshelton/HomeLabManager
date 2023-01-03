@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HomeLabManager.Common.Data.CoreConfiguration;
+﻿namespace HomeLabManager.Common.Data.CoreConfiguration;
 
 /// <summary>
 /// Simple DTO for the core application configuration.

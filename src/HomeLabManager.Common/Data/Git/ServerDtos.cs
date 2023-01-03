@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
+using YamlDotNet.Serialization;
+
+[assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
 namespace HomeLabManager.Common.Data.Git;
 
@@ -20,6 +19,11 @@ public enum ServerKind
 /// </summary>
 public sealed record ServerDto
 {
+    /// <summary>
+    /// Name of the directory the server dto came from.
+    /// </summary>
+    public string? Directory { get; init; }
+
     /// <summary>
     /// Unique id of this server, is the name of the directory the server lives in.
     /// </summary>
@@ -50,6 +54,12 @@ public sealed record ServerDto
 /// </summary>
 public sealed record ServerMetadataDto
 {
+    /// <summary>
+    /// Path to the file the metadata came from.
+    /// </summary>
+    [YamlIgnore]
+    public string? FileName { get; init; }
+
     /// <summary>
     /// Display name to use with the server.
     /// </summary>
