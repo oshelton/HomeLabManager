@@ -1,4 +1,6 @@
-﻿using HomeLabManager.Manager.Pages;
+﻿using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Manager.Pages;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
 namespace HomeLabManager.Manager
@@ -7,19 +9,36 @@ namespace HomeLabManager.Manager
     {
         public MainWindowViewModel()
         {
-            m_currentPage = Pages[0];
+            Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
+            {
+                GitConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gitconfig"),
+                GithubPat = "",
+                GithubUserName = "",
+                HomeLabRepoDataPath = "",
+            });
+
+            _currentPage = Pages[0];
+            _currentPage.Activate();
         }
 
         public bool CanNavigateBack
         {
-            get => m_canNavigateBack;
-            set => this.RaiseAndSetIfChanged(ref m_canNavigateBack, value);
+            get => _canNavigateBack;
+            set => this.RaiseAndSetIfChanged(ref _canNavigateBack, value);
         }
 
-        public PageBaseViewModel CurrentPage
+        public PageBaseViewModel? CurrentPage
         {
-            get => m_currentPage;
-            set => this.RaiseAndSetIfChanged(ref m_currentPage, value);
+            get => _currentPage;
+            set
+            {
+                if (value != _currentPage)
+                {
+                    _currentPage?.TryDeactivate();
+                    this.RaiseAndSetIfChanged(ref _currentPage, value);
+                    _currentPage?.Activate();
+                }
+            }
         }
 
         public IReadOnlyList<PageBaseViewModel> Pages { get; } = new[]
@@ -27,7 +46,7 @@ namespace HomeLabManager.Manager
             new HomeViewModel()
         };
 
-        private PageBaseViewModel m_currentPage;
-        private bool m_canNavigateBack;
+        private PageBaseViewModel? _currentPage;
+        private bool _canNavigateBack;
     }
 }

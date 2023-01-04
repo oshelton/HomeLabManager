@@ -23,13 +23,19 @@
     <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4" />
-    <PackageReference Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2.124-nightly" />
+    <PackageReference Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2.137-nightly" />
     <PackageReference Include="Material.Icons.Avalonia" Version="1.2.0" />
-    <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Motor.Extensions.Hosting.Abstractions" Version="0.10.5" />
+    <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview4" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Styles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HomeLabManager.Common\HomeLabManager.Common.csproj" />
   </ItemGroup>
 </Project>

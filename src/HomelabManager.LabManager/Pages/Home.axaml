@@ -62,7 +62,19 @@
         </materialControls:FloatingButton>
       </UniformGrid>
 
-      <TextBlock DockPanel.Dock="Top">At a glance list.</TextBlock>
+      <ItemsRepeater Margin="12" Items="{Binding Servers}">
+        <ItemsRepeater.Layout>
+          <WrapLayout Orientation="Horizontal" HorizontalSpacing="8" VerticalSpacing="8"/>
+        </ItemsRepeater.Layout>
+
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <materialControls:Card>
+              <TextBlock Text="{Binding Name}"/>
+            </materialControls:Card>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
     </DockPanel>
   </DataTemplate>
 </ResourceDictionary>
