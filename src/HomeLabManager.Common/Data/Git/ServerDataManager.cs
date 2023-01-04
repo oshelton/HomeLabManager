@@ -13,7 +13,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <summary>
     /// Construct a new GitDataManager with the core configuration manager to use.
     /// </summary>
-    public ServerDataManager(CoreConfigurationManager coreConfigurationManager)
+    public ServerDataManager(ICoreConfigurationManager coreConfigurationManager)
     {
         if (coreConfigurationManager is null)
             throw new ArgumentNullException(nameof(coreConfigurationManager));
@@ -26,6 +26,9 @@ public sealed class ServerDataManager : IServerDataManager
     /// </summary>
     public IReadOnlyList<ServerDto> GetServers()
     {
+        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+            return Array.Empty<ServerDto>();
+
         var deserializer = Utils.CreateBasicYamlDeserializer();
 
         var foundServerDtos = new List<ServerDto>();
@@ -66,6 +69,9 @@ public sealed class ServerDataManager : IServerDataManager
     /// </summary>
     public void AddNewServer(ServerDto server)
     {
+        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+            throw new InvalidOperationException("Server cannot be added if the repo data path directory does not exist.");
+
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
@@ -92,6 +98,9 @@ public sealed class ServerDataManager : IServerDataManager
     /// </summary>
     public void UpdateServer(ServerDto server)
     {
+        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+            throw new InvalidOperationException("Server cannot be updated if the repo data path directory does not exist.");
+
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
@@ -116,6 +125,9 @@ public sealed class ServerDataManager : IServerDataManager
     /// </summary>
     public void DeleteServer(ServerDto server)
     {
+        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+            throw new InvalidOperationException("Server cannot be deleted if the repo data path directory does not exist.");
+
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
@@ -177,5 +189,5 @@ public sealed class ServerDataManager : IServerDataManager
             File.WriteAllText(Path.Combine(serverDirectoryPath, ServerDockerFileName), serializer.Serialize(server.Configuration!));
     }
 
-    private readonly CoreConfigurationManager _coreConfigurationManager;
+    private readonly ICoreConfigurationManager _coreConfigurationManager;
 }

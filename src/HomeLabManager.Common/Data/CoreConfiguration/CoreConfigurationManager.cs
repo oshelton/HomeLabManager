@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
-
-namespace HomeLabManager.Common.Data.CoreConfiguration;
+﻿namespace HomeLabManager.Common.Data.CoreConfiguration;
 
 /// <summary>
 /// Class for managing the core configuration file related to this project.
@@ -42,7 +33,6 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (!File.Exists(CoreConfigPath))
         {
             var defaultConfiguration = defaultGenerator();
-            ValidateCoreConfig(defaultConfiguration);
             if (!DisableConfigurationCaching)
                 _cachedCoreConfiguration = defaultConfiguration;
 
@@ -82,7 +72,6 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// </summary>
     public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration)
     {
-        ValidateCoreConfig(updatedConfiguration);
         if (!DisableConfigurationCaching)
             _cachedCoreConfiguration = updatedConfiguration;
 
@@ -100,23 +89,6 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// </summary>
     /// <remarks>This assumes that the application</remarks>
     public bool DisableConfigurationCaching { get; set; }
-
-    /// <summary>
-    /// Validate the passed in core configuration dto.
-    /// </summary>
-    private static void ValidateCoreConfig(CoreConfigurationDto config)
-    {
-        if (config is null)
-            throw new ArgumentNullException(nameof(config));
-        if (!Directory.Exists(config.HomeLabRepoDataPath))
-            throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.HomeLabRepoDataPath)} must be a directory that exsts.");
-        if (!File.Exists(config.GitConfigFilePath))
-            throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.GitConfigFilePath)} must be a file that exsts.");
-        if (string.IsNullOrEmpty(config.GithubUserName))
-            throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.GithubUserName)} must be non-null.");
-        if (string.IsNullOrEmpty(config.GithubPat))
-            throw new InvalidDataException($"{nameof(CoreConfigurationDto)}.{nameof(config.GithubPat)} must be non-null.");
-    }
 
     private CoreConfigurationDto? _cachedCoreConfiguration;
 }
