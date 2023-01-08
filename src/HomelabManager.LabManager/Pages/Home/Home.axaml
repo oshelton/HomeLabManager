@@ -62,19 +62,49 @@
         </materialControls:FloatingButton>
       </UniformGrid>
 
-      <ItemsRepeater Margin="12" Items="{Binding Servers}">
-        <ItemsRepeater.Layout>
-          <WrapLayout Orientation="Horizontal" HorizontalSpacing="8" VerticalSpacing="8"/>
-        </ItemsRepeater.Layout>
+      <Grid>
+        <materialControls:Card
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          IsVisible="{Binding IsLoading}">
+          <StackPanel Margin="8">
+            <ProgressBar Classes="circular" IsIndeterminate="True" />
+            <TextBlock Margin="0,8,0,0">Loading Servers...</TextBlock>
+          </StackPanel>
+        </materialControls:Card>
 
-        <ItemsRepeater.ItemTemplate>
-          <DataTemplate>
-            <materialControls:Card>
-              <TextBlock Text="{Binding Name}"/>
-            </materialControls:Card>
-          </DataTemplate>
-        </ItemsRepeater.ItemTemplate>
-      </ItemsRepeater>
+        <Grid IsVisible="{Binding !IsLoading}">
+          <ItemsRepeater Margin="12" Items="{Binding Servers}">
+            <ItemsRepeater.Layout>
+              <WrapLayout Orientation="Horizontal" 
+                HorizontalSpacing="8" 
+                VerticalSpacing="8"/>
+            </ItemsRepeater.Layout>
+
+            <ItemsRepeater.ItemTemplate>
+              <DataTemplate>
+                <materialControls:Card MinWidth="250" MinHeight="150">
+                  <TextBlock Classes="Headline6"
+                    TextWrapping="Wrap" 
+                    MaxLines="2" 
+                    TextTrimming="CharacterEllipsis" 
+                    Text="{Binding Name}"/>
+                </materialControls:Card>
+              </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+          </ItemsRepeater>
+
+          <materialControls:Card HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsVisible="{Binding !HasAnyServers}">
+            <TextBlock Margin="8" TextAlignment="Center">
+              <Run Text="No Servers Exist."/>
+              <LineBreak />
+              <Run Text="Add one or more using the Servers button below."/>
+            </TextBlock>
+          </materialControls:Card>
+        </Grid>
+      </Grid>
     </DockPanel>
   </DataTemplate>
 </ResourceDictionary>
