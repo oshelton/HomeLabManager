@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using HomeLabManager.Common.Data.Git;
 using ReactiveUI;
 
-namespace HomeLabManager.Manager.Pages.HomeComponents;
+namespace HomeLabManager.Manager.Pages.Home;
 
 public sealed class ServerViewModel: ReactiveObject
 {

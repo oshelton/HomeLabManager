@@ -5,15 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using HomeLabManager.Common.Data.Git;
-using HomeLabManager.Manager.Pages.HomeComponents;
+using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
-namespace HomeLabManager.Manager.Pages
+namespace HomeLabManager.Manager.Pages.Home
 {
-    public sealed class HomeViewModel : PageBaseViewModel
+    /// <summary>
+    /// Home Page View Model.
+    /// </summary>
+    public sealed class HomeViewModel: PageBaseViewModel
     {
-        public HomeViewModel() 
+        public HomeViewModel()
         {
             _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>()!;
 
@@ -23,8 +26,11 @@ namespace HomeLabManager.Manager.Pages
 
         public override string Title => "Home";
 
-        public override async void Activate() 
+        public override async void NavigateTo(INavigationRequest request)
         {
+            if (request is not HomeNavigationRequest)
+                throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
+
             IsLoading = true;
 
             IReadOnlyList<ServerViewModel>? servers = null;
@@ -40,7 +46,7 @@ namespace HomeLabManager.Manager.Pages
             }, DispatcherPriority.Input);
         }
 
-        public override bool TryDeactivate() => true;
+        public override Task<bool> TryNavigateAway() => Task.FromResult(true);
 
         public bool IsLoading
         {

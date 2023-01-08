@@ -1,52 +1,41 @@
 ﻿using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Manager.Pages;
+using HomeLabManager.Manager.Services.Navigation;
+using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
-namespace HomeLabManager.Manager
+namespace HomeLabManager.Manager;
+
+/// <summary>
+/// View Model for the Main Window.
+/// </summary>
+public sealed class MainWindowViewModel: ReactiveObject
 {
-    public sealed class MainWindowViewModel : ReactiveObject
+    public MainWindowViewModel()
     {
-        public MainWindowViewModel()
+        Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
         {
-            Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
-            {
-                GitConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gitconfig"),
-                GithubPat = "",
-                GithubUserName = "",
-                HomeLabRepoDataPath = "",
-            });
+            GitConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gitconfig"),
+            GithubPat = "",
+            GithubUserName = "",
+            HomeLabRepoDataPath = "",
+        });
 
-            _currentPage = Pages[0];
-            _currentPage.Activate();
-        }
-
-        public bool CanNavigateBack
-        {
-            get => _canNavigateBack;
-            set => this.RaiseAndSetIfChanged(ref _canNavigateBack, value);
-        }
-
-        public PageBaseViewModel? CurrentPage
-        {
-            get => _currentPage;
-            set
-            {
-                if (value != _currentPage)
-                {
-                    _currentPage?.TryDeactivate();
-                    this.RaiseAndSetIfChanged(ref _currentPage, value);
-                    _currentPage?.Activate();
-                }
-            }
-        }
-
-        public IReadOnlyList<PageBaseViewModel> Pages { get; } = new[]
-        {
-            new HomeViewModel()
-        };
-
-        private PageBaseViewModel? _currentPage;
-        private bool _canNavigateBack;
+        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
     }
+
+    /// <summary>
+    /// Once the window loads navigate to the Home Page.
+    /// </summary>
+    public async void WindowLoaded()
+    {
+        await NavigationService.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Reference to the Navigation Service.
+    /// </summary>
+    public INavigationService NavigationService => _navigationService;
+
+    private readonly INavigationService _navigationService;
 }

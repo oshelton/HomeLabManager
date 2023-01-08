@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Manager.DesignModeServices;
+using HomeLabManager.Manager.Services.Navigation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -45,8 +46,18 @@ internal class Program
             {
                 var isInDesignMode = Avalonia.Controls.Design.IsDesignMode;
 
-                services.AddSingleton<ICoreConfigurationManager>(provider => isInDesignMode ? new DesignCoreConfigurationManager() : new CoreConfigurationManager(CoreConfigurationDirectory!));
-                services.AddTransient<IServerDataManager>(provider => isInDesignMode ? new DesignServerDataManager() : new ServerDataManager(provider.GetService<ICoreConfigurationManager>()!));
+                // Add data servers.
+                services.AddSingleton<ICoreConfigurationManager>(provider => isInDesignMode 
+                    ? new DesignCoreConfigurationManager() 
+                    : new CoreConfigurationManager(CoreConfigurationDirectory!));
+                services.AddTransient<IServerDataManager>(provider => isInDesignMode 
+                    ? new DesignServerDataManager() 
+                    : new ServerDataManager(provider.GetService<ICoreConfigurationManager>()!));
+
+                // Add non-data related services.
+                services.AddSingleton<INavigationService>(provider => isInDesignMode
+                    ? new DesignNavigationService()
+                    : new NavigationService());
             })
             .Build();
     }

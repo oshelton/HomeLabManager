@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia.Controls;
+﻿using HomeLabManager.Manager.Services.Navigation.Requests;
 using ReactiveUI;
 
 namespace HomeLabManager.Manager.Pages
@@ -17,14 +12,14 @@ namespace HomeLabManager.Manager.Pages
         public abstract string Title { get; }
 
         /// <summary>
-        /// Activate the page.
+        /// Navigate to this page.
         /// </summary>
-        public abstract void Activate();
+        public abstract void NavigateTo(INavigationRequest request);
 
         /// <summary>
-        /// Attempt to deactivate the page.
+        /// Attempt to navigate away from this page.
         /// </summary>
         /// <returns>True if the page deactivated and can be navigated away from, false otherwise.</returns>
-        public abstract bool TryDeactivate();
+        public abstract Task<bool> TryNavigateAway();
     }
 }

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:pages="using:HomeLabManager.Manager.Pages"
+             xmlns:pages="using:HomeLabManager.Manager.Pages.Home"
              >
   <Design.PreviewWith>
     <ContentControl Width="800" Height="600" ContentTemplate="{DynamicResource HomePageTemplate}">

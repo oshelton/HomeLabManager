@@ -1,7 +1,7 @@
 ﻿namespace HomeLabManager.Common.Data.CoreConfiguration;
 
 /// <summary>
-/// Class for managing the core configuration file related to this project.
+/// Interface for managing the core configuration file related to this project.
 /// </summary>
 /// <remarks>References to CoreConfigurationDtos should not be held onto but rather requested when needed.</remarks>
 public interface ICoreConfigurationManager
