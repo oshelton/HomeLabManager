@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
+using HomeLabManager.Manager.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
@@ -42,7 +43,7 @@ namespace HomeLabManager.Manager.Pages.Home
 
         public override string Title => "Home";
 
-        public override async void NavigateTo(INavigationRequest request)
+        public override async Task NavigateTo(INavigationRequest request)
         {
             if (request is not HomeNavigationRequest)
                 throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
@@ -55,7 +56,7 @@ namespace HomeLabManager.Manager.Pages.Home
                 servers = _serverDataManager.GetServers().Select(x => new ServerViewModel(x)).ToArray();
             }).ConfigureAwait(false);
 
-            Dispatcher.UIThread.Post(() =>
+            DispatcherHelper.PostToUIThread(() =>
             {
                 IsLoading = false;
                 Servers = servers;

@@ -13,8 +13,6 @@ namespace HomeLabManager.Manager;
 
 internal class Program
 {
-    public static IHost? ServiceProvider { get; private set; }
-
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -25,31 +23,52 @@ internal class Program
             .StartWithClassicDesktopLifetime(args);
     }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
+    /// <summary>
+    /// Avalonia configuration, don't remove; also used by visual designer.
+    /// </summary>
     public static AppBuilder BuildAvaloniaApp()
     {
-        CoreConfigurationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HomeLabManager.Manager");
-        if (!Directory.Exists(CoreConfigurationDirectory))
-            Directory.CreateDirectory(CoreConfigurationDirectory);
+        s_coreConfigurationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HomeLabManager.Manager");
+        if (!Directory.Exists(s_coreConfigurationDirectory))
+            Directory.CreateDirectory(s_coreConfigurationDirectory);
 
-        ServiceProvider = BuildServiceProvider();
+        ServiceProvider = BuildServiceProvider(false);
 
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .LogToTrace();
     }
 
-    private static IHost BuildServiceProvider()
+    /// <summary>
+    /// Sets up a test app environment.
+    /// </summary>
+    public static void BuildTestApp()
+    {
+        IsInTestingMode = true;
+        ServiceProvider = BuildServiceProvider(true);
+    }
+
+    /// <summary>
+    /// Refernce to the IHost responsible for holding onto services.
+    /// </summary>
+    public static IHost? ServiceProvider { get; private set; }
+
+    /// <summary>
+    /// Whether or not the app is in testing mode.
+    /// </summary>
+    public static bool IsInTestingMode { get; private set; }
+
+    private static IHost BuildServiceProvider(bool forceDesignMode)
     {
         return Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
-                var isInDesignMode = Avalonia.Controls.Design.IsDesignMode;
+                var isInDesignMode = Avalonia.Controls.Design.IsDesignMode || forceDesignMode;
 
                 // Add data servers.
                 services.AddSingleton<ICoreConfigurationManager>(provider => isInDesignMode 
                     ? new DesignCoreConfigurationManager() 
-                    : new CoreConfigurationManager(CoreConfigurationDirectory!));
+                    : new CoreConfigurationManager(s_coreConfigurationDirectory!));
                 services.AddTransient<IServerDataManager>(provider => isInDesignMode 
                     ? new DesignServerDataManager() 
                     : new ServerDataManager(provider.GetService<ICoreConfigurationManager>()!));
@@ -62,5 +81,5 @@ internal class Program
             .Build();
     }
 
-    private static string? CoreConfigurationDirectory { get; set; }
+    private static string? s_coreConfigurationDirectory;
 }

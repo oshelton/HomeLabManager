@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Services.Navigation.Requests;
+using HomeLabManager.Manager.Utils;
 using ReactiveUI;
 
 namespace HomeLabManager.Manager.Services.Navigation;
@@ -18,9 +19,6 @@ public sealed class NavigationService: ReactiveObject, INavigationService
 {
     public NavigationService() 
     {
-        _navigationStack.Clear();
-        CanNavigateBack = false;
-
         Pages = new[]
         {
                 new HomeViewModel(),
@@ -48,9 +46,10 @@ public sealed class NavigationService: ReactiveObject, INavigationService
                 return false;
         }
 
-        Dispatcher.UIThread.Post(() =>
+        await destinationPage.NavigateTo(request).ConfigureAwait(false);
+
+        await DispatcherHelper.InvokeAsync(() =>
         {
-            destinationPage.NavigateTo(request);
             CurrentPage = destinationPage;
 
             if (!isBackNavigation)
@@ -58,7 +57,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
             else
                 _navigationStack.RemoveAt(_navigationStack.Count - 1);
             UpdateCanNavigateBack();
-        }, DispatcherPriority.Input);
+        }, DispatcherPriority.Input).ConfigureAwait(false);
 
         return true;
     }

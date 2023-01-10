@@ -1,4 +1,7 @@
-﻿using HomeLabManager.Common.Data.Git;
+﻿using System.Runtime.CompilerServices;
+using HomeLabManager.Common.Data.Git;
+
+[assembly: InternalsVisibleTo("HomeLabManager.ManagerTests")]
 
 namespace HomeLabManager.Manager.DesignModeServices;
 
@@ -11,7 +14,12 @@ internal sealed class DesignServerDataManager: IServerDataManager
 
     public void DeleteServer(ServerDto server) => m_servers.Remove(server);
 
-    public IReadOnlyList<ServerDto> GetServers() => m_servers;
+    public IReadOnlyList<ServerDto> GetServers()
+    {
+        Thread.Sleep(10000);
+
+        return m_servers;
+    }
 
     public void UpdateServer(ServerDto server) { }
 

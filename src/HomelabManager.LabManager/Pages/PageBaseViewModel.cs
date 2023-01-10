@@ -14,7 +14,7 @@ namespace HomeLabManager.Manager.Pages
         /// <summary>
         /// Navigate to this page.
         /// </summary>
-        public abstract void NavigateTo(INavigationRequest request);
+        public abstract Task NavigateTo(INavigationRequest request);
 
         /// <summary>
         /// Attempt to navigate away from this page.

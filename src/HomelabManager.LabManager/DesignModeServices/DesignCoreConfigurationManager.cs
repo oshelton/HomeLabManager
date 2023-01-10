@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
+
+[assembly: InternalsVisibleTo("HomeLabManager.ManagerTests")]
 
 namespace HomeLabManager.Manager.DesignModeServices;
 

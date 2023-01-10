@@ -27,7 +27,7 @@ public sealed class MainWindowViewModel: ReactiveObject
     /// <summary>
     /// Once the window loads navigate to the Home Page.
     /// </summary>
-    public async void WindowLoaded()
+    public async Task WindowLoaded()
     {
         await NavigationService.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(false);
     }
