@@ -1,14 +1,14 @@
 ﻿using HomeLabManager.Common.Data.Git;
 
-namespace HomeLabManager.DataTests;
+namespace HomeLabManager.DataTests.Tests;
 
 public sealed class ServerDataManagerTests
 {
     [SetUp]
-    public void SetUp() 
-    { 
+    public void SetUp()
+    {
         Directory.CreateDirectory(Utils.TestDirectory);
-        
+
         Directory.CreateDirectory(Utils.TestGitDirectory);
 
         var serializer = Common.Data.Utils.CreateBasicYamlSerializer();
@@ -104,8 +104,8 @@ public sealed class ServerDataManagerTests
         var servers = serverManager.GetServers();
 
         var toUpdate = servers[0];
-        toUpdate = toUpdate with 
-        { 
+        toUpdate = toUpdate with
+        {
             Metadata = toUpdate.Metadata! with { Name = "Updated Server Name" }
         };
 

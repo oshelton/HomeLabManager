@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HomeLabManager.Common.Data.CoreConfiguration;
+﻿using HomeLabManager.Common.Data.CoreConfiguration;
 
-namespace HomeLabManager.DataTests;
+namespace HomeLabManager.DataTests.Tests;
 
 public sealed class CoreConfigurationManagerTests
 {
     [SetUp]
-    public void SetUp() 
-    { 
+    public void SetUp()
+    {
         Directory.CreateDirectory(Utils.TestDirectory);
         Directory.CreateDirectory(Utils.TestGitDirectory);
         File.WriteAllText(Utils.TestGitConfigFilePath, @"[user]\n\tname = Owen Shelton\n\temail = jowenshelton@gmail.com");
