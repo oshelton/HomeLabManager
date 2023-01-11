@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
 
@@ -24,6 +25,8 @@ internal sealed class DesignCoreConfigurationManager : ICoreConfigurationManager
     public CoreConfigurationDto GetOrCreateCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator) => s_staticConfiguration;
 
     public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration) { }
+
+    public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; } = new Subject<CoreConfigurationDto>();
 
     private static readonly CoreConfigurationDto s_staticConfiguration = new() { GitConfigFilePath = "", GithubPat = "", GithubUserName = "", HomeLabRepoDataPath = "" };
 }

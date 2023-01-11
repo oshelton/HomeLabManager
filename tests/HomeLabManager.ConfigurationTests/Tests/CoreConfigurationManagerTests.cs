@@ -80,4 +80,21 @@ public sealed class CoreConfigurationManagerTests
         Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
         Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));
     }
+
+    [Test]
+    public void CoreConfigChangeNotifying()
+    {
+        var (manager, coreConfig) = Utils.CreateCoreConfigurationManager(true);
+
+        coreConfig = coreConfig with { GithubUserName = "Owen shelton" };
+
+        CoreConfigurationDto? updatedDto = null;
+        var subscription = manager.CoreConfigurationUpdated.Subscribe(config => updatedDto = config);
+
+        manager.SaveCoreConfiguration(coreConfig);
+
+        Assert.That(updatedDto, Is.Not.Null);
+        Assert.That(updatedDto, Is.EqualTo(coreConfig));
+        subscription.Dispose();
+    }
 }

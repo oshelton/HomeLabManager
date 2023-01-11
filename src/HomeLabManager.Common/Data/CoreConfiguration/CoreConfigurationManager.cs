@@ -1,4 +1,6 @@
-﻿namespace HomeLabManager.Common.Data.CoreConfiguration;
+﻿using System.Reactive.Subjects;
+
+namespace HomeLabManager.Common.Data.CoreConfiguration;
 
 /// <summary>
 /// Class for managing the core configuration file related to this project.
@@ -18,6 +20,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
             throw new InvalidOperationException($"{nameof(coreConfigDirectory)} must exist.");
 
         CoreConfigPath = Path.Combine(coreConfigDirectory, "CoreConfig.yaml");
+        CoreConfigurationUpdated = new Subject<CoreConfigurationDto>();
     }
 
     /// <summary>
@@ -77,6 +80,8 @@ public class CoreConfigurationManager : ICoreConfigurationManager
 
         var serializer = Utils.CreateBasicYamlSerializer();
         File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
+
+        CoreConfigurationUpdated.OnNext(updatedConfiguration);
     }
 
     /// <summary>
@@ -89,6 +94,12 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// </summary>
     /// <remarks>This assumes that the application</remarks>
     public bool DisableConfigurationCaching { get; set; }
+
+    /// <summary>
+    /// Subject that publishes the new configuration to consumers when it is updated.
+    /// </summary>
+    /// <remarks>Dtos should be considered transient and not held onto; including this one.</remarks>
+    public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
 
     private CoreConfigurationDto? _cachedCoreConfiguration;
 }

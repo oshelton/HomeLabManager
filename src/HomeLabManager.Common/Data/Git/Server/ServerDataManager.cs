@@ -3,7 +3,7 @@ using HomeLabManager.Common.Data.CoreConfiguration;
 
 [assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
-namespace HomeLabManager.Common.Data.Git;
+namespace HomeLabManager.Common.Data.Git.Server;
 
 /// <summary>
 /// Class for accessing and updating the data stored in a Home Lab Git Repo.
@@ -18,7 +18,7 @@ public sealed class ServerDataManager : IServerDataManager
         if (coreConfigurationManager is null)
             throw new ArgumentNullException(nameof(coreConfigurationManager));
 
-        _coreConfigurationManager= coreConfigurationManager;
+        _coreConfigurationManager = coreConfigurationManager;
     }
 
     /// <summary>
@@ -39,15 +39,15 @@ public sealed class ServerDataManager : IServerDataManager
             var dockerPath = Path.Combine(serverDirectory, ServerDockerFileName);
             var configurationPath = Path.Combine(serverDirectory, ServerConfigurationFileName);
 
-            ServerMetadataDto metadata = File.Exists(metadataPath)
+            var metadata = File.Exists(metadataPath)
                 ? deserializer.Deserialize<ServerMetadataDto>(File.ReadAllText(metadataPath)) with { FileName = metadataPath }
                 : new ServerMetadataDto() { Name = Path.GetDirectoryName(serverDirectory), FileName = metadataPath };
 
-            DockerComposeDto? docker = File.Exists(dockerPath)
+            var docker = File.Exists(dockerPath)
                 ? deserializer.Deserialize<DockerComposeDto>(File.ReadAllText(dockerPath))
                 : null;
 
-            ServerConfigurationDto? configuration = File.Exists(configurationPath)
+            var configuration = File.Exists(configurationPath)
                 ? deserializer.Deserialize<ServerConfigurationDto>(File.ReadAllText(configurationPath))
                 : null;
 

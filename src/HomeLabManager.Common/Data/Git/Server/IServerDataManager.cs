@@ -1,4 +1,4 @@
-﻿namespace HomeLabManager.Common.Data.Git;
+﻿namespace HomeLabManager.Common.Data.Git.Server;
 
 /// <summary>
 /// Class for accessing and updating the data stored in a Home Lab Git Repo.

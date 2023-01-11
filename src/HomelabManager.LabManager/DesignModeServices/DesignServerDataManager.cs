@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using HomeLabManager.Common.Data.Git;
+using HomeLabManager.Common.Data.Git.Server;
 
 [assembly: InternalsVisibleTo("HomeLabManager.ManagerTests")]
 

@@ -1,4 +1,6 @@
-﻿namespace HomeLabManager.Common.Data.CoreConfiguration;
+﻿using System.Reactive.Subjects;
+
+namespace HomeLabManager.Common.Data.CoreConfiguration;
 
 /// <summary>
 /// Interface for managing the core configuration file related to this project.
@@ -34,4 +36,10 @@ public interface ICoreConfigurationManager
     /// </summary>
     /// <remarks>This assumes that the application</remarks>
     public bool DisableConfigurationCaching { get; set; }
+
+    /// <summary>
+    /// Subject that publishes the new configuration to consumers when it is updated.
+    /// </summary>
+    /// <remarks>Dtos should be considered transient and not held onto; including this one.</remarks>
+    public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
 }

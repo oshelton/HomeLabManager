@@ -1,4 +1,4 @@
-﻿using HomeLabManager.Common.Data.Git;
+﻿using HomeLabManager.Common.Data.Git.Server;
 
 namespace HomeLabManager.DataTests.Tests;
 

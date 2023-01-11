@@ -3,7 +3,7 @@ using YamlDotNet.Serialization;
 
 [assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
-namespace HomeLabManager.Common.Data.Git;
+namespace HomeLabManager.Common.Data.Git.Server;
 
 /// <summary>
 /// Kind of server.
@@ -87,7 +87,7 @@ public sealed record ServerMetadataDto
 /// </summary>
 public sealed record DockerComposeDto
 {
-    
+
 }
 
 /// <summary>
