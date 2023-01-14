@@ -18,6 +18,7 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Pages/Home/HomePage.axaml" />
+				<ResourceInclude Source="/Pages/Settings/SettingsPage.axaml" />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
@@ -51,6 +52,7 @@
 			SelectedItem="{Binding NavigationService.CurrentPage}">
 			<Carousel.DataTemplates>
 				<StaticResource ResourceKey="HomePageTemplate" />
+				<StaticResourceExtension ResourceKey="SettingsPageTemplate" />
 			</Carousel.DataTemplates>
 		</Carousel>
 	</DockPanel>

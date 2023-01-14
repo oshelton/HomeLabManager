@@ -5,7 +5,7 @@
 	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
 	xmlns:materialThemes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles">
 	<Application.Styles>
-    
+
 		<!--  Third Party Styles  -->
 		<materialThemes:MaterialTheme
 			BaseTheme="Dark"
@@ -14,5 +14,6 @@
 		<StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
 
 		<!--  Application Styles  -->
+		<StyleInclude Source="/Styles/Buttons.axaml" />
 	</Application.Styles>
 </Application>

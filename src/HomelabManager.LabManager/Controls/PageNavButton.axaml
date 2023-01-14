@@ -2,9 +2,8 @@
 	x:Class="HomeLabManager.Manager.Controls.PageNavButton"
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:controls="using:HomeLabManager.Common.DataManager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	d:DesignHeight="50"
 	d:DesignWidth="100"
@@ -15,17 +14,9 @@
 		VerticalContentAlignment="Center"
 		DataContext="{Binding $parent}"
 		ToolTip.Tip="{Binding ToolTip.Tip}">
-		<StackPanel Margin="4,4,4,4" Orientation="Horizontal">
-			<materialIcons:MaterialIcon
-				Width="18"
-				Height="18"
-				Kind="{Binding Icon}" />
-			<TextBlock
-				Margin="4,0,0,0"
-				VerticalAlignment="Center"
-				Classes="ButtonText"
-				FontWeight="Bold"
-				Text="{Binding Text}" />
+		<StackPanel>
+			<materialIcons:MaterialIcon Kind="{Binding Icon}" />
+			<TextBlock Margin="4,0,0,0" Text="{Binding Text}" />
 		</StackPanel>
 	</Button>
 </UserControl>
