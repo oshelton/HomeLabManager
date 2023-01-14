@@ -1,0 +1,90 @@
+<ResourceDictionary
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:pages="using:HomeLabManager.Manager.Pages.Home">
+	<Design.PreviewWith>
+		<ContentControl
+			Width="800"
+			Height="600"
+			ContentTemplate="{DynamicResource HomePageTemplate}">
+			<ContentControl.Content>
+				<pages:HomeViewModel />
+			</ContentControl.Content>
+		</ContentControl>
+	</Design.PreviewWith>
+
+	<DataTemplate x:Key="HomePageTemplate" DataType="{x:Type pages:HomeViewModel}">
+		<DockPanel>
+			<UniformGrid
+				HorizontalAlignment="Right"
+				Columns="4"
+				DockPanel.Dock="Bottom">
+				<controls:PageNavButton Icon="Web" Text="Servers" />
+				<controls:PageNavButton
+					Margin="6,0,0,0"
+					Icon="Console"
+					Text="Commands" />
+				<controls:PageNavButton
+					Margin="6,0,0,0"
+					Icon="Toolbox"
+					Text="Tools" />
+				<controls:PageNavButton
+					Margin="6,0,0,0"
+					Icon="CogOutline"
+					Text="Settings" />
+			</UniformGrid>
+
+			<Grid>
+				<materialControls:Card
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					IsVisible="{Binding IsLoading}">
+					<StackPanel Margin="8">
+						<ProgressBar Classes="circular" IsIndeterminate="True" />
+						<TextBlock Margin="0,8,0,0">Loading Servers...</TextBlock>
+					</StackPanel>
+				</materialControls:Card>
+
+				<Grid IsVisible="{Binding !IsLoading}">
+					<ItemsRepeater Margin="12" Items="{Binding Servers}">
+						<ItemsRepeater.Layout>
+							<WrapLayout
+								HorizontalSpacing="8"
+								Orientation="Horizontal"
+								VerticalSpacing="8" />
+						</ItemsRepeater.Layout>
+
+						<ItemsRepeater.ItemTemplate>
+							<DataTemplate>
+								<materialControls:Card MinWidth="250" MinHeight="150">
+									<TextBlock
+										Classes="Headline6"
+										MaxLines="2"
+										Text="{Binding Name}"
+										TextTrimming="CharacterEllipsis"
+										TextWrapping="Wrap" />
+								</materialControls:Card>
+							</DataTemplate>
+						</ItemsRepeater.ItemTemplate>
+					</ItemsRepeater>
+
+					<materialControls:Card
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						IsVisible="{Binding !HasAnyServers}">
+						<TextBlock Margin="8" TextAlignment="Center">
+							<Run Text="No Servers Exist." />
+							<LineBreak />
+							<Run Text="Add one or more using the Servers button below." />
+						</TextBlock>
+					</materialControls:Card>
+				</Grid>
+			</Grid>
+		</DockPanel>
+	</DataTemplate>
+</ResourceDictionary>

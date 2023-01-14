@@ -1,52 +1,57 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:eventBinder="using:EventBinder"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialControls="using:Material.Styles.Controls"
-        xmlns:materialIcons="using:Material.Icons.Avalonia"
-        xmlns:local="using:HomeLabManager.Manager"
-        xmlns:pages="using:HomeLabManager.Manager.Pages"
-        mc:Ignorable="d" 
-        MinWidth="800" 
-        MinHeight="600"
-        x:Class="HomeLabManager.Manager.MainWindow"
-        Title="Home Lab Manager"
-        Loaded="{eventBinder:EventBinding WindowLoaded}">
-  <Window.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source='/Pages/Home/Home.axaml'/>
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </Window.Resources>
+<Window
+	x:Class="HomeLabManager.Manager.MainWindow"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:eventBinder="using:EventBinder"
+	xmlns:local="using:HomeLabManager.Manager"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:pages="using:HomeLabManager.Manager.Pages"
+	Title="Home Lab Manager"
+	MinWidth="800"
+	MinHeight="600"
+	Loaded="{eventBinder:EventBinding WindowLoaded}"
+	mc:Ignorable="d">
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Pages/Home/HomePage.axaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
 
-  <Window.DataContext>
-    <local:MainWindowViewModel />
-  </Window.DataContext>
+	<Window.DataContext>
+		<local:MainWindowViewModel />
+	</Window.DataContext>
 
-  <DockPanel Margin="24">
-    <DockPanel DockPanel.Dock="Top">
-      <materialControls:FloatingButton Name="BackButton" 
-        Margin="0, 0, 8, 0"
-        Classes="Mini"
-        IsEnabled="{Binding NavigationService.CanNavigateBack}"
-        ToolTip.Tip="Navigate to the previous page.">
-        <materialIcons:MaterialIcon Classes="ButtonIcon" Kind="NavigateBefore" />
-      </materialControls:FloatingButton>
+	<DockPanel Margin="24">
+		<DockPanel DockPanel.Dock="Top">
+			<materialControls:FloatingButton
+				Name="BackButton"
+				Margin="0,0,8,0"
+				Classes="Mini"
+				IsEnabled="{Binding NavigationService.CanNavigateBack}"
+				ToolTip.Tip="Navigate to the previous page.">
+				<materialIcons:MaterialIcon
+					Width="32"
+					Height="32"
+					Kind="NavigateBefore" />
+			</materialControls:FloatingButton>
 
-      <TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
-    </DockPanel>
+			<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
+		</DockPanel>
 
-    <Carousel
-      Name="ContentHost"
-      Margin="0, 24, 0, 0"
-      DockPanel.Dock="Bottom"
-      Items="{Binding NavigationService.Pages}" 
-      SelectedItem="{Binding NavigationService.CurrentPage}">
-      <Carousel.DataTemplates>
-        <StaticResource ResourceKey="HomePageTemplate" />
-      </Carousel.DataTemplates>
-    </Carousel>
-  </DockPanel>
+		<Carousel
+			Name="ContentHost"
+			Margin="0,24,0,0"
+			DockPanel.Dock="Bottom"
+			Items="{Binding NavigationService.Pages}"
+			SelectedItem="{Binding NavigationService.CurrentPage}">
+			<Carousel.DataTemplates>
+				<StaticResource ResourceKey="HomePageTemplate" />
+			</Carousel.DataTemplates>
+		</Carousel>
+	</DockPanel>
 </Window>
