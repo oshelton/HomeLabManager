@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Pages.Home;
+using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
@@ -18,9 +19,10 @@ internal sealed class DesignNavigationService: ReactiveObject, INavigationServic
 {
     public DesignNavigationService()
     {
-        Pages = new[]
+        Pages = new PageBaseViewModel[]
         {
                 new HomeViewModel(),
+                new SettingsViewModel(),
         };
     }
 

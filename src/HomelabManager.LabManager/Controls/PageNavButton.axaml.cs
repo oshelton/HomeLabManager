@@ -17,6 +17,25 @@ namespace HomeLabManager.Manager.Controls
             AvaloniaProperty.Register<PageNavButton, MaterialIconKind>(nameof(Icon), MaterialIconKind.SimpleIcons);
 
         /// <summary>
+        /// Defines the <see cref="Text"/> property.
+        /// </summary>
+        public static readonly StyledProperty<string> TextProperty =
+            AvaloniaProperty.Register<PageNavButton, string>(nameof(Text), "Nav Button");
+
+        /// <summary>
+        /// Defines the <see cref="Click"/> event.
+        /// </summary>
+        public static readonly RoutedEvent<RoutedEventArgs> ClickEvent =
+            RoutedEvent.Register<PageNavButton, RoutedEventArgs>(nameof(Click), RoutingStrategies.Direct);
+
+        public PageNavButton()
+        {
+            InitializeComponent();
+
+            button.Classes = Classes;
+        }
+
+        /// <summary>
         /// Gets or sets a value for the Button's Icon.
         /// </summary>
         public MaterialIconKind Icon
@@ -24,12 +43,6 @@ namespace HomeLabManager.Manager.Controls
             get => GetValue(IconProperty);
             set => SetValue(IconProperty, value);
         }
-
-        /// <summary>
-        /// Defines the <see cref="Text"/> property.
-        /// </summary>
-        public static readonly StyledProperty<string> TextProperty =
-            AvaloniaProperty.Register<PageNavButton, string>(nameof(Text), "Nav Button");
 
         /// <summary>
         /// Gets or sets a value for the Button's Text.
@@ -41,25 +54,18 @@ namespace HomeLabManager.Manager.Controls
         }
 
         /// <summary>
-        /// Defines the <see cref="Click"/> event.
-        /// </summary>
-        public static readonly RoutedEvent<RoutedEventArgs> ClickEvent =
-            RoutedEvent.Register<Button, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble);
-
-        /// <summary>
         /// Raised when the user clicks the button.
         /// </summary>
-        public event EventHandler<RoutedEventArgs>? Click
+        public event EventHandler<RoutedEventArgs> Click
         {
-            add => button.Click += value;
-            remove => button.Click -= value;
+            add => AddHandler(ClickEvent, value);
+            remove => RemoveHandler(ClickEvent, value);
         }
 
-        public PageNavButton()
+        internal void OnButtonClick(object sender, RoutedEventArgs args)
         {
-            InitializeComponent();
-
-            button.Classes = Classes;
+            var eventArgs = new RoutedEventArgs { RoutedEvent = ClickEvent };
+            RaiseEvent(eventArgs);
         }
     }
 }

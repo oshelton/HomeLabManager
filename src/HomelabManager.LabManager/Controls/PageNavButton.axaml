@@ -12,6 +12,7 @@
 		x:Name="button"
 		Padding="0"
 		VerticalContentAlignment="Center"
+		Click="OnButtonClick"
 		DataContext="{Binding $parent}"
 		ToolTip.Tip="{Binding ToolTip.Tip}">
 		<StackPanel>

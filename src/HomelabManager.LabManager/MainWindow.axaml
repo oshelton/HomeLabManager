@@ -3,16 +3,18 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:eventBinder="using:EventBinder"
+	xmlns:i="using:Avalonia.Xaml.Interactivity"
+	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+	xmlns:ic="using:Avalonia.Xaml.Interactions.Custom"
 	xmlns:local="using:HomeLabManager.Manager"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:pages="using:HomeLabManager.Manager.Pages"
+	x:Name="window"
 	Title="Home Lab Manager"
 	MinWidth="800"
 	MinHeight="600"
-	Loaded="{eventBinder:EventBinding WindowLoaded}"
 	mc:Ignorable="d">
 	<Window.Resources>
 		<ResourceDictionary>
@@ -27,14 +29,27 @@
 		<local:MainWindowViewModel />
 	</Window.DataContext>
 
+	<i:Interaction.Behaviors>
+		<ia:EventTriggerBehavior EventName="Loaded">
+			<ia:CallMethodAction MethodName="WindowLoaded" TargetObject="{Binding}" />
+		</ia:EventTriggerBehavior>
+	</i:Interaction.Behaviors>
+
 	<DockPanel Margin="24">
 		<DockPanel DockPanel.Dock="Top">
 			<materialControls:FloatingButton
-				Name="BackButton"
+				Name="backButton"
 				Margin="0,0,8,0"
 				Classes="Mini"
+				ClickMode="Release"
 				IsEnabled="{Binding NavigationService.CanNavigateBack}"
 				ToolTip.Tip="Navigate to the previous page.">
+				<i:Interaction.Behaviors>
+					<ia:EventTriggerBehavior EventName="Click">
+						<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding}" />
+					</ia:EventTriggerBehavior>
+				</i:Interaction.Behaviors>
+
 				<materialIcons:MaterialIcon
 					Width="32"
 					Height="32"
@@ -50,6 +65,10 @@
 			DockPanel.Dock="Bottom"
 			Items="{Binding NavigationService.Pages}"
 			SelectedItem="{Binding NavigationService.CurrentPage}">
+			<Carousel.PageTransition>
+				<CrossFade Duration="0:00:00.250" />
+			</Carousel.PageTransition>
+
 			<Carousel.DataTemplates>
 				<StaticResource ResourceKey="HomePageTemplate" />
 				<StaticResourceExtension ResourceKey="SettingsPageTemplate" />

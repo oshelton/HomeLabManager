@@ -9,6 +9,10 @@
 		</Border>
 	</Design.PreviewWith>
 
+	<Style Selector=":is(Button)">
+		<Setter Property="ClickMode" Value="Press" />
+	</Style>
+
 	<Style Selector=":is(Button) StackPanel">
 		<Setter Property="Margin" Value="4,4,4,4" />
 		<Setter Property="Orientation" Value="Horizontal" />

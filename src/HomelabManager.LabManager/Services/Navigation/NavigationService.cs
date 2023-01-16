@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Pages.Home;
+using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
 using ReactiveUI;
@@ -19,9 +15,10 @@ public sealed class NavigationService: ReactiveObject, INavigationService
 {
     public NavigationService() 
     {
-        Pages = new[]
+        Pages = new PageBaseViewModel[]
         {
                 new HomeViewModel(),
+                new SettingsViewModel(),
         };
     }
 
@@ -41,7 +38,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
 
         if (CurrentPage is not null)
         {
-            var result = await destinationPage.TryNavigateAway().ConfigureAwait(false);
+            var result = await CurrentPage.TryNavigateAway().ConfigureAwait(false);
             if (!result)
                 return false;
         }
