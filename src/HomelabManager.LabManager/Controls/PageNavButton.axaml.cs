@@ -23,17 +23,18 @@ namespace HomeLabManager.Manager.Controls
             AvaloniaProperty.Register<PageNavButton, string>(nameof(Text), "Nav Button");
 
         /// <summary>
+        /// Defines the <see cref="IsOutline"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> IsOutlineProperty =
+            AvaloniaProperty.Register<PageNavButton, bool>(nameof(IsOutline), false);
+
+        /// <summary>
         /// Defines the <see cref="Click"/> event.
         /// </summary>
         public static readonly RoutedEvent<RoutedEventArgs> ClickEvent =
-            RoutedEvent.Register<PageNavButton, RoutedEventArgs>(nameof(Click), RoutingStrategies.Direct);
+            RoutedEvent.Register<PageNavButton, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble);
 
-        public PageNavButton()
-        {
-            InitializeComponent();
-
-            button.Classes = Classes;
-        }
+        public PageNavButton() => InitializeComponent();
 
         /// <summary>
         /// Gets or sets a value for the Button's Icon.
@@ -51,6 +52,15 @@ namespace HomeLabManager.Manager.Controls
         {
             get => GetValue(TextProperty);
             set => SetValue(TextProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value for if the button should be an outline button or not.
+        /// </summary>
+        public bool IsOutline
+        {
+            get => GetValue(IsOutlineProperty);
+            set => SetValue(IsOutlineProperty, value);
         }
 
         /// <summary>
