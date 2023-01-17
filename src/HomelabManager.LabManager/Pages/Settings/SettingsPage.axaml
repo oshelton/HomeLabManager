@@ -3,8 +3,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+	xmlns:materialAssists="using:Material.Styles.Assists"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:pages="using:HomeLabManager.Manager.Pages.Settings">
 	<Design.PreviewWith>
@@ -20,6 +21,24 @@
 
 	<DataTemplate x:Key="SettingsPageTemplate" DataType="{x:Type pages:SettingsViewModel}">
 		<DockPanel>
+			<DockPanel.Styles>
+				<Style Selector="materialIcons|MaterialIcon.TipIcon">
+					<Setter Property="Margin" Value="8" />
+					<Setter Property="Kind" Value="Information" />
+				</Style>
+
+				<Style Selector="TextBlock.SettingLabel">
+					<Setter Property="Grid.Column" Value="1" />
+					<Setter Property="VerticalAlignment" Value="Center" />
+				</Style>
+
+				<Style Selector="TextBox.SettingField">
+					<Setter Property="Grid.Column" Value="3" />
+					<Setter Property="Margin" Value="8,0,8,0" />
+					<Setter Property="VerticalAlignment" Value="Center" />
+				</Style>
+			</DockPanel.Styles>
+
 			<UniformGrid
 				HorizontalAlignment="Right"
 				Columns="2"
@@ -29,12 +48,69 @@
 					Icon="FloppyDisc"
 					Text="Save" />
 				<controls:PageNavButton
-					Classes="Outline"
 					Icon="Cancel"
+					IsOutline="True"
 					Text="Cancel" />
 			</UniformGrid>
 
-			<Grid />
+			<Grid ColumnDefinitions="Auto,Auto,32,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+				<materialIcons:MaterialIcon Classes="TipIcon">
+					<ToolTip.Tip>
+						<TextBlock MaxWidth="384" TextWrapping="Wrap">
+							<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
+							<LineBreak />
+							<LineBreak />
+							<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
+						</TextBlock>
+					</ToolTip.Tip>
+				</materialIcons:MaterialIcon>
+				<TextBlock Classes="SettingLabel">Home Lab Repo Data Path:</TextBlock>
+				<TextBox
+					x:Name="homeLabText"
+					Classes="outline SettingField"
+					IsReadOnly="True" />
+
+				<materialIcons:MaterialIcon Grid.Row="1" Classes="TipIcon">
+					<ToolTip.Tip>
+						<TextBlock MaxWidth="384" TextWrapping="Wrap">
+							<Run>This is the path to the standard Git config file containing the Name and Email Address to use.</Run>
+						</TextBlock>
+					</ToolTip.Tip>
+				</materialIcons:MaterialIcon>
+				<TextBlock Grid.Row="1" Classes="SettingLabel">Git Config File Path:</TextBlock>
+				<TextBox
+					x:Name="gitConfigText"
+					Grid.Row="1"
+					Classes="outline SettingField"
+					IsReadOnly="True" />
+
+
+				<materialIcons:MaterialIcon
+					Grid.Row="2"
+					Classes="TipIcon"
+					ToolTip.Tip="This is the User Name used when signing into Github." />
+				<TextBlock Grid.Row="2" Classes="SettingLabel">Github User Name:</TextBlock>
+				<TextBox
+					x:Name="githubUsernameText"
+					Grid.Row="2"
+					Classes="outline SettingField" />
+
+				<materialIcons:MaterialIcon Grid.Row="3" Classes="TipIcon">
+					<ToolTip.Tip>
+						<TextBlock MaxWidth="384" TextWrapping="Wrap">
+							<Run>This is the Github PAT used when pushing up to Github.</Run>
+							<LineBreak />
+							<LineBreak />
+							<Run>See Github PAT documentation for details.</Run>
+						</TextBlock>
+					</ToolTip.Tip>
+				</materialIcons:MaterialIcon>
+				<TextBlock Grid.Row="3" Classes="SettingLabel">Github PAT:</TextBlock>
+				<TextBox
+					x:Name="githubPatText"
+					Grid.Row="3"
+					Classes="outline SettingField" />
+			</Grid>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>
