@@ -55,7 +55,7 @@
 					IsVisible="{Binding IsLoading}">
 					<StackPanel Margin="8">
 						<ProgressBar Classes="circular" IsIndeterminate="True" />
-						<TextBlock Margin="0,8,0,0">Loading Servers...</TextBlock>
+						<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Servers...</TextBlock>
 					</StackPanel>
 				</materialControls:Card>
 
@@ -86,7 +86,10 @@
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"
 						IsVisible="{Binding !HasAnyServers}">
-						<TextBlock Margin="8" TextAlignment="Center">
+						<TextBlock
+							Margin="8"
+							Classes="Body1"
+							TextAlignment="Center">
 							<Run Text="No Servers Exist." />
 							<LineBreak />
 							<Run Text="Add one or more using the Servers button below." />
