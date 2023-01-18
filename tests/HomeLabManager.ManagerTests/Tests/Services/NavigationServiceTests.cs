@@ -18,7 +18,7 @@ public class NavigationServiceTests
         var service = new NavigationService();
 
         Assert.That(service.CanNavigateBack, Is.False);
-        Assert.That(service.Pages, Has.Count.EqualTo(1));
+        Assert.That(service.Pages, Has.Count.EqualTo(2));
         Assert.That(service.CurrentPage, Is.Null);
     }
 
@@ -33,7 +33,7 @@ public class NavigationServiceTests
         await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
 
         Assert.That(service.CanNavigateBack, Is.False);
-        Assert.That(service.Pages, Has.Count.EqualTo(1));
+        Assert.That(service.Pages, Has.Count.EqualTo(2));
         Assert.That(service.CurrentPage!.GetType(), Is.EqualTo(typeof(HomeViewModel)));
     }
 }
