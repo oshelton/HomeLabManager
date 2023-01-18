@@ -32,11 +32,6 @@ public sealed class MainWindowViewModel: ReactiveObject
         await NavigationService.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(false);
     }
 
-    public async Task NavigateBack()
-    {
-        await NavigationService.NavigateBack().ConfigureAwait(false);
-    }
-
     /// <summary>
     /// Reference to the Navigation Service.
     /// </summary>

@@ -62,12 +62,12 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     /// <summary>
     /// Navigate back to the previous page.
     /// </summary>
-    public async Task<bool> NavigateBack()
+    public async Task NavigateBack()
     {
         if (!CanNavigateBack)
-            return false;
+            return;
 
-        return await NavigateTo(_navigationStack[^2], true).ConfigureAwait(false);
+        await NavigateTo(_navigationStack[^2], true).ConfigureAwait(false);
     }
 
     /// <summary>

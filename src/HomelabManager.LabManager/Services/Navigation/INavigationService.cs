@@ -23,8 +23,7 @@ public interface INavigationService
     /// <summary>
     /// Navigate back to the previous page.
     /// </summary>
-    /// <returns>false if navigation fails, true if it succeeds.</returns>
-    Task<bool> NavigateBack();
+    Task NavigateBack();
     
     /// <summary>
     /// Get whether or not back navigation is possible.

@@ -41,12 +41,11 @@
 				Name="backButton"
 				Margin="0,0,8,0"
 				Classes="Mini"
-				ClickMode="Release"
 				IsEnabled="{Binding NavigationService.CanNavigateBack}"
 				ToolTip.Tip="Navigate to the previous page.">
 				<i:Interaction.Behaviors>
 					<ia:EventTriggerBehavior EventName="Click">
-						<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding}" />
+						<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding NavigationService}" />
 					</ia:EventTriggerBehavior>
 				</i:Interaction.Behaviors>
 
