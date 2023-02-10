@@ -28,5 +28,11 @@ internal sealed class DesignCoreConfigurationManager : ICoreConfigurationManager
 
     public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; } = new Subject<CoreConfigurationDto>();
 
-    private static readonly CoreConfigurationDto s_staticConfiguration = new() { GitConfigFilePath = "", GithubPat = "", GithubUserName = "", HomeLabRepoDataPath = "" };
+    private static readonly CoreConfigurationDto s_staticConfiguration = new() 
+    { 
+        GitConfigFilePath = "", 
+        GithubPat = "", 
+        GithubUserName = "", 
+        HomeLabRepoDataPath = "C:\\tmp",
+    };
 }

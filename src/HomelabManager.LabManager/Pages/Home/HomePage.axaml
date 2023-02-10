@@ -1,26 +1,27 @@
 <ResourceDictionary
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:i="using:Avalonia.Xaml.Interactivity"
 	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
-	xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:pages="using:HomeLabManager.Manager.Pages.Home">
+	xmlns:page="using:HomeLabManager.Manager.Pages.Home">
 	<Design.PreviewWith>
 		<ContentControl
 			Width="800"
 			Height="600"
 			ContentTemplate="{DynamicResource HomePageTemplate}">
 			<ContentControl.Content>
-				<pages:HomeViewModel />
+				<page:HomeViewModel />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>
 
-	<DataTemplate x:Key="HomePageTemplate" DataType="{x:Type pages:HomeViewModel}">
+	<DataTemplate x:Key="HomePageTemplate" DataType="{x:Type page:HomeViewModel}">
 		<DockPanel>
 			<UniformGrid
 				HorizontalAlignment="Right"
@@ -48,55 +49,106 @@
 				</controls:PageNavButton>
 			</UniformGrid>
 
-			<Grid>
-				<materialControls:Card
-					HorizontalAlignment="Center"
-					VerticalAlignment="Center"
-					IsVisible="{Binding IsLoading}">
-					<StackPanel Margin="8">
-						<ProgressBar Classes="circular" IsIndeterminate="True" />
-						<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Servers...</TextBlock>
-					</StackPanel>
-				</materialControls:Card>
-
-				<Grid IsVisible="{Binding !IsLoading}">
-					<ItemsRepeater Margin="12" Items="{Binding Servers}">
-						<ItemsRepeater.Layout>
-							<WrapLayout
-								HorizontalSpacing="8"
-								Orientation="Horizontal"
-								VerticalSpacing="8" />
-						</ItemsRepeater.Layout>
-
-						<ItemsRepeater.ItemTemplate>
-							<DataTemplate>
-								<materialControls:Card MinWidth="250" MinHeight="150">
+			<Border
+				Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.IsLoading}}"
+				Classes.NoRepoPath="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.NoRepoPath}}"
+				Classes.NoServers="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.NoServers}}"
+				Classes.RepoPathDoesNotExist="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.RepoPathDoesNotExist}}"
+				Classes.ServerDisplay="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.HasServers}}">
+				<Border.Styles>
+					<Style Selector="Border.NoRepoPath">
+						<Setter Property="Child">
+							<Template>
+								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 									<TextBlock
-										Classes="Headline6"
-										MaxLines="2"
-										Text="{Binding Name}"
-										TextTrimming="CharacterEllipsis"
-										TextWrapping="Wrap" />
+										Margin="8"
+										Classes="Body1"
+										TextAlignment="Center">
+										<Run Text="No Home Lab Git Repo Path has been specified." />
+										<LineBreak />
+										<Run Text="Set the path using the Settings button below." />
+									</TextBlock>
 								</materialControls:Card>
-							</DataTemplate>
-						</ItemsRepeater.ItemTemplate>
-					</ItemsRepeater>
+							</Template>
+						</Setter>
+					</Style>
 
-					<materialControls:Card
-						HorizontalAlignment="Center"
-						VerticalAlignment="Center"
-						IsVisible="{Binding !HasAnyServers}">
-						<TextBlock
-							Margin="8"
-							Classes="Body1"
-							TextAlignment="Center">
-							<Run Text="No Servers Exist." />
-							<LineBreak />
-							<Run Text="Add one or more using the Servers button below." />
-						</TextBlock>
-					</materialControls:Card>
-				</Grid>
-			</Grid>
+					<Style Selector="Border.RepoPathDoesNotExist">
+						<Setter Property="Child">
+							<Template>
+								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+									<TextBlock
+										Margin="8"
+										Classes="Body1"
+										TextAlignment="Center">
+										<Run Text="The Home Lab Git Repo Path is not a directory or does not exist." />
+										<LineBreak />
+										<Run Text="Correct the path using the Settings button below." />
+									</TextBlock>
+								</materialControls:Card>
+							</Template>
+						</Setter>
+					</Style>
+
+					<Style Selector="Border.IsLoading">
+						<Setter Property="Child">
+							<Template>
+								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+									<StackPanel Margin="8">
+										<ProgressBar Classes="circular" IsIndeterminate="True" />
+										<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Servers...</TextBlock>
+									</StackPanel>
+								</materialControls:Card>
+							</Template>
+						</Setter>
+					</Style>
+
+					<Style Selector="Border.NoServers">
+						<Setter Property="Child">
+							<Template>
+								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+									<TextBlock
+										Margin="8"
+										Classes="Body1"
+										TextAlignment="Center">
+										<Run Text="No Servers Exist." />
+										<LineBreak />
+										<Run Text="Add one or more using the Servers button below." />
+									</TextBlock>
+								</materialControls:Card>
+							</Template>
+						</Setter>
+					</Style>
+
+					<Style Selector="Border.ServerDisplay">
+						<Setter Property="Child">
+							<Template>
+								<ItemsRepeater Margin="12" Items="{Binding Servers}">
+									<ItemsRepeater.Layout>
+										<WrapLayout
+											HorizontalSpacing="8"
+											Orientation="Horizontal"
+											VerticalSpacing="8" />
+									</ItemsRepeater.Layout>
+
+									<ItemsRepeater.ItemTemplate>
+										<DataTemplate>
+											<materialControls:Card MinWidth="250" MinHeight="150">
+												<TextBlock
+													Classes="Headline6"
+													MaxLines="2"
+													Text="{Binding Name}"
+													TextTrimming="CharacterEllipsis"
+													TextWrapping="Wrap" />
+											</materialControls:Card>
+										</DataTemplate>
+									</ItemsRepeater.ItemTemplate>
+								</ItemsRepeater>
+							</Template>
+						</Setter>
+					</Style>
+				</Border.Styles>
+			</Border>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>

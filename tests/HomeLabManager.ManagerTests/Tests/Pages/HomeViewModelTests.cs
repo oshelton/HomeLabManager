@@ -20,8 +20,7 @@ public class HomeViewModelTests
         var homePage = new HomeViewModel();
 
         Assert.That(homePage.Title, Is.EqualTo("Home"));
-        Assert.That(homePage.IsLoading, Is.False);
-        Assert.That(homePage.HasAnyServers, Is.False);
+        Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.NoRepoPath));
         Assert.That(homePage.Servers, Is.Null);
     }
 
@@ -37,11 +36,11 @@ public class HomeViewModelTests
 
         await Task.Delay(1000).ConfigureAwait(true);
 
-        Assert.That(homePage.IsLoading, Is.True);
+        Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.IsLoading));
 
         await navigateTask.ConfigureAwait(true);
 
-        Assert.That(homePage.HasAnyServers, Is.True);
+        Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.HasServers));
         Assert.That(homePage.Servers!, Has.Count.EqualTo(3));
     }
 }
