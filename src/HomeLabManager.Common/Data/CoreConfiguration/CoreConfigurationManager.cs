@@ -39,14 +39,14 @@ public class CoreConfigurationManager : ICoreConfigurationManager
             if (!DisableConfigurationCaching)
                 _cachedCoreConfiguration = defaultConfiguration;
 
-            var serializer = Utils.CreateBasicYamlSerializer();
+            var serializer = DataUtils.CreateBasicYamlSerializer();
 
             File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
             return defaultConfiguration;
         }
         else
         {
-            var deserializer = Utils.CreateBasicYamlDeserializer();
+            var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
             var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
             _cachedCoreConfiguration = readConfiguration;
@@ -63,7 +63,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (_cachedCoreConfiguration is not null && !DisableConfigurationCaching)
             return _cachedCoreConfiguration;
 
-        var deserializer = Utils.CreateBasicYamlDeserializer();
+        var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
         var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
         _cachedCoreConfiguration = readConfiguration;
@@ -78,7 +78,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (!DisableConfigurationCaching)
             _cachedCoreConfiguration = updatedConfiguration;
 
-        var serializer = Utils.CreateBasicYamlSerializer();
+        var serializer = DataUtils.CreateBasicYamlSerializer();
         File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
 
         CoreConfigurationUpdated.OnNext(updatedConfiguration);

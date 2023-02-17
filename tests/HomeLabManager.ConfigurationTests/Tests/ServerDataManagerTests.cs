@@ -11,7 +11,7 @@ public sealed class ServerDataManagerTests
 
         Directory.CreateDirectory(Utils.TestGitDirectory);
 
-        var serializer = Common.Data.Utils.CreateBasicYamlSerializer();
+        var serializer = Common.Data.DataUtils.CreateBasicYamlSerializer();
         foreach (var server in _servers)
         {
             var directoryName = server.UniqueId?.ToString("D")!;

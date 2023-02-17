@@ -29,7 +29,7 @@ public sealed class ServerDataManager : IServerDataManager
         if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
             return Array.Empty<ServerDto>();
 
-        var deserializer = Utils.CreateBasicYamlDeserializer();
+        var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
         var foundServerDtos = new List<ServerDto>();
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
@@ -178,7 +178,7 @@ public sealed class ServerDataManager : IServerDataManager
         if (!Directory.Exists(serverDirectoryPath))
             throw new InvalidDataException($"{serverDirectoryPath} must refer to an existing directory in the filesystem.");
 
-        var serializer = Utils.CreateBasicYamlSerializer();
+        var serializer = DataUtils.CreateBasicYamlSerializer();
 
         File.WriteAllText(Path.Combine(serverDirectoryPath, ServerMetadataFileName), serializer.Serialize(server.Metadata!));
 

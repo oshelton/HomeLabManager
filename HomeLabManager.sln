@@ -32,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestData", "TestData", "{B2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.ManagerTests", "tests\HomeLabManager.ManagerTests\HomeLabManager.ManagerTests.csproj", "{58A54A4B-0EF8-4009-912E-82286E9C3A81}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLabManager.CommonTests", "tests\HomeLabManager.CommonTests\HomeLabManager.CommonTests.csproj", "{7AEA2B08-2533-41B3-8AD8-320B041A4ACD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -62,6 +64,9 @@ Global
 		{58A54A4B-0EF8-4009-912E-82286E9C3A81}.Debug|x64.Build.0 = Debug|x64
 		{58A54A4B-0EF8-4009-912E-82286E9C3A81}.Release|x64.ActiveCfg = Release|x64
 		{58A54A4B-0EF8-4009-912E-82286E9C3A81}.Release|x64.Build.0 = Release|x64
+		{7AEA2B08-2533-41B3-8AD8-320B041A4ACD}.Debug|x64.ActiveCfg = Debug|x64
+		{7AEA2B08-2533-41B3-8AD8-320B041A4ACD}.Debug|x64.Build.0 = Debug|x64
+		{7AEA2B08-2533-41B3-8AD8-320B041A4ACD}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +76,7 @@ Global
 		{F7711BEE-AD46-45CD-8322-9FB8B4D546FD} = {92A51926-5B5B-4F09-91F5-E14F8CEEB711}
 		{B27841B1-C63C-4BCE-B622-9F251DFEB7B5} = {C1E8B47A-0DDC-41A8-B904-9775A37A15F9}
 		{58A54A4B-0EF8-4009-912E-82286E9C3A81} = {92A51926-5B5B-4F09-91F5-E14F8CEEB711}
+		{7AEA2B08-2533-41B3-8AD8-320B041A4ACD} = {92A51926-5B5B-4F09-91F5-E14F8CEEB711}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7A27280-66BF-4B43-9E13-A1ED2138C45A}
