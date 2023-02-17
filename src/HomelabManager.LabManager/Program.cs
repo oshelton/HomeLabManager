@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -7,6 +8,7 @@ using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -14,6 +16,16 @@ namespace HomeLabManager.Manager;
 
 internal class Program
 {
+    /// <summary>
+    /// Mode to use for service creation.
+    /// </summary>
+    public enum ServiceMode
+    {
+        Real,
+        Design,
+        Testing,
+    }
+
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -33,7 +45,7 @@ internal class Program
         if (!Directory.Exists(s_coreConfigurationDirectory))
             Directory.CreateDirectory(s_coreConfigurationDirectory);
 
-        ServiceProvider = BuildServiceProvider(false);
+        ServiceProvider = BuildServiceProvider(Avalonia.Controls.Design.IsDesignMode ? ServiceMode.Design : ServiceMode.Real);
 
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
@@ -46,7 +58,7 @@ internal class Program
     public static void BuildTestApp()
     {
         IsInTestingMode = true;
-        ServiceProvider = BuildServiceProvider(true);
+        ServiceProvider = BuildServiceProvider(ServiceMode.Testing);
     }
 
     /// <summary>
@@ -59,27 +71,46 @@ internal class Program
     /// </summary>
     public static bool IsInTestingMode { get; private set; }
 
-    private static IHost BuildServiceProvider(bool forceDesignMode)
+    private static IHost BuildServiceProvider(ServiceMode mode)
     {
-        return Host.CreateDefaultBuilder()
+        var host = Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
-                var isInDesignMode = Avalonia.Controls.Design.IsDesignMode || forceDesignMode;
+                switch (mode)
+                {
+                    case ServiceMode.Real:
+                        // Add Data Services.
+                        services.AddSingleton<ICoreConfigurationManager>(provider => new CoreConfigurationManager(s_coreConfigurationDirectory!));
+                        services.AddSingleton<IServerDataManager>(provider => new ServerDataManager(provider.GetService<ICoreConfigurationManager>()!));
+                        
+                        // Add non-data services.
+                        services.AddSingleton<INavigationService>(provider => new NavigationService());
+                        break;
+                    case ServiceMode.Design:
+                        // Add Data Services.
+                        services.AddSingleton<ICoreConfigurationManager>(provider => new DesignCoreConfigurationManager());
+                        services.AddSingleton<IServerDataManager>(provider => new DesignServerDataManager());
 
-                // Add data services.
-                services.AddSingleton<ICoreConfigurationManager>(provider => isInDesignMode 
-                    ? new DesignCoreConfigurationManager() 
-                    : new CoreConfigurationManager(s_coreConfigurationDirectory!));
-                services.AddSingleton<IServerDataManager>(provider => isInDesignMode 
-                    ? new DesignServerDataManager() 
-                    : new ServerDataManager(provider.GetService<ICoreConfigurationManager>()!));
+                        // Add non-data services.
+                        services.AddSingleton<INavigationService>(provider => new DesignNavigationService());
+                        break;
+                    case ServiceMode.Testing:
+                        // Add Data Services.
+                        services.AddSingleton<ICoreConfigurationManager>(provider => new TestCoreConfigurationManager());
+                        services.AddSingleton<IServerDataManager>(provider => new TestServerDataManager());
 
-                // Add non-data related services.
-                services.AddSingleton<INavigationService>(provider => isInDesignMode
-                    ? new DesignNavigationService()
-                    : new NavigationService());
+                        // Add non-data services.
+                        services.AddSingleton<INavigationService>(provider => new TestNavigationService());
+                        break;
+                }
             })
             .Build();
+
+        Debug.Assert(host.Services.GetService<ICoreConfigurationManager>() is not null);
+        Debug.Assert(host.Services.GetService<IServerDataManager>() is not null);
+        Debug.Assert(host.Services.GetService<INavigationService>() is not null);
+
+        return host;
     }
 
     private static string? s_coreConfigurationDirectory;
