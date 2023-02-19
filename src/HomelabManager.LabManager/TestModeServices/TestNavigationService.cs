@@ -13,7 +13,7 @@ using ReactiveUI;
 namespace HomeLabManager.Manager.DesignModeServices;
 
 /// <summary>
-/// Design time Navigation Service.
+/// Testing Navigation Service.
 /// </summary>
 internal sealed class TestNavigationService: ReactiveObject, INavigationService
 {
@@ -24,6 +24,11 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
                 new HomeViewModel(),
                 new SettingsViewModel(),
         };
+    }
+
+    public void Configure(IReadOnlyList<PageBaseViewModel> pages)
+    {
+        Pages = pages;
     }
 
     public async Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)

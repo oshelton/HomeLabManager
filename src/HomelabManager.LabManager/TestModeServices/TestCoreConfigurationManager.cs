@@ -8,23 +8,34 @@ using HomeLabManager.Common.Data.CoreConfiguration;
 namespace HomeLabManager.Manager.DesignModeServices;
 
 /// <summary>
-/// CoreConfigurationManager to be used at design time.
+/// CoreConfigurationManager to be used with unit tests..
 /// </summary>
 internal sealed class TestCoreConfigurationManager : ICoreConfigurationManager
 {
-    public string CoreConfigPath => "";
-
-    public bool DisableConfigurationCaching 
-    { 
-        get => false; 
-        set => Debug.WriteLine("Does nothing."); 
+    public void Configure(Func<TestCoreConfigurationManager, string>? getCoreConfigPath = null,
+        Func<TestCoreConfigurationManager, CoreConfigurationDto>? getCoreConfiguration = null,
+        Func<TestCoreConfigurationManager, CoreConfigurationDto>? getOrCreateCoreConfiguration = null,
+        Action<TestCoreConfigurationManager>? saveCoreConfiguration = null)
+    {
+        _getCoreConfigPath = getCoreConfigPath;
+        _getCoreConfiguration = getCoreConfiguration;
+        _getOrCreateCoreConfiguration = getOrCreateCoreConfiguration;
+        _saveCoreConfiguration = saveCoreConfiguration;
     }
 
-    public CoreConfigurationDto GetCoreConfiguration() => s_staticConfiguration;
+    public string CoreConfigPath => _getCoreConfigPath is not null ? _getCoreConfigPath(this) : "";
 
-    public CoreConfigurationDto GetOrCreateCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator) => s_staticConfiguration;
+    public bool DisableConfigurationCaching { get; set; }
 
-    public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration) { }
+    public CoreConfigurationDto GetCoreConfiguration() => _getCoreConfiguration is not null ? _getCoreConfiguration(this) : s_staticConfiguration;
+
+    public CoreConfigurationDto GetOrCreateCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator) => _getOrCreateCoreConfiguration is not null ? _getOrCreateCoreConfiguration(this) : s_staticConfiguration;
+
+    public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration)
+    {
+        if (_saveCoreConfiguration is not null)
+            _saveCoreConfiguration(this);
+    }
 
     public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; } = new Subject<CoreConfigurationDto>();
 
@@ -35,4 +46,9 @@ internal sealed class TestCoreConfigurationManager : ICoreConfigurationManager
         GithubUserName = "", 
         HomeLabRepoDataPath = "C:\\tmp",
     };
+
+    private Func<TestCoreConfigurationManager, string>? _getCoreConfigPath;
+    private Func<TestCoreConfigurationManager, CoreConfigurationDto>? _getCoreConfiguration;
+    private Func<TestCoreConfigurationManager, CoreConfigurationDto>? _getOrCreateCoreConfiguration;
+    private Action<TestCoreConfigurationManager>? _saveCoreConfiguration;
 }

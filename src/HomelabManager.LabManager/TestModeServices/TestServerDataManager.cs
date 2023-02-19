@@ -6,7 +6,7 @@ using HomeLabManager.Common.Data.Git.Server;
 namespace HomeLabManager.Manager.DesignModeServices;
 
 /// <summary>
-/// Design time Server Data Manager implementation.
+/// Test time Server Data Manager implementation.
 /// </summary>
 internal sealed class TestServerDataManager: IServerDataManager
 {
