@@ -63,6 +63,9 @@ namespace HomeLabManager.Manager.Pages.Home
             var coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
             var coreConfig = coreConfigurationManager.GetCoreConfiguration();
 
+            _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>();
+            _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>();
+
             if (string.IsNullOrEmpty(coreConfig.HomeLabRepoDataPath))
             {
                 CurrentDisplayMode = HomeDisplayMode.NoRepoPath;
@@ -74,9 +77,6 @@ namespace HomeLabManager.Manager.Pages.Home
                 CurrentDisplayMode = HomeDisplayMode.RepoPathDoesNotExist;
                 return;
             }
-
-            _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>();
-            _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>();
 
             // Load Servers.
             CurrentDisplayMode = HomeDisplayMode.IsLoading;
