@@ -1,14 +1,9 @@
-using System;
 using System.Diagnostics;
 using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
-using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
