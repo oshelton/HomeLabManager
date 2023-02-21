@@ -3,6 +3,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:i="using:Avalonia.Xaml.Interactivity"
+	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+	xmlns:ic="using:Avalonia.Xaml.Interactions.Custom"
 	xmlns:materialAssists="using:Material.Styles.Assists"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -12,7 +15,7 @@
 		<ContentControl
 			Width="800"
 			Height="600"
-			ContentTemplate="{DynamicResource SettingsPageTemplate}">
+			ContentTemplate="{StaticResource SettingsPageTemplate}">
 			<ContentControl.Content>
 				<pages:SettingsViewModel />
 			</ContentControl.Content>
@@ -20,15 +23,18 @@
 	</Design.PreviewWith>
 
 	<DataTemplate x:Key="SettingsPageTemplate" DataType="{x:Type pages:SettingsViewModel}">
-		<DockPanel>
+		<DockPanel IsEnabled="{Binding !IsSaving}">
 			<DockPanel.Styles>
 				<Style Selector="materialIcons|MaterialIcon.TipIcon">
-					<Setter Property="Margin" Value="8" />
+					<Setter Property="Margin" Value="8,12,8,8" />
+					<Setter Property="Height" Value="24" />
+					<Setter Property="Width" Value="24" />
 					<Setter Property="Kind" Value="Information" />
 				</Style>
 
 				<Style Selector="TextBlock.SettingLabel">
 					<Setter Property="Grid.Column" Value="1" />
+					<Setter Property="Margin" Value="0,6,0,0" />
 					<Setter Property="VerticalAlignment" Value="Center" />
 				</Style>
 
@@ -36,6 +42,15 @@
 					<Setter Property="Grid.Column" Value="3" />
 					<Setter Property="Margin" Value="8,0,8,0" />
 					<Setter Property="VerticalAlignment" Value="Center" />
+				</Style>
+
+				<Style Selector="materialControls|FloatingButton.BrowseButton">
+					<Setter Property="Grid.Column" Value="4" />
+					<Setter Property="Content">
+						<Template>
+							<materialIcons:MaterialIcon Kind="Folder" />
+						</Template>
+					</Setter>
 				</Style>
 			</DockPanel.Styles>
 
@@ -46,17 +61,33 @@
 				<controls:PageNavButton
 					Margin="0,0,6,0"
 					Icon="FloppyDisc"
-					Text="Save" />
+					IsEnabled="{Binding HasChanges}"
+					Text="Save">
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="Click">
+							<ia:CallMethodAction MethodName="SaveChangesAndNavigateBack" TargetObject="{Binding}" />
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
+				</controls:PageNavButton>
 				<controls:PageNavButton
 					Icon="Cancel"
 					IsOutline="True"
-					Text="Cancel" />
+					Text="Cancel">
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="Click">
+							<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding NavigationService}" />
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
+				</controls:PageNavButton>
 			</UniformGrid>
 
 			<Grid ColumnDefinitions="Auto,Auto,32,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
 				<materialIcons:MaterialIcon Classes="TipIcon">
 					<ToolTip.Tip>
-						<TextBlock MaxWidth="384" TextWrapping="Wrap">
+						<TextBlock
+							MaxWidth="384"
+							Classes="Body1"
+							TextWrapping="Wrap">
 							<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
 							<LineBreak />
 							<LineBreak />
@@ -64,40 +95,74 @@
 						</TextBlock>
 					</ToolTip.Tip>
 				</materialIcons:MaterialIcon>
-				<TextBlock Classes="SettingLabel">Home Lab Repo Data Path:</TextBlock>
+				<TextBlock Classes="SettingLabel Body1">Home Lab Repo Data Path:</TextBlock>
 				<TextBox
 					x:Name="homeLabText"
-					Classes="outline SettingField"
-					IsReadOnly="True" />
+					materialAssists:TextFieldAssist.Label="Repo Path"
+					Classes="SettingField"
+					IsReadOnly="True"
+					Text="{Binding HomeLabRepoDataPath}" />
+				<materialControls:FloatingButton
+					Name="homeLabButton"
+					Margin="8"
+					Classes="Mini BrowseButton"
+					ToolTip.Tip="Open a directory picker to set the repo directory.">
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="Click">
+							<ia:CallMethodAction MethodName="OpenFolderPickerForRepoPath" TargetObject="{Binding}" />
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
+				</materialControls:FloatingButton>
 
 				<materialIcons:MaterialIcon Grid.Row="1" Classes="TipIcon">
 					<ToolTip.Tip>
-						<TextBlock MaxWidth="384" TextWrapping="Wrap">
-							<Run>This is the path to the standard Git config file containing the Name and Email Address to use.</Run>
+						<TextBlock
+							MaxWidth="384"
+							Classes="Body1"
+							TextWrapping="Wrap">
+							This is the path to the standard Git config file containing the Name and Email Address to use.
 						</TextBlock>
 					</ToolTip.Tip>
 				</materialIcons:MaterialIcon>
-				<TextBlock Grid.Row="1" Classes="SettingLabel">Git Config File Path:</TextBlock>
+				<TextBlock Grid.Row="1" Classes="SettingLabel Body1">Git Config File Path:</TextBlock>
 				<TextBox
 					x:Name="gitConfigText"
 					Grid.Row="1"
-					Classes="outline SettingField"
-					IsReadOnly="True" />
-
+					materialAssists:TextFieldAssist.Label="Git Config Path"
+					Classes="SettingField"
+					IsReadOnly="True"
+					Text="{Binding GitConfigFilePath}" />
+				<materialControls:FloatingButton
+					Name="gitConfigButton"
+					Grid.Row="1"
+					Margin="8"
+					Classes="Mini BrowseButton"
+					ToolTip.Tip="Open a file picker to specify the path to the git config file.">
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="Click">
+							<ia:CallMethodAction MethodName="OpenFilePickerForGitConfig" TargetObject="{Binding}" />
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
+				</materialControls:FloatingButton>
 
 				<materialIcons:MaterialIcon
 					Grid.Row="2"
 					Classes="TipIcon"
 					ToolTip.Tip="This is the User Name used when signing into Github." />
-				<TextBlock Grid.Row="2" Classes="SettingLabel">Github User Name:</TextBlock>
+				<TextBlock Grid.Row="2" Classes="SettingLabel Body1">Github User Name:</TextBlock>
 				<TextBox
 					x:Name="githubUsernameText"
 					Grid.Row="2"
-					Classes="outline SettingField" />
+					materialAssists:TextFieldAssist.Label="Github User Name"
+					Classes="SettingField"
+					Text="{Binding GithubUserName}" />
 
 				<materialIcons:MaterialIcon Grid.Row="3" Classes="TipIcon">
 					<ToolTip.Tip>
-						<TextBlock MaxWidth="384" TextWrapping="Wrap">
+						<TextBlock
+							MaxWidth="384"
+							Classes="Body1"
+							TextWrapping="Wrap">
 							<Run>This is the Github PAT used when pushing up to Github.</Run>
 							<LineBreak />
 							<LineBreak />
@@ -105,11 +170,13 @@
 						</TextBlock>
 					</ToolTip.Tip>
 				</materialIcons:MaterialIcon>
-				<TextBlock Grid.Row="3" Classes="SettingLabel">Github PAT:</TextBlock>
+				<TextBlock Grid.Row="3" Classes="SettingLabel Body1">Github PAT:</TextBlock>
 				<TextBox
 					x:Name="githubPatText"
 					Grid.Row="3"
-					Classes="outline SettingField" />
+					materialAssists:TextFieldAssist.Label="Github PAT"
+					Classes="SettingField"
+					Text="{Binding GithubPat}" />
 			</Grid>
 		</DockPanel>
 	</DataTemplate>

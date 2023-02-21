@@ -3,6 +3,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:dialogHost="using:DialogHostAvalonia"
 	xmlns:i="using:Avalonia.Xaml.Interactivity"
 	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
 	xmlns:ic="using:Avalonia.Xaml.Interactions.Custom"
@@ -13,12 +14,17 @@
 	xmlns:pages="using:HomeLabManager.Manager.Pages"
 	x:Name="window"
 	Title="Home Lab Manager"
-	MinWidth="800"
-	MinHeight="600"
+	MinWidth="640"
+	MinHeight="480"
 	mc:Ignorable="d">
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
+				<!--  Shared Dialogs  -->
+				<ResourceInclude Source="/SharedDialogs/ConfirmLeaveDialog.axaml" />
+				<ResourceInclude Source="/SharedDialogs/SimpleSavingDataDialog.axaml" />
+
+				<!--  Pages  -->
 				<ResourceInclude Source="/Pages/Home/HomePage.axaml" />
 				<ResourceInclude Source="/Pages/Settings/SettingsPage.axaml" />
 			</ResourceDictionary.MergedDictionaries>
@@ -35,43 +41,54 @@
 		</ia:EventTriggerBehavior>
 	</i:Interaction.Behaviors>
 
-	<DockPanel Margin="24">
-		<DockPanel DockPanel.Dock="Top">
-			<materialControls:FloatingButton
-				Name="backButton"
-				Margin="0,0,8,0"
-				Classes="Mini"
-				IsEnabled="{Binding NavigationService.CanNavigateBack}"
-				ToolTip.Tip="Navigate to the previous page.">
-				<i:Interaction.Behaviors>
-					<ia:EventTriggerBehavior EventName="Click">
-						<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding NavigationService}" />
-					</ia:EventTriggerBehavior>
-				</i:Interaction.Behaviors>
+	<Grid>
+		<DockPanel Margin="24">
+			<DockPanel DockPanel.Dock="Top">
+				<materialControls:FloatingButton
+					Name="backButton"
+					Margin="0,0,8,0"
+					Classes="Mini"
+					IsEnabled="{Binding NavigationService.CanNavigateBack}"
+					ToolTip.Tip="Navigate to the previous page.">
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="Click">
+							<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding NavigationService}" />
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
 
-				<materialIcons:MaterialIcon
-					Width="32"
-					Height="32"
-					Kind="NavigateBefore" />
-			</materialControls:FloatingButton>
+					<materialIcons:MaterialIcon
+						Width="32"
+						Height="32"
+						Kind="NavigateBefore" />
+				</materialControls:FloatingButton>
 
-			<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
+				<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
+			</DockPanel>
+
+			<Carousel
+				Name="ContentHost"
+				Margin="0,24,0,0"
+				DockPanel.Dock="Bottom"
+				Items="{Binding NavigationService.Pages}"
+				SelectedItem="{Binding NavigationService.CurrentPage}">
+				<Carousel.PageTransition>
+					<CrossFade Duration="0:00:00.250" />
+				</Carousel.PageTransition>
+
+				<Carousel.DataTemplates>
+					<!--  Pages  -->
+					<StaticResource ResourceKey="HomePageTemplate" />
+					<StaticResource ResourceKey="SettingsPageTemplate" />
+				</Carousel.DataTemplates>
+			</Carousel>
 		</DockPanel>
 
-		<Carousel
-			Name="ContentHost"
-			Margin="0,24,0,0"
-			DockPanel.Dock="Bottom"
-			Items="{Binding NavigationService.Pages}"
-			SelectedItem="{Binding NavigationService.CurrentPage}">
-			<Carousel.PageTransition>
-				<CrossFade Duration="0:00:00.250" />
-			</Carousel.PageTransition>
-
-			<Carousel.DataTemplates>
-				<StaticResource ResourceKey="HomePageTemplate" />
-				<StaticResourceExtension ResourceKey="SettingsPageTemplate" />
-			</Carousel.DataTemplates>
-		</Carousel>
-	</DockPanel>
+		<dialogHost:DialogHost Identifier="{x:Static local:MainWindow.MainDialogHostId}">
+			<dialogHost:DialogHost.DataTemplates>
+				<!--  Shared Dialogs  -->
+				<StaticResource ResourceKey="ConfirmLeaveDialog" />
+				<StaticResource ResourceKey="SimpleSavingDataDialog" />
+			</dialogHost:DialogHost.DataTemplates>
+		</dialogHost:DialogHost>
+	</Grid>
 </Window>
