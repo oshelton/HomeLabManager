@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
     <PackageReference Include="Docker.DotNet" Version="3.125.12" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
-    <PackageReference Include="YamlDotNet" Version="12.1.0" />
+    <PackageReference Include="YamlDotNet" Version="13.0.1" />
   </ItemGroup>
 
 </Project>

@@ -29,7 +29,6 @@
 					<Setter Property="Margin" Value="8,12,8,8" />
 					<Setter Property="Height" Value="24" />
 					<Setter Property="Width" Value="24" />
-					<Setter Property="Kind" Value="Information" />
 				</Style>
 
 				<Style Selector="TextBlock.SettingLabel">
@@ -82,7 +81,7 @@
 			</UniformGrid>
 
 			<Grid ColumnDefinitions="Auto,Auto,32,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
-				<materialIcons:MaterialIcon Classes="TipIcon">
+				<materialIcons:MaterialIcon Classes="TipIcon" Kind="Information">
 					<ToolTip.Tip>
 						<TextBlock
 							MaxWidth="384"
@@ -114,7 +113,10 @@
 					</i:Interaction.Behaviors>
 				</materialControls:FloatingButton>
 
-				<materialIcons:MaterialIcon Grid.Row="1" Classes="TipIcon">
+				<materialIcons:MaterialIcon
+					Grid.Row="1"
+					Classes="TipIcon"
+					Kind="Information">
 					<ToolTip.Tip>
 						<TextBlock
 							MaxWidth="384"
@@ -148,6 +150,7 @@
 				<materialIcons:MaterialIcon
 					Grid.Row="2"
 					Classes="TipIcon"
+					Kind="Information"
 					ToolTip.Tip="This is the User Name used when signing into Github." />
 				<TextBlock Grid.Row="2" Classes="SettingLabel Body1">Github User Name:</TextBlock>
 				<TextBox
@@ -157,7 +160,10 @@
 					Classes="SettingField"
 					Text="{Binding GithubUserName}" />
 
-				<materialIcons:MaterialIcon Grid.Row="3" Classes="TipIcon">
+				<materialIcons:MaterialIcon
+					Grid.Row="3"
+					Classes="TipIcon"
+					Kind="Information">
 					<ToolTip.Tip>
 						<TextBlock
 							MaxWidth="384"

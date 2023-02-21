@@ -86,10 +86,7 @@ public sealed class SettingsViewModel : PageBaseViewModel
         }).ConfigureAwait(true);
 
         if (chosenFolder is not null && chosenFolder.Count == 1)
-        {
-            chosenFolder[0].TryGetUri(out var uri);
-            HomeLabRepoDataPath = uri!.LocalPath;
-        }
+            HomeLabRepoDataPath = chosenFolder[0].Path.LocalPath;
     }
 
     public async Task OpenFilePickerForGitConfig()
@@ -101,10 +98,7 @@ public sealed class SettingsViewModel : PageBaseViewModel
         }).ConfigureAwait(true);
 
         if (openedFile is not null && openedFile.Count == 1)
-        {
-            openedFile[0].TryGetUri(out var uri);
-            GitConfigFilePath = uri!.LocalPath;
-        }
+            GitConfigFilePath = openedFile[0].Path.LocalPath;
     }
 
     public async Task SaveChangesAndNavigateBack()
