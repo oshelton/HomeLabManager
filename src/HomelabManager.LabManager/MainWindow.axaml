@@ -62,6 +62,47 @@
 						Kind="NavigateBefore" />
 				</materialControls:FloatingButton>
 
+				<ToggleButton
+					Name="repoDataPathButton"
+					DockPanel.Dock="Right"
+					IsEnabled="{Binding HasRepoDataPath}">
+					<Grid>
+						<materialIcons:MaterialIcon
+							Width="24"
+							Height="24"
+							Kind="Folder" />
+					</Grid>
+				</ToggleButton>
+
+				<Popup
+					IsLightDismissEnabled="True"
+					IsOpen="{Binding #repoDataPathButton.IsChecked, Mode=TwoWay}"
+					PlacementAnchor="BottomLeft"
+					PlacementGravity="BottomLeft"
+					PlacementTarget="{Binding #repoDataPathButton}"
+					VerticalOffset="4">
+					<materialControls:Card>
+						<StackPanel Orientation="Vertical">
+							<TextBlock Margin="8,8,8,4">
+								<Run Classes="Body1" FontWeight="Bold">Repo Data Path:</Run>
+								<Run Classes="Body1" Text="{Binding RepoDataPath}" />
+							</TextBlock>
+
+							<Button
+								Margin="8,4,8,8"
+								HorizontalAlignment="Right"
+								Classes="Flat">
+								Open Folder
+								<i:Interaction.Behaviors>
+									<ia:EventTriggerBehavior EventName="Click">
+										<ia:CallMethodAction MethodName="OpenRepoDataPath" TargetObject="{Binding}" />
+									</ia:EventTriggerBehavior>
+								</i:Interaction.Behaviors>
+							</Button>
+						</StackPanel>
+					</materialControls:Card>
+				</Popup>
+
 				<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
 			</DockPanel>
 
