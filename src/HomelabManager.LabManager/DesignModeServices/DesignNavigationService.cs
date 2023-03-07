@@ -19,45 +19,12 @@ internal sealed class DesignNavigationService: ReactiveObject, INavigationServic
 {
     public DesignNavigationService()
     {
-        Pages = new PageBaseViewModel[]
-        {
-                new HomeViewModel(),
-                new SettingsViewModel(),
-        };
+        Pages = Array.Empty<PageBaseViewModel>();
     }
 
-    public async Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)
+    public Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
-
-        var destinationPageType = request.DestinationPageType;
-        var destinationPage = Pages.FirstOrDefault(x => x.GetType() == destinationPageType);
-
-        if (destinationPage is null)
-            throw new InvalidOperationException("INavigationRequest must have a destination page.");
-
-        if (CurrentPage is not null)
-        {
-            var result = await destinationPage.TryNavigateAway().ConfigureAwait(false);
-            if (!result)
-                return false;
-        }
-
-        await destinationPage.NavigateTo(request).ConfigureAwait(false);
-
-        await DispatcherHelper.InvokeAsync(() =>
-        {
-            CurrentPage = destinationPage;
-
-            if (!isBackNavigation)
-                _navigationStack.Add(request);
-            else
-                _navigationStack.RemoveAt(_navigationStack.Count - 1);
-            UpdateCanNavigateBack();
-        }, DispatcherPriority.Input).ConfigureAwait(false);
-
-        return true;
+        return Task.FromResult(false);
     }
 
     public async Task NavigateBack()
