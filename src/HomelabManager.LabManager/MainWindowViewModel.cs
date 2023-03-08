@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using EventBinder;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
@@ -67,7 +68,6 @@ public sealed class MainWindowViewModel: ReactiveObject
             Arguments = RepoDataPath,
             FileName = "explorer.exe"
         };
-
         Process.Start(startInfo);
     }
 

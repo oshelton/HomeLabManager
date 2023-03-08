@@ -4,9 +4,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:dialogHost="using:DialogHostAvalonia"
-	xmlns:i="using:Avalonia.Xaml.Interactivity"
-	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
-	xmlns:ic="using:Avalonia.Xaml.Interactions.Custom"
+	xmlns:eventBinder="using:EventBinder"
 	xmlns:local="using:HomeLabManager.Manager"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -16,6 +14,7 @@
 	Title="Home Lab Manager"
 	MinWidth="640"
 	MinHeight="480"
+	Loaded="{eventBinder:EventBinding WindowLoaded, Debounce=10}"
 	mc:Ignorable="d">
 	<Window.Resources>
 		<ResourceDictionary>
@@ -35,12 +34,6 @@
 		<local:MainWindowViewModel />
 	</Window.DataContext>
 
-	<i:Interaction.Behaviors>
-		<ia:EventTriggerBehavior EventName="Loaded">
-			<ia:CallMethodAction MethodName="WindowLoaded" TargetObject="{Binding}" />
-		</ia:EventTriggerBehavior>
-	</i:Interaction.Behaviors>
-
 	<Grid>
 		<DockPanel Margin="24">
 			<DockPanel DockPanel.Dock="Top">
@@ -48,14 +41,9 @@
 					Name="backButton"
 					Margin="0,0,8,0"
 					Classes="Mini"
+					Click="{eventBinder:EventBinding NavigationService.NavigateBack, Debounce=10}"
 					IsEnabled="{Binding NavigationService.CanNavigateBack}"
 					ToolTip.Tip="Navigate to the previous page.">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding NavigationService}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-
 					<materialIcons:MaterialIcon
 						Width="32"
 						Height="32"
@@ -91,13 +79,9 @@
 							<Button
 								Margin="8,4,8,8"
 								HorizontalAlignment="Right"
-								Classes="Flat">
+								Classes="Flat"
+								Click="{eventBinder:EventBinding OpenRepoDataPath, Debounce=10}">
 								Open Folder
-								<i:Interaction.Behaviors>
-									<ia:EventTriggerBehavior EventName="Click">
-										<ia:CallMethodAction MethodName="OpenRepoDataPath" TargetObject="{Binding}" />
-									</ia:EventTriggerBehavior>
-								</i:Interaction.Behaviors>
 							</Button>
 						</StackPanel>
 					</materialControls:Card>

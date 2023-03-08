@@ -3,9 +3,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:i="using:Avalonia.Xaml.Interactivity"
-	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
-	xmlns:ic="using:Avalonia.Xaml.Interactions.Custom"
+	xmlns:eventBinder="using:EventBinder"
 	xmlns:materialAssists="using:Material.Styles.Assists"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -59,25 +57,15 @@
 				DockPanel.Dock="Bottom">
 				<controls:PageNavButton
 					Margin="0,0,6,0"
+					Click="{eventBinder:EventBinding SaveChangesAndNavigateBack, Debounce=10}"
 					Icon="FloppyDisc"
 					IsEnabled="{Binding HasChanges}"
-					Text="Save">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="SaveChangesAndNavigateBack" TargetObject="{Binding}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-				</controls:PageNavButton>
+					Text="Save" />
 				<controls:PageNavButton
+					Click="{eventBinder:EventBinding NavigationService.NavigateBack, Debounce=10}"
 					Icon="Cancel"
 					IsOutline="True"
-					Text="Cancel">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="NavigateBack" TargetObject="{Binding NavigationService}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-				</controls:PageNavButton>
+					Text="Cancel" />
 			</UniformGrid>
 
 			<Grid ColumnDefinitions="Auto,Auto,32,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
@@ -105,13 +93,8 @@
 					Name="homeLabButton"
 					Margin="8"
 					Classes="Mini BrowseButton"
-					ToolTip.Tip="Open a directory picker to set the repo directory.">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="OpenFolderPickerForRepoPath" TargetObject="{Binding}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-				</materialControls:FloatingButton>
+					Click="{eventBinder:EventBinding OpenFolderPickerForRepoPath, Debounce=10}"
+					ToolTip.Tip="Open a directory picker to set the repo directory." />
 
 				<materialIcons:MaterialIcon
 					Grid.Row="1"
@@ -139,13 +122,8 @@
 					Grid.Row="1"
 					Margin="8"
 					Classes="Mini BrowseButton"
-					ToolTip.Tip="Open a file picker to specify the path to the git config file.">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="OpenFilePickerForGitConfig" TargetObject="{Binding}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-				</materialControls:FloatingButton>
+					Click="{eventBinder:EventBinding OpenFilePickerForGitConfig, Debounce=10}"
+					ToolTip.Tip="Open a file picker to specify the path to the git config file." />
 
 				<materialIcons:MaterialIcon
 					Grid.Row="2"

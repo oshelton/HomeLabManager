@@ -3,9 +3,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:dialogs="using:HomeLabManager.Manager.SharedDialogs"
-	xmlns:i="using:Avalonia.Xaml.Interactivity"
-	xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
-	xmlns:ic="using:Avalonia.Xaml.Interactions.Custom"
+	xmlns:eventBinder="using:EventBinder"
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
 	<Design.PreviewWith>
 		<ContentControl MaxWidth="350" ContentTemplate="{StaticResource ConfirmLeaveDialog}">
@@ -44,24 +42,18 @@
 				HorizontalAlignment="Right"
 				DockPanel.Dock="Bottom"
 				Orientation="Horizontal">
-				<Button MinWidth="120" Content="Yes">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="Continue" TargetObject="{Binding}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-				</Button>
+				<Button
+					MinWidth="120"
+					Click="{eventBinder:EventBinding Continue,
+					                                 Debounce=10}"
+					Content="Yes" />
 				<Button
 					MinWidth="120"
 					Margin="8,0,0,0"
 					Classes="Outline"
-					Content="Cancel">
-					<i:Interaction.Behaviors>
-						<ia:EventTriggerBehavior EventName="Click">
-							<ia:CallMethodAction MethodName="Cancel" TargetObject="{Binding}" />
-						</ia:EventTriggerBehavior>
-					</i:Interaction.Behaviors>
-				</Button>
+					Click="{eventBinder:EventBinding Cancel,
+					                                 Debounce=10}"
+					Content="Cancel" />
 			</StackPanel>
 		</DockPanel>
 	</DataTemplate>
