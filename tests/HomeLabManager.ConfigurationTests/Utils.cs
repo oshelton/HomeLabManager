@@ -21,8 +21,8 @@ namespace HomeLabManager.DataTests
             {
                 HomeLabRepoDataPath = TestGitDirectory,
                 GitConfigFilePath = TestGitConfigFilePath,
-                GithubUserName = "oshelton",
-                GithubPat = "<place_pat_here>"
+                GithubUserName = File.ReadAllText(GithubUserNameFilePath),
+                GithubPat = File.ReadAllText(GithubUserPatFilePath)
             });
 
             return (manager, coreConfig);
@@ -47,5 +47,8 @@ namespace HomeLabManager.DataTests
             }
             Directory.Delete(directory);
         }
+
+        private const string GithubUserNameFilePath = "../../../../../TestData/github_username.txt";
+        private const string GithubUserPatFilePath = "../../../../../TestData/github_pat.txt";
     }
 }
