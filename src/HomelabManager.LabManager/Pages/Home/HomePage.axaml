@@ -38,7 +38,7 @@
 				<controls:PageNavButton
 					x:Name="settingsButton"
 					Margin="6,0,0,0"
-					Click="{eventBinder:EventBinding NavigateToSettings, Debounce=10}"
+					Click="{eventBinder:EventBinding NavigateToSettings}"
 					Icon="CogOutline"
 					Text="Settings" />
 			</UniformGrid>

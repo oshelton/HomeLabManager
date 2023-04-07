@@ -57,12 +57,12 @@
 				DockPanel.Dock="Bottom">
 				<controls:PageNavButton
 					Margin="0,0,6,0"
-					Click="{eventBinder:EventBinding SaveChangesAndNavigateBack, Debounce=10}"
+					Click="{eventBinder:EventBinding SaveChangesAndNavigateBack}"
 					Icon="FloppyDisc"
 					IsEnabled="{Binding HasChanges}"
 					Text="Save" />
 				<controls:PageNavButton
-					Click="{eventBinder:EventBinding NavigationService.NavigateBack, Debounce=10}"
+					Click="{eventBinder:EventBinding NavigationService.NavigateBack}"
 					Icon="Cancel"
 					IsOutline="True"
 					Text="Cancel" />
@@ -93,7 +93,7 @@
 					Name="homeLabButton"
 					Margin="8"
 					Classes="Mini BrowseButton"
-					Click="{eventBinder:EventBinding OpenFolderPickerForRepoPath, Debounce=10}"
+					Click="{eventBinder:EventBinding OpenFolderPickerForRepoPath}"
 					ToolTip.Tip="Open a directory picker to set the repo directory." />
 
 				<materialIcons:MaterialIcon
@@ -122,7 +122,7 @@
 					Grid.Row="1"
 					Margin="8"
 					Classes="Mini BrowseButton"
-					Click="{eventBinder:EventBinding OpenFilePickerForGitConfig, Debounce=10}"
+					Click="{eventBinder:EventBinding OpenFilePickerForGitConfig}"
 					ToolTip.Tip="Open a file picker to specify the path to the git config file." />
 
 				<materialIcons:MaterialIcon

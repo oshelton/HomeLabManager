@@ -14,7 +14,7 @@
 	Title="Home Lab Manager"
 	MinWidth="640"
 	MinHeight="480"
-	Loaded="{eventBinder:EventBinding WindowLoaded, Debounce=10}"
+	Loaded="{eventBinder:EventBinding WindowLoaded}"
 	mc:Ignorable="d">
 	<Window.Resources>
 		<ResourceDictionary>
@@ -41,7 +41,7 @@
 					Name="backButton"
 					Margin="0,0,8,0"
 					Classes="Mini"
-					Click="{eventBinder:EventBinding NavigationService.NavigateBack, Debounce=10}"
+					Click="{eventBinder:EventBinding NavigationService.NavigateBack}"
 					IsEnabled="{Binding NavigationService.CanNavigateBack}"
 					ToolTip.Tip="Navigate to the previous page.">
 					<materialIcons:MaterialIcon
@@ -80,7 +80,7 @@
 								Margin="8,4,8,8"
 								HorizontalAlignment="Right"
 								Classes="Flat"
-								Click="{eventBinder:EventBinding OpenRepoDataPath, Debounce=10}">
+								Click="{eventBinder:EventBinding OpenRepoDataPath}">
 								Open Folder
 							</Button>
 						</StackPanel>

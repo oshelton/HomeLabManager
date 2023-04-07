@@ -44,15 +44,13 @@
 				Orientation="Horizontal">
 				<Button
 					MinWidth="120"
-					Click="{eventBinder:EventBinding Continue,
-					                                 Debounce=10}"
+					Click="{eventBinder:EventBinding Continue}"
 					Content="Yes" />
 				<Button
 					MinWidth="120"
 					Margin="8,0,0,0"
 					Classes="Outline"
-					Click="{eventBinder:EventBinding Cancel,
-					                                 Debounce=10}"
+					Click="{eventBinder:EventBinding Cancel}"
 					Content="Cancel" />
 			</StackPanel>
 		</DockPanel>
