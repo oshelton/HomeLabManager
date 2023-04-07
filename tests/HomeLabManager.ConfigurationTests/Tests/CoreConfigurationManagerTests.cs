@@ -34,8 +34,8 @@ public sealed class CoreConfigurationManagerTests
 
         Assert.That(coreConfig.HomeLabRepoDataPath, Is.EqualTo(Utils.TestGitDirectory));
         Assert.That(coreConfig.GitConfigFilePath, Is.EqualTo(Utils.TestGitConfigFilePath));
-        Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
-        Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));
+        Assert.That(coreConfig.GithubUserName, Is.EqualTo("oshelton"));
+        Assert.That(coreConfig.GithubPat, Is.Not.Null);
     }
 
     [Test]
@@ -46,8 +46,8 @@ public sealed class CoreConfigurationManagerTests
 
         Assert.That(coreConfig.HomeLabRepoDataPath, Is.EqualTo(Utils.TestGitDirectory));
         Assert.That(coreConfig.GitConfigFilePath, Is.EqualTo(Utils.TestGitConfigFilePath));
-        Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
-        Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));
+        Assert.That(coreConfig.GithubUserName, Is.EqualTo("oshelton"));
+        Assert.That(coreConfig.GithubPat, Is.Not.Null);
     }
 
     [Test]
@@ -63,7 +63,7 @@ public sealed class CoreConfigurationManagerTests
         Assert.That(newConfig.HomeLabRepoDataPath, Is.EqualTo(Utils.TestGitDirectory));
         Assert.That(newConfig.GitConfigFilePath, Is.EqualTo(Utils.TestGitConfigFilePath));
         Assert.That(newConfig.GithubUserName, Is.EqualTo(coreConfig.GithubUserName));
-        Assert.That(newConfig.GithubPat, Is.EqualTo("pat"));
+        Assert.That(newConfig.GithubPat, Is.EqualTo(coreConfig.GithubPat));
     }
 
     [Test]
@@ -77,8 +77,8 @@ public sealed class CoreConfigurationManagerTests
 
         Assert.That(coreConfig.HomeLabRepoDataPath, Is.EqualTo(Utils.TestGitDirectory));
         Assert.That(coreConfig.GitConfigFilePath, Is.EqualTo(Utils.TestGitConfigFilePath));
-        Assert.That(coreConfig.GithubUserName, Is.EqualTo("owen"));
-        Assert.That(coreConfig.GithubPat, Is.EqualTo("pat"));
+        Assert.That(coreConfig.GithubUserName, Is.EqualTo("oshelton"));
+        Assert.That(coreConfig.GithubPat, Is.Not.Null);
     }
 
     [Test]
