@@ -219,6 +219,18 @@ public sealed class GitDataManagerTests
         Utils.DeleteReadOnlyDirectory(tempRepoDirectory);
     }
 
+    [Test]
+    public void CommitAndPushChanges_NoChanges_NoChangesToCommit()
+    {
+        var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
+        var gitManager = new GitDataManager(_coreConfigurationManager);
+
+        var commitMessage = "Test commit message";
+        var result = gitManager.CommitAndPushChanges(commitMessage);
+
+        Assert.That(result, Is.False);
+    }
+
     private static PushOptions CreatePushOptions(string githubUsername, string githubPat)
     {
         return new PushOptions
