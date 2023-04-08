@@ -92,22 +92,21 @@
 				<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
 			</DockPanel>
 
-			<Carousel
+			<TransitioningContentControl
 				Name="ContentHost"
 				Margin="0,24,0,0"
-				DockPanel.Dock="Bottom"
-				Items="{Binding NavigationService.Pages}"
-				SelectedItem="{Binding NavigationService.CurrentPage}">
-				<Carousel.PageTransition>
+				Content="{Binding NavigationService.CurrentPage}"
+				DockPanel.Dock="Bottom">
+				<TransitioningContentControl.PageTransition>
 					<CrossFade Duration="0:00:00.250" />
-				</Carousel.PageTransition>
+				</TransitioningContentControl.PageTransition>
 
-				<Carousel.DataTemplates>
+				<TransitioningContentControl.DataTemplates>
 					<!--  Pages  -->
 					<StaticResource ResourceKey="HomePageTemplate" />
 					<StaticResource ResourceKey="SettingsPageTemplate" />
-				</Carousel.DataTemplates>
-			</Carousel>
+				</TransitioningContentControl.DataTemplates>
+			</TransitioningContentControl>
 		</DockPanel>
 
 		<dialogHost:DialogHost Identifier="{x:Static local:MainWindow.MainDialogHostId}">
