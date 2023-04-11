@@ -87,7 +87,6 @@
 					x:Name="homeLabText"
 					materialAssists:TextFieldAssist.Label="Repo Path"
 					Classes="SettingField"
-					IsReadOnly="True"
 					Text="{Binding HomeLabRepoDataPath}" />
 				<materialControls:FloatingButton
 					Name="homeLabButton"
@@ -115,7 +114,6 @@
 					Grid.Row="1"
 					materialAssists:TextFieldAssist.Label="Git Config Path"
 					Classes="SettingField"
-					IsReadOnly="True"
 					Text="{Binding GitConfigFilePath}" />
 				<materialControls:FloatingButton
 					Name="gitConfigButton"

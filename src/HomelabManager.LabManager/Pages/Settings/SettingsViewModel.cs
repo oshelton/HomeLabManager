@@ -1,24 +1,48 @@
-﻿using System.Diagnostics;
-using System.Reactive.Linq;
-using System.Web;
+﻿using System.Reactive.Linq;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using DialogHostAvalonia;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.SharedDialogs;
+using LibGit2Sharp;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using ReactiveValidation;
+using ReactiveValidation.Extensions;
 
 namespace HomeLabManager.Manager.Pages.Settings;
 
 /// <summary>
 /// Settings Page View Model.
 /// </summary>
-public sealed class SettingsViewModel : PageBaseViewModel
+public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 {
+    public SettingsViewModel()
+    {
+        var builder = new ValidationBuilder<SettingsViewModel>();
+
+        builder.RuleFor(vm => vm.HomeLabRepoDataPath)
+            .WithPropertyCascadeMode(CascadeMode.Stop)
+            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application cannot work as expected.")
+            .Must(value => Directory.Exists(value), ValidationMessageType.Warning).WithMessage("This should point to a directory.").Throttle(1000)
+            .Must(value => Repository.IsValid(value), ValidationMessageType.Warning).WithMessage("This is not a Git Working Copy; some features will not work properly.").Throttle(1000);
+
+        builder.RuleFor(vm => vm.GitConfigFilePath)
+            .WithPropertyCascadeMode(CascadeMode.Stop)
+            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty change tracking will not be able to work as expected.")
+            .Must(value => File.Exists(value), ValidationMessageType.Warning).WithMessage("This must point to a file that exists.").Throttle(1000);
+
+        builder.RuleFor(vm => vm.GithubUserName)
+            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
+
+        builder.RuleFor(vm => vm.GithubPat)
+            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
+
+        Validator = builder.Build(this);
+    }
+
     public override string Title => "Settings";
 
     public override async Task NavigateTo(INavigationRequest request)
