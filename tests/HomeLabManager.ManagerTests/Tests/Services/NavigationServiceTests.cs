@@ -1,19 +1,20 @@
 ﻿using HomeLabManager.Manager.Pages.Home;
+using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 
 namespace HomeLabManager.ManagerTests.Tests.Services;
 
 /// <summary>
-/// Tests related ot the release NavigationService.
+/// Tests related to the NavigationService.
 /// </summary>
 public class NavigationServiceTests
 {
-    /// <summary>
-    /// Test initial creation and state of the Navigation Service.
-    /// </summary>
+    [SetUp]
+    public void SetUp() => Utils.RegisterTestServices();
+
     [Test]
-    public void TestCreation()
+    public void NavigationService_Creation_TestDefaultConstructor()
     {
         var service = new NavigationService();
 
@@ -22,18 +23,40 @@ public class NavigationServiceTests
         Assert.That(service.CurrentPage, Is.Null);
     }
 
-    /// <summary>
-    /// Test the initial navigation for the service and that it leaves it in the expected state.
-    /// </summary>
     [Test]
-    public async Task TestInitialNavigation()
+    public async Task NavigateTo_InitialNavigation_TestInitialNavigationToHomePage()
     {
         var service = new NavigationService();
 
         await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
 
         Assert.That(service.CanNavigateBack, Is.False);
-        Assert.That(service.Pages, Has.Count.EqualTo(2));
+        Assert.That(service.CurrentPage!.GetType(), Is.EqualTo(typeof(HomeViewModel)));
+    }
+
+    [Test]
+    public async Task NavigateTo_SecondPageNavigation_TestNavigatingToASecondPage()
+    {
+        var service = new NavigationService();
+
+        await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
+        await service.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(true);
+
+        Assert.That(service.CanNavigateBack, Is.True);
+        Assert.That(service.CurrentPage!.GetType(), Is.EqualTo(typeof(SettingsViewModel)));
+    }
+
+    [Test]
+    public async Task NavigateBack_TestNavigateBackFunctionality_ConfirmNavigatingBackWorksAsExpected()
+    {
+        var service = new NavigationService();
+
+        await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
+        await service.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(true);
+
+        await service.NavigateBack().ConfigureAwait(true);
+
+        Assert.That(service.CanNavigateBack, Is.False);
         Assert.That(service.CurrentPage!.GetType(), Is.EqualTo(typeof(HomeViewModel)));
     }
 }
