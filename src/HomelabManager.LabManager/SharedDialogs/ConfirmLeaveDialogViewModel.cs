@@ -3,7 +3,7 @@ using ReactiveUI;
 
 namespace HomeLabManager.Manager.SharedDialogs;
 
-internal sealed class ConfirmLeaveDialogViewModel : ReactiveObject
+public sealed class ConfirmLeaveDialogViewModel
 {
     public bool DoLeave { get; private set; }
 

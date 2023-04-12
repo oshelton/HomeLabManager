@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using EventBinder;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
