@@ -1,12 +1,12 @@
 ﻿using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Platform.Storage;
-using DialogHostAvalonia;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.Manager.SharedDialogs;
+using HomeLabManager.Manager.Utils;
 using LibGit2Sharp;
+using Material.Dialog;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveValidation;
@@ -87,18 +87,15 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             .Subscribe(state => HasChanges = !state.Equals(_initialState));
     }
 
-    public override async Task<bool> TryNavigateAway()
+    public override Task<bool> TryNavigateAway()
     {
         if (!HasChanges)
         {
             _stateChangeSubscription!.Dispose();
-            return true;
+            return Task.FromResult(true);
         }
 
-        var dialogModel = new ConfirmLeaveDialogViewModel();
-        await DialogHost.Show(dialogModel, MainWindow.MainDialogHostId).ConfigureAwait(true);
-
-        return dialogModel.DoLeave;
+        return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("There are unsaved changes on this page, they will be lost if you continue.");
     }
 
     public async Task OpenFolderPickerForRepoPath()
@@ -129,7 +126,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     {
         IsSaving = true;
 
-        var dialogTask = DialogHost.Show(new SimpleSavingDataDialogViewModel() { SaveMessage = "Saving Core Configuration Changes..." }, MainWindow.MainDialogHostId);
+        var (dialog, dialogTask) = SharedDialogs.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
         await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
         {
@@ -139,7 +136,9 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             GithubPat = GithubPat
         })).ConfigureAwait(true);
 
-        DialogHost.Close(MainWindow.MainDialogHostId);
+        await Task.Delay(3000).ConfigureAwait(true);
+
+        dialog.GetWindow().Close();
 
         IsSaving = false;
         HasChanges = false;

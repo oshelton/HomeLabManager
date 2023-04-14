@@ -3,7 +3,6 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:dialogHost="using:DialogHostAvalonia"
 	xmlns:eventBinder="using:EventBinder"
 	xmlns:local="using:HomeLabManager.Manager"
 	xmlns:materialControls="using:Material.Styles.Controls"
@@ -21,10 +20,6 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<!--  Shared Dialogs  -->
-				<ResourceInclude Source="/SharedDialogs/ConfirmLeaveDialog.axaml" />
-				<ResourceInclude Source="/SharedDialogs/SimpleSavingDataDialog.axaml" />
-
 				<!--  Pages  -->
 				<ResourceInclude Source="/Pages/Home/HomePage.axaml" />
 				<ResourceInclude Source="/Pages/Settings/SettingsPage.axaml" />
@@ -108,13 +103,5 @@
 				</TransitioningContentControl.DataTemplates>
 			</TransitioningContentControl>
 		</DockPanel>
-
-		<dialogHost:DialogHost Identifier="{x:Static local:MainWindow.MainDialogHostId}">
-			<dialogHost:DialogHost.DataTemplates>
-				<!--  Shared Dialogs  -->
-				<StaticResource ResourceKey="ConfirmLeaveDialog" />
-				<StaticResource ResourceKey="SimpleSavingDataDialog" />
-			</dialogHost:DialogHost.DataTemplates>
-		</dialogHost:DialogHost>
 	</Grid>
 </Window>
