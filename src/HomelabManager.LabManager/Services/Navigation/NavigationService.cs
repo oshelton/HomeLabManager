@@ -1,7 +1,5 @@
 ﻿using Avalonia.Threading;
 using HomeLabManager.Manager.Pages;
-using HomeLabManager.Manager.Pages.Home;
-using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
 using ReactiveUI;
@@ -13,25 +11,15 @@ namespace HomeLabManager.Manager.Services.Navigation;
 /// </summary>
 public sealed class NavigationService: ReactiveObject, INavigationService
 {
-    public NavigationService() 
-    {
-        Pages = new PageBaseViewModel[]
-        {
-                new HomeViewModel(),
-                new SettingsViewModel(),
-        };
-    }
-
     /// <summary>
     /// Navigate to a different page.
     /// </summary>
-    public async Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)
+    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null)
     {
         if (request is null)
             throw new ArgumentNullException(nameof(request));
 
-        var destinationPageType = request.DestinationPageType;
-        var destinationPage = Pages.FirstOrDefault(x => x.GetType() == destinationPageType);
+        var destinationPage = navigateBackToPage ?? request.CreatePage();
 
         if (destinationPage is null)
             throw new InvalidOperationException("INavigationRequest must have a destination page.");
@@ -49,8 +37,8 @@ public sealed class NavigationService: ReactiveObject, INavigationService
         {
             CurrentPage = destinationPage;
 
-            if (!isBackNavigation)
-                _navigationStack.Add(request);
+            if (navigateBackToPage is null)
+                _navigationStack.Add((request, destinationPage));
             else
                 _navigationStack.RemoveAt(_navigationStack.Count - 1);
             UpdateCanNavigateBack();
@@ -67,7 +55,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
         if (!CanNavigateBack)
             return;
 
-        await NavigateTo(_navigationStack[^2], true).ConfigureAwait(false);
+        await NavigateTo(_navigationStack[^2].Request, _navigationStack[^2].Page).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -89,21 +77,12 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     }
 
     /// <summary>
-    /// Get all available pages.
-    /// </summary>
-    public IReadOnlyList<PageBaseViewModel> Pages
-    {
-        get => _pages;
-        private set => this.RaiseAndSetIfChanged(ref _pages, value);
-    }
-
-    /// <summary>
     /// Update whether or not back navigation is possible.
     /// </summary>
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
-    private List<INavigationRequest> _navigationStack = new();
+    private readonly List<(INavigationRequest Request, PageBaseViewModel Page)> _navigationStack = new();
+
     private bool _canNavigateBack;
     private PageBaseViewModel? _currentPage;
-    private IReadOnlyList<PageBaseViewModel> _pages = new List<PageBaseViewModel>();
 }

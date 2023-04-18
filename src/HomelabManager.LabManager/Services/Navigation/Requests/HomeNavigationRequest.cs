@@ -1,4 +1,5 @@
-﻿using HomeLabManager.Manager.Pages.Home;
+﻿using HomeLabManager.Manager.Pages;
+using HomeLabManager.Manager.Pages.Home;
 
 namespace HomeLabManager.Manager.Services.Navigation.Requests
 {
@@ -8,8 +9,8 @@ namespace HomeLabManager.Manager.Services.Navigation.Requests
     public sealed class HomeNavigationRequest : INavigationRequest
     {
         /// <summary>
-        /// Reference to the Home Page View Model type.
+        /// Create instance of the Home Page.
         /// </summary>
-        public Type DestinationPageType => typeof(HomeViewModel);
+        public PageBaseViewModel CreatePage() => new HomeViewModel();
     }
 }

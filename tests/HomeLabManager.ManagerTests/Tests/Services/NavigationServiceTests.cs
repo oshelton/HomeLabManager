@@ -19,7 +19,6 @@ public class NavigationServiceTests
         var service = new NavigationService();
 
         Assert.That(service.CanNavigateBack, Is.False);
-        Assert.That(service.Pages, Has.Count.EqualTo(2));
         Assert.That(service.CurrentPage, Is.Null);
     }
 

@@ -18,7 +18,7 @@ public interface INavigationService
     /// Navigate to a page using a NavigationRequest.
     /// </summary>
     /// <returns>false if navigation fails, true if it succeeds.</returns>
-    Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false);
+    Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null);
     
     /// <summary>
     /// Navigate back to the previous page.
@@ -34,9 +34,4 @@ public interface INavigationService
     /// Get the current page.
     /// </summary>
     PageBaseViewModel? CurrentPage { get; }
-
-    /// <summary>
-    /// Get a reference to all available pages.
-    /// </summary>
-    IReadOnlyList<PageBaseViewModel> Pages { get; }
 }

@@ -17,27 +17,12 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class TestNavigationService: ReactiveObject, INavigationService
 {
-    public TestNavigationService()
-    {
-        Pages = new PageBaseViewModel[]
-        {
-                new HomeViewModel(),
-                new SettingsViewModel(),
-        };
-    }
-
-    public void Configure(IReadOnlyList<PageBaseViewModel> pages)
-    {
-        Pages = pages;
-    }
-
-    public async Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)
+    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null)
     {
         if (request is null)
             throw new ArgumentNullException(nameof(request));
 
-        var destinationPageType = request.DestinationPageType;
-        var destinationPage = Pages.FirstOrDefault(x => x.GetType() == destinationPageType);
+        var destinationPage = navigateBackToPage ?? request.CreatePage();
 
         if (destinationPage is null)
             throw new InvalidOperationException("INavigationRequest must have a destination page.");
@@ -55,8 +40,8 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
         {
             CurrentPage = destinationPage;
 
-            if (!isBackNavigation)
-                _navigationStack.Add(request);
+            if (navigateBackToPage is null)
+                _navigationStack.Add((request, destinationPage));
             else
                 _navigationStack.RemoveAt(_navigationStack.Count - 1);
             UpdateCanNavigateBack();
@@ -70,7 +55,7 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
         if (!CanNavigateBack)
             return;
 
-        await NavigateTo(_navigationStack[^2], true).ConfigureAwait(false);
+        await NavigateTo(_navigationStack[^2].Request, _navigationStack[^2].Page).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -84,14 +69,9 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
     public PageBaseViewModel? CurrentPage { get; private set; }
 
     /// <summary>
-    /// Get all available pages.
-    /// </summary>
-    public IReadOnlyList<PageBaseViewModel> Pages { get; private set; }
-
-    /// <summary>
     /// Update whether or not back navigation is possible.
     /// </summary>
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
-    private List<INavigationRequest> _navigationStack = new();
+    private readonly List<(INavigationRequest Request, PageBaseViewModel Page)> _navigationStack = new();
 }

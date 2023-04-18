@@ -21,6 +21,9 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 {
     public SettingsViewModel()
     {
+        _coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
+        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
+
         var builder = new ValidationBuilder<SettingsViewModel>();
 
         builder.RuleFor(vm => vm.HomeLabRepoDataPath)
@@ -49,9 +52,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     {
         if (request is not SettingsNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
-
-        _coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
-        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
 
         HasChanges = false;
 
@@ -184,8 +184,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         set => this.RaiseAndSetIfChanged(ref _githubPat, value);
     }
 
-    private ICoreConfigurationManager? _coreConfigurationManager;
-    private INavigationService? _navigationService;
+    private ICoreConfigurationManager _coreConfigurationManager;
+    private INavigationService _navigationService;
     
     private bool _hasChanges;
     private bool _isSaving;

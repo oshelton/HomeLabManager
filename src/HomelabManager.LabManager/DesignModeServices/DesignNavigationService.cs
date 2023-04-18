@@ -17,12 +17,7 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class DesignNavigationService: ReactiveObject, INavigationService
 {
-    public DesignNavigationService()
-    {
-        Pages = Array.Empty<PageBaseViewModel>();
-    }
-
-    public Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)
+    public Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null)
     {
         return Task.FromResult(false);
     }
@@ -32,7 +27,7 @@ internal sealed class DesignNavigationService: ReactiveObject, INavigationServic
         if (!CanNavigateBack)
             return;
 
-        await NavigateTo(_navigationStack[^2], true).ConfigureAwait(false);
+        await NavigateTo(_navigationStack[^2].Request, _navigationStack[^2].Page).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -46,14 +41,9 @@ internal sealed class DesignNavigationService: ReactiveObject, INavigationServic
     public PageBaseViewModel? CurrentPage { get; private set; }
 
     /// <summary>
-    /// Get all available pages.
-    /// </summary>
-    public IReadOnlyList<PageBaseViewModel> Pages { get; private set; }
-
-    /// <summary>
     /// Update whether or not back navigation is possible.
     /// </summary>
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
-    private List<INavigationRequest> _navigationStack = new();
+    private readonly List<(INavigationRequest Request, PageBaseViewModel Page)> _navigationStack = new();
 }

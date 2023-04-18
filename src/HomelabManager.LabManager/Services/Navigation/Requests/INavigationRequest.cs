@@ -12,8 +12,6 @@ namespace HomeLabManager.Manager.Services.Navigation.Requests;
 /// </summary>
 public interface INavigationRequest
 {
-    /// <summary>
-    /// Page Type to be navigated to.
-    /// </summary>
-    Type DestinationPageType { get; }
+    // Create an instance of the associated Page.
+    PageBaseViewModel CreatePage();
 }

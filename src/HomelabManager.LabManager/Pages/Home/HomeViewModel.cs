@@ -26,9 +26,12 @@ namespace HomeLabManager.Manager.Pages.Home
     {
         public HomeViewModel()
         {
+            _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>()!;
+            _coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
+            _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
+
             if (Avalonia.Controls.Design.IsDesignMode)
             {
-                _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>();
                 var mode = new Random().NextInt64(0, 5);
                 switch (mode)
                 {
@@ -60,11 +63,7 @@ namespace HomeLabManager.Manager.Pages.Home
                 throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
             // Confirm there is a repo data path and that it exists.
-            var coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
-            var coreConfig = coreConfigurationManager.GetCoreConfiguration();
-
-            _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>();
-            _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>();
+            var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
 
             if (string.IsNullOrEmpty(coreConfig.HomeLabRepoDataPath))
             {
@@ -98,6 +97,9 @@ namespace HomeLabManager.Manager.Pages.Home
 
         public async Task NavigateToSettings() => await _navigationService!.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(false);
 
+        /// <summary>
+        /// Current display mode.
+        /// </summary>
         public HomeDisplayMode CurrentDisplayMode
         {
             get => _currentDisplayMode;
@@ -113,8 +115,9 @@ namespace HomeLabManager.Manager.Pages.Home
             private set => this.RaiseAndSetIfChanged(ref _servers, value);
         }
 
-        private IServerDataManager? _serverDataManager;
-        private INavigationService? _navigationService;
+        private readonly IServerDataManager _serverDataManager;
+        private readonly ICoreConfigurationManager _coreConfigurationManager;
+        private readonly INavigationService _navigationService;
 
         private HomeDisplayMode _currentDisplayMode;
         private IReadOnlyList<ServerViewModel>? _servers;
