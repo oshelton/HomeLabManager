@@ -51,12 +51,10 @@
 					Name="repoDataPathButton"
 					DockPanel.Dock="Right"
 					IsEnabled="{Binding HasRepoDataPath}">
-					<Grid>
-						<materialIcons:MaterialIcon
-							Width="24"
-							Height="24"
-							Kind="Folder" />
-					</Grid>
+					<materialIcons:MaterialIcon
+						Width="24"
+						Height="24"
+						Kind="Folder" />
 				</ToggleButton>
 
 				<Popup
