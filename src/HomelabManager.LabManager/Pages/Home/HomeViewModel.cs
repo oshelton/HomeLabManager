@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Manager.Pages.ServerListing;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
@@ -94,6 +95,8 @@ namespace HomeLabManager.Manager.Pages.Home
         }
 
         public override Task<bool> TryNavigateAway() => Task.FromResult(true);
+
+        public async Task NavigateToServerListing() => await _navigationService!.NavigateTo(new ServerListingNavigationRequest()).ConfigureAwait(false);
 
         public async Task NavigateToSettings() => await _navigationService!.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(false);
 

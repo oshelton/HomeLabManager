@@ -1,0 +1,30 @@
+<ResourceDictionary
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:eventBinder="using:EventBinder"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:page="using:HomeLabManager.Manager.Pages.ServerListing">
+	<Design.PreviewWith>
+		<ContentControl
+			Width="800"
+			Height="600"
+			ContentTemplate="{DynamicResource ServerListingPageTemplate}">
+			<ContentControl.Content>
+				<page:ServerListingViewModel />
+			</ContentControl.Content>
+		</ContentControl>
+	</Design.PreviewWith>
+
+	<DataTemplate x:Key="ServerListingPageTemplate" DataType="{x:Type page:ServerListingViewModel}">
+		<ItemsRepeater Margin="12" Items="{Binding Servers}">
+			<ItemsRepeater.Layout>
+				<StackLayout Orientation="Vertical" Spacing="8" />
+			</ItemsRepeater.Layout>
+		</ItemsRepeater>
+	</DataTemplate>
+</ResourceDictionary>
