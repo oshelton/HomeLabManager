@@ -136,8 +136,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             GithubPat = GithubPat
         })).ConfigureAwait(true);
 
-        await Task.Delay(3000).ConfigureAwait(true);
-
         dialog.GetWindow().Close();
 
         IsSaving = false;
