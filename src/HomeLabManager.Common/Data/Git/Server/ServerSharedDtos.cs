@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using YamlDotNet.Serialization;
-
-[assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
+﻿using YamlDotNet.Serialization;
 
 namespace HomeLabManager.Common.Data.Git.Server;
 
@@ -10,43 +7,9 @@ namespace HomeLabManager.Common.Data.Git.Server;
 /// </summary>
 public enum ServerKind
 {
-    WindowsWSL,
-    Ubuntu,
-}
-
-/// <summary>
-/// DTO representing a Server's information.
-/// </summary>
-public sealed record ServerDto
-{
-    /// <summary>
-    /// Name of the directory the server dto came from.
-    /// </summary>
-    public string? Directory { get; init; }
-
-    /// <summary>
-    /// Unique id of this server, is the name of the directory the server lives in.
-    /// </summary>
-    public Guid? UniqueId { get; internal set; }
-
-    /// <summary>
-    /// Metadata for this server.
-    /// </summary>
-    public ServerMetadataDto? Metadata { get; init; }
-    /// <summary>
-    /// Data extracted from the server's Docker compose file.
-    /// </summary>
-    public DockerComposeDto? DockerCompose { get; init; }
-    /// <summary>
-    /// Server configuration details of the server.
-    /// </summary>
-    public ServerConfigurationDto? Configuration { get; init; }
-
-    /// <summary>
-    /// Convert the Server's unique ID to a string capable of being used as a directory name.
-    /// </summary>
-    /// <returns>A directory safe string or null if the server has no unique ID.</returns>
-    public string? UniqueIdToDirectoryName() => UniqueId?.ToString("D");
+    Windows,
+    StandardLinux,
+    TrueNas,
 }
 
 /// <summary>
@@ -96,4 +59,36 @@ public sealed record DockerComposeDto
 public sealed record ServerConfigurationDto
 {
 
+}
+
+public abstract record BaseServerDto
+{
+    /// <summary>
+    /// Name of the directory the server dto came from.
+    /// </summary>
+    public string? Directory { get; init; }
+
+    /// <summary>
+    /// Unique id of this server, is the name of the directory the server lives in.
+    /// </summary>
+    public Guid? UniqueId { get; internal set; }
+
+    /// <summary>
+    /// Metadata for this server.
+    /// </summary>
+    public ServerMetadataDto? Metadata { get; init; }
+    /// <summary>
+    /// Data extracted from the server's Docker compose file.
+    /// </summary>
+    public DockerComposeDto? DockerCompose { get; init; }
+    /// <summary>
+    /// Server configuration details of the server.
+    /// </summary>
+    public ServerConfigurationDto? Configuration { get; init; }
+
+    /// <summary>
+    /// Convert the Server's unique ID to a string capable of being used as a directory name.
+    /// </summary>
+    /// <returns>A directory safe string or null if the server has no unique ID.</returns>
+    public virtual string? UniqueIdToDirectoryName() => UniqueId?.ToString("D");
 }

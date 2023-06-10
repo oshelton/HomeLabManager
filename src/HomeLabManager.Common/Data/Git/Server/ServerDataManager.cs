@@ -5,14 +5,10 @@ using HomeLabManager.Common.Data.CoreConfiguration;
 
 namespace HomeLabManager.Common.Data.Git.Server;
 
-/// <summary>
-/// Class for accessing and updating the data stored in a Home Lab Git Repo.
-/// </summary>
+/// <inheritdoc/>
 public sealed class ServerDataManager : IServerDataManager
 {
-    /// <summary>
-    /// Construct a new GitDataManager with the core configuration manager to use.
-    /// </summary>
+    /// <inheritdoc/>
     public ServerDataManager(ICoreConfigurationManager coreConfigurationManager)
     {
         if (coreConfigurationManager is null)
@@ -21,27 +17,23 @@ public sealed class ServerDataManager : IServerDataManager
         _coreConfigurationManager = coreConfigurationManager;
     }
 
-    /// <summary>
-    /// Get a list of the server information in the git HomeLab directory.
-    /// </summary>
-    public IReadOnlyList<ServerDto> GetServers()
+    /// <inheritdoc/>
+    public IReadOnlyList<ServerHostDto> GetServers()
     {
         if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
-            return Array.Empty<ServerDto>();
+            return Array.Empty<ServerHostDto>();
 
-        var deserializer = DataUtils.CreateBasicYamlDeserializer();
-
-        var foundServerDtos = new List<ServerDto>();
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
-        foreach (var serverDirectory in Directory.EnumerateDirectories(Path.Combine(repoPath, "servers")))
+        static T readServerDto<T>(string basePath) where T : BaseServerDto, new()
         {
-            var metadataPath = Path.Combine(serverDirectory, ServerMetadataFileName);
-            var dockerPath = Path.Combine(serverDirectory, ServerDockerFileName);
-            var configurationPath = Path.Combine(serverDirectory, ServerConfigurationFileName);
+            var metadataPath = Path.Combine(basePath, ServerMetadataFileName);
+            var dockerPath = Path.Combine(basePath, ServerDockerFileName);
+            var configurationPath = Path.Combine(basePath, ServerConfigurationFileName);
+
+            var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
             var metadata = File.Exists(metadataPath)
                 ? deserializer.Deserialize<ServerMetadataDto>(File.ReadAllText(metadataPath)) with { FileName = metadataPath }
-                : new ServerMetadataDto() { Name = Path.GetDirectoryName(serverDirectory), FileName = metadataPath };
+                : new ServerMetadataDto() { Name = Path.GetDirectoryName(basePath), FileName = metadataPath };
 
             var docker = File.Exists(dockerPath)
                 ? deserializer.Deserialize<DockerComposeDto>(File.ReadAllText(dockerPath))
@@ -51,23 +43,37 @@ public sealed class ServerDataManager : IServerDataManager
                 ? deserializer.Deserialize<ServerConfigurationDto>(File.ReadAllText(configurationPath))
                 : null;
 
-            foundServerDtos.Add(new ServerDto()
+            var directoryName = Path.GetFileName(basePath);
+            return new T
             {
-                Directory = serverDirectory,
-                UniqueId = Guid.Parse(Path.GetFileName(serverDirectory)!),
+                Directory = basePath,
+                UniqueId = directoryName.StartsWith(ServerVmDto.UniqueIdPrefix, StringComparison.InvariantCulture) ? Guid.Parse(directoryName.AsSpan(ServerVmDto.UniqueIdPrefix.Length)) : Guid.Parse(directoryName),
                 Metadata = metadata,
                 DockerCompose = docker,
                 Configuration = configuration
-            });
+            };
+        };
+
+        var foundServerDtos = new List<ServerHostDto>();
+        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+        foreach (var serverDirectory in Directory.EnumerateDirectories(Path.Combine(repoPath, ServersDirectoryName)))
+        {
+            var serverHostDto = readServerDto<ServerHostDto>(serverDirectory);
+            serverHostDto.VMs = Directory.EnumerateDirectories(serverDirectory, $"{ServerVmDto.UniqueIdPrefix}*").Select(vmDir =>
+            {
+                var vm = readServerDto<ServerVmDto>(vmDir);
+                vm.Host = serverHostDto;
+
+                return vm;
+            }).ToList();
+            foundServerDtos.Add(serverHostDto);
         }
 
         return foundServerDtos;
     }
 
-    /// <summary>
-    /// Add a new server to the repo.
-    /// </summary>
-    public void AddNewServer(ServerDto server)
+    /// <inheritdoc/>
+    public void AddUpdateServer(ServerHostDto server)
     {
         if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
             throw new InvalidOperationException("Server cannot be added if the repo data path directory does not exist.");
@@ -77,53 +83,15 @@ public sealed class ServerDataManager : IServerDataManager
 
         if (server.Metadata is null)
             throw new InvalidDataException("Server must at least have metadata assigned to it.");
-        if (server.UniqueId is not null)
-            throw new InvalidDataException("This server already has an Id and should be updated, not added.");
 
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
-        if (Directory.GetDirectories(serversDirectory).Any(x => Path.GetDirectoryName(x) == server.Metadata?.Name))
-            throw new InvalidDataException("A server already exists with this name; try another.");
 
-        server.UniqueId = Guid.NewGuid();
-
-        var newServerDirectory = Path.Combine(serversDirectory, server.UniqueIdToDirectoryName()!);
-        Directory.CreateDirectory(newServerDirectory);
-
-        WriteServerDtoToFile(server, newServerDirectory);
+        WriteServerHostDto(server, serversDirectory);
     }
 
-    /// <summary>
-    /// Add a new server to the repo.
-    /// </summary>
-    public void UpdateServer(ServerDto server)
-    {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
-            throw new InvalidOperationException("Server cannot be updated if the repo data path directory does not exist.");
-
-        if (server is null)
-            throw new ArgumentNullException(nameof(server));
-
-        if (server.Metadata is null)
-            throw new InvalidDataException("Server must at least have metadata assigned to it.");
-        if (server.Metadata?.Name is null)
-            throw new InvalidDataException("Server to be added must have a name.");
-        if (server.UniqueId is null)
-            throw new InvalidDataException("This server doess not have an Id and should be added, not updated.");
-
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
-        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName()!);
-
-        if (!Directory.Exists(serverDirectory))
-            Directory.CreateDirectory(serverDirectory);
-
-        WriteServerDtoToFile(server, serverDirectory);
-    }
-
-    /// <summary>
-    /// Delete the passed in server.
-    /// </summary>
-    public void DeleteServer(ServerDto server)
+    /// <inheritdoc/>
+    public void DeleteServer(ServerHostDto server)
     {
         if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
             throw new InvalidOperationException("Server cannot be deleted if the repo data path directory does not exist.");
@@ -132,7 +100,7 @@ public sealed class ServerDataManager : IServerDataManager
             throw new ArgumentNullException(nameof(server));
 
         if (server.UniqueId is null)
-            throw new InvalidDataException("This server doess not have an Id and should be added, not updated.");
+            throw new InvalidDataException("This server doess not have an Id and should be added, not deleted.");
 
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
         var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName()!);
@@ -146,7 +114,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <summary>
     /// Name of the directory that server information lives in.
     /// </summary>
-    /// /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
+    /// <remarks>Mostly available for testing and utility functions; use with caution.</remarks>
     internal const string ServersDirectoryName = "servers";
 
     /// <summary>
@@ -168,25 +136,52 @@ public sealed class ServerDataManager : IServerDataManager
     /// <summary>
     /// Write the passed in server dto to the passed in directory.
     /// </summary>
-    private static void WriteServerDtoToFile(ServerDto server, string serverDirectoryPath)
+    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory)
     {
         if (server is null)
             throw new ArgumentNullException(nameof(server));
-        if (serverDirectoryPath is null)
-            throw new ArgumentNullException(nameof(serverDirectoryPath));
+        if (serversDirectory is null)
+            throw new ArgumentNullException(nameof(serversDirectory));
 
-        if (!Directory.Exists(serverDirectoryPath))
-            throw new InvalidDataException($"{serverDirectoryPath} must refer to an existing directory in the filesystem.");
+        static void writeDtoToFile(BaseServerDto dto, string basePath)
+        {
+            if (dto is null)
+                throw new ArgumentNullException(nameof(server));
+            if (string.IsNullOrEmpty(basePath))
+                throw new ArgumentNullException(nameof(basePath));
 
-        var serializer = DataUtils.CreateBasicYamlSerializer();
+            if (!Directory.Exists(basePath))
+                throw new InvalidDataException($"{basePath} must refer to an existing directory in the filesystem.");
 
-        File.WriteAllText(Path.Combine(serverDirectoryPath, ServerMetadataFileName), serializer.Serialize(server.Metadata!));
+            var serializer = DataUtils.CreateBasicYamlSerializer();
 
-        if (server.DockerCompose is not null)
-            File.WriteAllText(Path.Combine(serverDirectoryPath, ServerDockerFileName), serializer.Serialize(server.DockerCompose!));
+            File.WriteAllText(Path.Combine(basePath, ServerMetadataFileName), serializer.Serialize(dto.Metadata!));
 
-        if (server.Configuration is not null)
-            File.WriteAllText(Path.Combine(serverDirectoryPath, ServerDockerFileName), serializer.Serialize(server.Configuration!));
+            if (dto.DockerCompose is not null)
+                File.WriteAllText(Path.Combine(basePath, ServerDockerFileName), serializer.Serialize(dto.DockerCompose!));
+
+            if (dto.Configuration is not null)
+                File.WriteAllText(Path.Combine(basePath, ServerDockerFileName), serializer.Serialize(dto.Configuration!));
+        };
+
+        server.UniqueId ??= Guid.NewGuid();
+
+        var newServerDirectory = Path.Combine(serversDirectory, server.UniqueIdToDirectoryName()!);
+        if (!Directory.Exists(newServerDirectory))
+            Directory.CreateDirectory(newServerDirectory);
+
+        writeDtoToFile(server, newServerDirectory);
+
+        foreach (var vm in server.VMs)
+        {
+            vm.UniqueId ??= Guid.NewGuid();
+
+            var newVmDirectory = Path.Combine(newServerDirectory, vm.UniqueIdToDirectoryName()!);
+            if (!Directory.Exists(newVmDirectory))
+                Directory.CreateDirectory(newVmDirectory);
+
+            writeDtoToFile(vm, newVmDirectory);
+        }
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
