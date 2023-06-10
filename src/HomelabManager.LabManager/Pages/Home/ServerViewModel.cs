@@ -10,7 +10,7 @@ namespace HomeLabManager.Manager.Pages.Home;
 
 public sealed class ServerViewModel: ReactiveObject
 {
-    public ServerViewModel(ServerDto dto)
+    public ServerViewModel(ServerHostDto dto)
     {
         if (dto is null)
             throw new ArgumentNullException(nameof(dto));
