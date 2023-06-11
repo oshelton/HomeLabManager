@@ -91,6 +91,9 @@ public sealed class ServerDataManager : IServerDataManager
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
 
+        if (!Directory.Exists(serversDirectory))
+            Directory.CreateDirectory(serversDirectory);
+
         WriteServerHostDto(server, serversDirectory);
     }
 
