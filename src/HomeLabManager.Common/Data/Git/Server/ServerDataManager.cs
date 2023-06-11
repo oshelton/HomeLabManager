@@ -55,18 +55,22 @@ public sealed class ServerDataManager : IServerDataManager
         };
 
         var foundServerDtos = new List<ServerHostDto>();
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
-        foreach (var serverDirectory in Directory.EnumerateDirectories(Path.Combine(repoPath, ServersDirectoryName)))
+        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
+        var serversDir = Path.Combine(repoPath, ServersDirectoryName);
+        if (Directory.Exists(serversDir))
         {
-            var serverHostDto = readServerDto<ServerHostDto>(serverDirectory);
-            serverHostDto.VMs = Directory.EnumerateDirectories(serverDirectory, $"{ServerVmDto.UniqueIdPrefix}*").Select(vmDir =>
+            foreach (var serverDirectory in Directory.EnumerateDirectories(serversDir))
             {
-                var vm = readServerDto<ServerVmDto>(vmDir);
-                vm.Host = serverHostDto;
+                var serverHostDto = readServerDto<ServerHostDto>(serverDirectory);
+                serverHostDto.VMs = Directory.EnumerateDirectories(serverDirectory, $"{ServerVmDto.UniqueIdPrefix}*").Select(vmDir =>
+                {
+                    var vm = readServerDto<ServerVmDto>(vmDir);
+                    vm.Host = serverHostDto;
 
-                return vm;
-            }).ToList();
-            foundServerDtos.Add(serverHostDto);
+                    return vm;
+                }).ToList();
+                foundServerDtos.Add(serverHostDto);
+            }
         }
 
         return foundServerDtos;
