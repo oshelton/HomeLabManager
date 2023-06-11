@@ -136,8 +136,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             GithubPat = GithubPat
         })).ConfigureAwait(true);
 
-        await Task.Delay(3000).ConfigureAwait(true);
-
         dialog.GetWindow().Close();
 
         IsSaving = false;
@@ -146,7 +144,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         await _navigationService!.NavigateBack().ConfigureAwait(false);
     }
 
-    public INavigationService? NavigationService => _navigationService;
+    public INavigationService NavigationService => _navigationService;
 
     public bool HasChanges
     {
@@ -160,25 +158,25 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         private set => this.RaiseAndSetIfChanged(ref _isSaving, value);
     }
 
-    public string? HomeLabRepoDataPath
+    public string HomeLabRepoDataPath
     {
         get => _homeLabRepoDataPath;
         set => this.RaiseAndSetIfChanged(ref _homeLabRepoDataPath, value);
     }
 
-    public string? GitConfigFilePath
+    public string GitConfigFilePath
     {
         get => _gitConfigFilePath;
         set => this.RaiseAndSetIfChanged(ref _gitConfigFilePath, value);
     }
 
-    public string? GithubUserName
+    public string GithubUserName
     {
         get => _githubUserName;
         set => this.RaiseAndSetIfChanged(ref _githubUserName, value);
     }
 
-    public string? GithubPat
+    public string GithubPat
     {
         get => _githubPat;
         set => this.RaiseAndSetIfChanged(ref _githubPat, value);
@@ -190,20 +188,20 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     private bool _hasChanges;
     private bool _isSaving;
 
-    private string? _homeLabRepoDataPath;
-    private string? _gitConfigFilePath;
-    private string? _githubUserName;
-    private string? _githubPat;
+    private string _homeLabRepoDataPath;
+    private string _gitConfigFilePath;
+    private string _githubUserName;
+    private string _githubPat;
 
-    private IDisposable? _stateChangeSubscription;
+    private IDisposable _stateChangeSubscription;
 
     private TrackedPropertyState? _initialState;
 
     private struct TrackedPropertyState
     {
-        public string? HomeLabRepoDataPath;
-        public string? GitConfigFilePath;
-        public string? GithubUserName;
-        public string? GithubPat;
+        public string HomeLabRepoDataPath;
+        public string GitConfigFilePath;
+        public string GithubUserName;
+        public string GithubPat;
     }
 }

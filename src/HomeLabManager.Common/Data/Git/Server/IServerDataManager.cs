@@ -8,20 +8,15 @@ public interface IServerDataManager
     /// <summary>
     /// Get a list of the server information in the git HomeLab directory.
     /// </summary>
-    public IReadOnlyList<ServerDto> GetServers();
+    public IReadOnlyList<ServerHostDto> GetServers();
 
     /// <summary>
-    /// Add a new server to the repo.
+    /// Add a new server to the repo or update an existing one.
     /// </summary>
-    public void AddNewServer(ServerDto server);
-
-    /// <summary>
-    /// Add a new server to the repo.
-    /// </summary>
-    public void UpdateServer(ServerDto server);
+    public void AddUpdateServer(ServerHostDto server);
 
     /// <summary>
     /// Delete the passed in server.
     /// </summary>
-    public void DeleteServer(ServerDto server);
+    public void DeleteServer(ServerHostDto server);
 }

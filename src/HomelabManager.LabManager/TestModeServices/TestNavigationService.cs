@@ -17,7 +17,7 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class TestNavigationService: ReactiveObject, INavigationService
 {
-    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null)
+    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel navigateBackToPage = null)
     {
         if (request is null)
             throw new ArgumentNullException(nameof(request));
@@ -66,7 +66,7 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
     /// <summary>
     /// Get the current page.
     /// </summary>
-    public PageBaseViewModel? CurrentPage { get; private set; }
+    public PageBaseViewModel CurrentPage { get; private set; }
 
     /// <summary>
     /// Update whether or not back navigation is possible.

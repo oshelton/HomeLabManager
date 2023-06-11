@@ -18,5 +18,5 @@ public class Worker : BackgroundService
     }
 
     private readonly ILogger<Worker> m_logger;
-    private readonly Action<ILogger, DateTimeOffset, Exception?> m_logWorkerStarted;
+    private readonly Action<ILogger, DateTimeOffset, Exception> m_logWorkerStarted;
 }

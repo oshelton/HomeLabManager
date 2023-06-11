@@ -59,7 +59,7 @@ internal class Program
     /// <summary>
     /// Refernce to the IHost responsible for holding onto services.
     /// </summary>
-    public static IHost? ServiceProvider { get; private set; }
+    public static IHost ServiceProvider { get; private set; }
 
     /// <summary>
     /// Whether or not the app is in testing mode.
@@ -108,5 +108,5 @@ internal class Program
         return host;
     }
 
-    private static string? s_coreConfigurationDirectory;
+    private static string s_coreConfigurationDirectory;
 }

@@ -130,7 +130,7 @@ namespace HomeLabManager.Common.Data.Git
         /// <summary>
         /// Create a Git signature based on the username and email in the git config file refferenced by the core config.
         /// </summary>
-        internal static Signature CreateGitSignature(string? gitConfigFilePath)
+        internal static Signature CreateGitSignature(string gitConfigFilePath)
         {
             if (!File.Exists(gitConfigFilePath))
                 throw new InvalidDataException($"Cannot commit changes without a valid Git configuration file; Path: {gitConfigFilePath}.");
@@ -154,7 +154,7 @@ namespace HomeLabManager.Common.Data.Git
         /// <summary>
         /// Create a Github Credentials Provider.
         /// </summary>
-        internal static CredentialsHandler CreateGithubCredentialsHandler(string? githubUserName, string? githubPat)
+        internal static CredentialsHandler CreateGithubCredentialsHandler(string githubUserName, string githubPat)
         {
             return (string url, string usernameFromUrl, SupportedCredentialTypes types) =>
             {

@@ -11,7 +11,7 @@ namespace HomeLabManager.Common.Converters;
 /// <typeparam name="TParameter">Desired typ of the conversion parameter.</typeparam>
 public class GenericConverter<TValue, TParameter> : IValueConverter
 {
-	public GenericConverter(Func<TValue?, TParameter?, object?> converterFunction, bool passThroughNull = false, object? defaultValue = null)
+	public GenericConverter(Func<TValue, TParameter, object> converterFunction, bool passThroughNull = false, object defaultValue = null)
 	{
 		_converterFunction = converterFunction;
 
@@ -22,17 +22,17 @@ public class GenericConverter<TValue, TParameter> : IValueConverter
 			_defaultValue = defaultValue;
 	}
 
-	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 	{
 		if ((value is TValue || (value is null && _passThroughNull)) && (parameter is null || parameter is TParameter))
-            return _converterFunction((TValue?) value, (TParameter?) parameter);
+            return _converterFunction((TValue) value, (TParameter) parameter);
 		else
 			return _defaultValue;
 	}
 
-	public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+	public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 
-	private readonly Func<TValue?, TParameter?, object?> _converterFunction;
+	private readonly Func<TValue, TParameter, object> _converterFunction;
 	private readonly bool _passThroughNull;
 	private readonly object _defaultValue;
 }

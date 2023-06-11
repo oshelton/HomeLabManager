@@ -82,7 +82,7 @@ public sealed class GitDataManagerTests
     [Test]
     public void IsDataPathARepo_InvalidRepoDir_ConfirmBehaviorIfRepoDirInvalid()
     {
-        void UpdateCoreConfig(string? path)
+        void UpdateCoreConfig(string path)
         {
             var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
             coreConfig = new CoreConfigurationDto()

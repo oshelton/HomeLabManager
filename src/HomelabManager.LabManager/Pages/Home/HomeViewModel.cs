@@ -81,7 +81,7 @@ namespace HomeLabManager.Manager.Pages.Home
             // Load Servers.
             CurrentDisplayMode = HomeDisplayMode.IsLoading;
 
-            IReadOnlyList<ServerViewModel>? servers = null;
+            IReadOnlyList<ServerViewModel> servers = null;
             await Task.Run(async () =>
             {
                 servers = _serverDataManager!.GetServers().Select(x => new ServerViewModel(x)).ToArray();
@@ -112,7 +112,7 @@ namespace HomeLabManager.Manager.Pages.Home
         /// <summary>
         /// Collection of servers.
         /// </summary>
-        public IReadOnlyList<ServerViewModel>? Servers
+        public IReadOnlyList<ServerViewModel> Servers
         {
             get => _servers;
             private set => this.RaiseAndSetIfChanged(ref _servers, value);
@@ -123,6 +123,6 @@ namespace HomeLabManager.Manager.Pages.Home
         private readonly INavigationService _navigationService;
 
         private HomeDisplayMode _currentDisplayMode;
-        private IReadOnlyList<ServerViewModel>? _servers;
+        private IReadOnlyList<ServerViewModel> _servers;
     }
 }
