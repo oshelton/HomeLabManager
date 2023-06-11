@@ -14,7 +14,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     /// <summary>
     /// Navigate to a different page.
     /// </summary>
-    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null)
+    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel navigateBackToPage = null)
     {
         if (request is null)
             throw new ArgumentNullException(nameof(request));
@@ -70,7 +70,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     /// <summary>
     /// Get the current page.
     /// </summary>
-    public PageBaseViewModel? CurrentPage
+    public PageBaseViewModel CurrentPage
     {
         get => _currentPage;
         private set => this.RaiseAndSetIfChanged(ref _currentPage, value);
@@ -84,5 +84,5 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     private readonly List<(INavigationRequest Request, PageBaseViewModel Page)> _navigationStack = new();
 
     private bool _canNavigateBack;
-    private PageBaseViewModel? _currentPage;
+    private PageBaseViewModel _currentPage;
 }

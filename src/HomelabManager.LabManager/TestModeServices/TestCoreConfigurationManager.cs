@@ -12,10 +12,10 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class TestCoreConfigurationManager : ICoreConfigurationManager
 {
-    public void Configure(Func<TestCoreConfigurationManager, string>? getCoreConfigPath = null,
-        Func<TestCoreConfigurationManager, CoreConfigurationDto>? getCoreConfiguration = null,
-        Func<TestCoreConfigurationManager, CoreConfigurationDto>? getOrCreateCoreConfiguration = null,
-        Action<TestCoreConfigurationManager>? saveCoreConfiguration = null)
+    public void Configure(Func<TestCoreConfigurationManager, string> getCoreConfigPath = null,
+        Func<TestCoreConfigurationManager, CoreConfigurationDto> getCoreConfiguration = null,
+        Func<TestCoreConfigurationManager, CoreConfigurationDto> getOrCreateCoreConfiguration = null,
+        Action<TestCoreConfigurationManager> saveCoreConfiguration = null)
     {
         _getCoreConfigPath = getCoreConfigPath;
         _getCoreConfiguration = getCoreConfiguration;
@@ -47,8 +47,8 @@ internal sealed class TestCoreConfigurationManager : ICoreConfigurationManager
         HomeLabRepoDataPath = "C:\\tmp",
     };
 
-    private Func<TestCoreConfigurationManager, string>? _getCoreConfigPath;
-    private Func<TestCoreConfigurationManager, CoreConfigurationDto>? _getCoreConfiguration;
-    private Func<TestCoreConfigurationManager, CoreConfigurationDto>? _getOrCreateCoreConfiguration;
-    private Action<TestCoreConfigurationManager>? _saveCoreConfiguration;
+    private Func<TestCoreConfigurationManager, string> _getCoreConfigPath;
+    private Func<TestCoreConfigurationManager, CoreConfigurationDto> _getCoreConfiguration;
+    private Func<TestCoreConfigurationManager, CoreConfigurationDto> _getOrCreateCoreConfiguration;
+    private Action<TestCoreConfigurationManager> _saveCoreConfiguration;
 }

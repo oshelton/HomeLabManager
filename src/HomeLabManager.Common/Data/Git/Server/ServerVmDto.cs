@@ -22,9 +22,9 @@ namespace HomeLabManager.Common.Data.Git.Server
         /// Reference back to the host that owns this VM.
         /// </summary>
         [YamlIgnore]
-        public ServerHostDto? Host { get; internal set; }
+        public ServerHostDto Host { get; internal set; }
 
         /// <inheritdoc/>
-        public override string? UniqueIdToDirectoryName() => $"{UniqueIdPrefix}{UniqueId?.ToString("D")}";
+        public override string UniqueIdToDirectoryName() => $"{UniqueIdPrefix}{UniqueId?.ToString("D")}";
     }
 }

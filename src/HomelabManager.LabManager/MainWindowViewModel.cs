@@ -41,7 +41,7 @@ public sealed class MainWindowViewModel: ReactiveObject
     /// <summary>
     /// Path to the data repo.
     /// </summary>
-    public string? RepoDataPath
+    public string RepoDataPath
     {
         get => _repoDataPath;
         set => this.RaiseAndSetIfChanged(ref _repoDataPath, value);
@@ -79,5 +79,5 @@ public sealed class MainWindowViewModel: ReactiveObject
     private readonly INavigationService _navigationService;
 
     private bool _hasRepoDataPath;
-    private string? _repoDataPath;
+    private string _repoDataPath;
 }

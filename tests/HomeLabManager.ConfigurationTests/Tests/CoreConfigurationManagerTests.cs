@@ -88,7 +88,7 @@ public sealed class CoreConfigurationManagerTests
 
         coreConfig = coreConfig with { GithubUserName = "Owen shelton" };
 
-        CoreConfigurationDto? updatedDto = null;
+        CoreConfigurationDto updatedDto = null;
         var subscription = manager.CoreConfigurationUpdated.Subscribe(config => updatedDto = config);
 
         manager.SaveCoreConfiguration(coreConfig);

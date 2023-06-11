@@ -4,7 +4,7 @@ namespace HomeLabManager.Manager;
 
 public sealed partial class MainWindow : Window
 {
-    public static MainWindow? Instance { get; private set; }
+    public static MainWindow Instance { get; private set; }
 
     public MainWindow()
     {

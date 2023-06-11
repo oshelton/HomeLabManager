@@ -13,7 +13,7 @@ public static class SharedDialogs
     /// Create and show a simple confirmation dialog.
     /// </summary>
     /// <param name="content">Content to display in the dialog or nothing if none is provided.</param>
-    public static async Task<bool> ShowSimpleConfirmLeaveDialog(string? content = null)
+    public static async Task<bool> ShowSimpleConfirmLeaveDialog(string content = null)
     {
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
         {
@@ -33,7 +33,7 @@ public static class SharedDialogs
     /// Show a simple saving in progress dialog.
     /// </summary>
     /// <param name="textLabel">Text to display in the dialog, will show nothing if none provided.</param>
-    public static (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string? textLabel = null)
+    public static (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
     {
         var layoutContainer = new StackPanel
         {

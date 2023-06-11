@@ -18,5 +18,5 @@ public sealed class ServerViewModel: ReactiveObject
         Name = dto.Metadata?.Name;
     }
 
-    public string? Name { get; }
+    public string Name { get; }
 }

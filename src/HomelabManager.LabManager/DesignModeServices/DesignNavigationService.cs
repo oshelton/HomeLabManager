@@ -17,7 +17,7 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class DesignNavigationService: ReactiveObject, INavigationService
 {
-    public Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel? navigateBackToPage = null)
+    public Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel navigateBackToPage = null)
     {
         return Task.FromResult(false);
     }
@@ -38,7 +38,7 @@ internal sealed class DesignNavigationService: ReactiveObject, INavigationServic
     /// <summary>
     /// Get the current page.
     /// </summary>
-    public PageBaseViewModel? CurrentPage { get; private set; }
+    public PageBaseViewModel CurrentPage { get; private set; }
 
     /// <summary>
     /// Update whether or not back navigation is possible.

@@ -10,7 +10,7 @@ namespace HomeLabManager.Manager.Pages
     public abstract class ValidatedPageBaseViewModel: PageBaseViewModel, IValidatableObject
     {
         /// <inheritdoc />
-        public IObjectValidator? Validator
+        public IObjectValidator Validator
         {
             get => _objectValidator;
             set
@@ -34,10 +34,10 @@ namespace HomeLabManager.Manager.Pages
         public bool HasErrors => Validator?.IsValid == false || Validator?.HasWarnings == true;
 
         /// <inheritdoc />
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         /// <inheritdoc />
-        public IEnumerable GetErrors(string? propertyName)
+        public IEnumerable GetErrors(string propertyName)
         {
             if (Validator == null)
                 return Array.Empty<ValidationMessage>();
@@ -49,6 +49,6 @@ namespace HomeLabManager.Manager.Pages
 
         #endregion
 
-        private IObjectValidator? _objectValidator;
+        private IObjectValidator _objectValidator;
     }
 }

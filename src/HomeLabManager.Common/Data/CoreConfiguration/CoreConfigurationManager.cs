@@ -101,5 +101,5 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// <remarks>Dtos should be considered transient and not held onto; including this one.</remarks>
     public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
 
-    private CoreConfigurationDto? _cachedCoreConfiguration;
+    private CoreConfigurationDto _cachedCoreConfiguration;
 }
