@@ -21,8 +21,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 {
     public SettingsViewModel()
     {
-        _coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
-        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
+        _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
+        _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 
         var builder = new ValidationBuilder<SettingsViewModel>();
 
@@ -182,8 +182,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         set => this.RaiseAndSetIfChanged(ref _githubPat, value);
     }
 
-    private ICoreConfigurationManager _coreConfigurationManager;
-    private INavigationService _navigationService;
+    private readonly ICoreConfigurationManager _coreConfigurationManager;
+    private readonly INavigationService _navigationService;
     
     private bool _hasChanges;
     private bool _isSaving;
