@@ -1,8 +1,6 @@
-﻿using Avalonia.Interactivity;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Manager.Pages.ServerListing;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
