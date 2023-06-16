@@ -21,10 +21,69 @@
 	</Design.PreviewWith>
 
 	<DataTemplate x:Key="ServerListingPageTemplate" DataType="{x:Type page:ServerListingViewModel}">
-		<ItemsRepeater Margin="12" Items="{Binding Servers}">
-			<ItemsRepeater.Layout>
-				<StackLayout Orientation="Vertical" Spacing="8" />
-			</ItemsRepeater.Layout>
-		</ItemsRepeater>
+		<Border
+			Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.IsLoading}}"
+			Classes.NoServers="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.NoServers}}"
+			Classes.ServerDisplay="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.HasServers}}">
+			<Border.Styles>
+				<Style Selector="Border.IsLoading">
+					<Setter Property="Child">
+						<Template>
+							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+								<StackPanel Margin="8">
+									<ProgressBar Classes="circular" IsIndeterminate="True" />
+									<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Servers...</TextBlock>
+								</StackPanel>
+							</materialControls:Card>
+						</Template>
+					</Setter>
+				</Style>
+
+				<Style Selector="Border.NoServers">
+					<Setter Property="Child">
+						<Template>
+							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+								<TextBlock
+									Margin="8"
+									Classes="Body1"
+									TextAlignment="Center">
+									<Run Text="No Servers Exist." />
+									<LineBreak />
+									<Run Text="Add one or more using the Servers button below." />
+								</TextBlock>
+							</materialControls:Card>
+						</Template>
+					</Setter>
+				</Style>
+
+				<Style Selector="Border.ServerDisplay">
+					<Setter Property="Child">
+						<Template>
+							<ItemsRepeater Margin="12" Items="{Binding Servers}">
+								<ItemsRepeater.Layout>
+									<StackLayout Orientation="Vertical" Spacing="8" />
+								</ItemsRepeater.Layout>
+
+								<ItemsRepeater.ItemTemplate>
+									<DataTemplate>
+										<materialControls:Card>
+											<Grid>
+
+												<TextBlock
+													Classes="Headline6"
+													MaxLines="2"
+													Text="{Binding DisplayName}"
+													TextTrimming="CharacterEllipsis"
+													TextWrapping="Wrap" />
+											</Grid>
+										</materialControls:Card>
+									</DataTemplate>
+								</ItemsRepeater.ItemTemplate>
+							</ItemsRepeater>
+						</Template>
+					</Setter>
+				</Style>
+			</Border.Styles>
+		</Border>
 	</DataTemplate>
 </ResourceDictionary>

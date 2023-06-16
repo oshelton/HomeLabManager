@@ -29,7 +29,8 @@ namespace HomeLabManager.Manager.Pages.ServerListing
 
             if (Avalonia.Controls.Design.IsDesignMode)
             {
-                var mode = new Random().NextInt64(0, 5);
+                /*
+                var mode = new Random().NextInt64(0, 3);
                 switch (mode)
                 {
                     case 0:
@@ -43,6 +44,9 @@ namespace HomeLabManager.Manager.Pages.ServerListing
                         CurrentDisplayMode = ServerListingDisplayMode.HasServers;
                         break;
                 }
+                */
+                _servers = _serverDataManager!.GetServers().Select(x => new ServerViewModel(x)).ToArray();
+                CurrentDisplayMode = ServerListingDisplayMode.HasServers;
             }
         }
 
