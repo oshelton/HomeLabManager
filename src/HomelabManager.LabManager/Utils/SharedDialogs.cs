@@ -43,20 +43,17 @@ public static class SharedDialogs
 
         layoutContainer.Children.AddRange(new Control[]
         {
-            new ProgressBar
-            {
-                Classes = new Classes("circular"),
-                IsIndeterminate  =true,
-            },
+            new ProgressBar { IsIndeterminate = true },
             new TextBlock
             {
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 Margin = new Avalonia.Thickness(16),
-                Classes = new Classes("Body1"),
                 TextWrapping = Avalonia.Media.TextWrapping.Wrap,
                 Text = textLabel,
             }
         });
+        layoutContainer.Children[0].Classes.Add("circular");
+        layoutContainer.Children[1].Classes.Add("Body1");
 
         var dialog = DialogHelper.CreateCustomDialog(new CustomDialogBuilderParams
         {
