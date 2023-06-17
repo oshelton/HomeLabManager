@@ -11,7 +11,7 @@
 			BaseTheme="Dark"
 			PrimaryColor="Red"
 			SecondaryColor="Lime" />
-		<StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
+		<materialIcons:MaterialIconStyles />
 
 		<!--  Application Styles  -->
 		<StyleInclude Source="/Styles/Buttons.axaml" />

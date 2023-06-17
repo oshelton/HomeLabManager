@@ -117,7 +117,7 @@
 					<Style Selector="Border.ServerDisplay">
 						<Setter Property="Child">
 							<Template>
-								<ItemsRepeater Margin="12" Items="{Binding Servers}">
+								<ItemsRepeater Margin="12" ItemsSource="{Binding Servers}">
 									<ItemsRepeater.Layout>
 										<WrapLayout
 											HorizontalSpacing="8"

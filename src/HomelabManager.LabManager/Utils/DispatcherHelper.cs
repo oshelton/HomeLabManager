@@ -27,7 +27,7 @@ public static class DispatcherHelper
 
         if (!Program.IsInTestingMode)
         {
-            return Dispatcher.UIThread.InvokeAsync(toInvoke, priority);
+            return Task.Run(async () => await Dispatcher.UIThread.InvokeAsync(toInvoke, priority));
         }
         else
         {
