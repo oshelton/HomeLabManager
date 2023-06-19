@@ -1,11 +1,10 @@
-﻿using HomeLabManager.Manager.Pages.Home;
-using HomeLabManager.Manager.Pages;
+﻿using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Pages.ServerListing;
 
 namespace HomeLabManager.Manager.Services.Navigation.Requests
 {
     /// <summary>
-    /// Navigation Request class for the Home Page.
+    /// Navigation Request class for the Server Listing Page.
     /// </summary>
     public sealed class ServerListingNavigationRequest : INavigationRequest
     {
