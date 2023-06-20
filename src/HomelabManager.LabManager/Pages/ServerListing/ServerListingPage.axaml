@@ -43,14 +43,23 @@
 					<Setter Property="Child">
 						<Template>
 							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
-								<TextBlock
-									Margin="8"
-									Classes="Body1"
-									TextAlignment="Center">
-									<Run Text="No Servers Exist." />
-									<LineBreak />
-									<Run Text="Add one or more using the Servers button below." />
-								</TextBlock>
+								<StackPanel>
+									<TextBlock
+										Margin="8"
+										Classes="Body1"
+										TextAlignment="Center">
+										<Run Text="No Servers Exist." />
+										<LineBreak />
+										<Run Text="Create a new one with the button below." />
+									</TextBlock>
+
+									<controls:PageNavButton
+										Margin="8"
+										HorizontalAlignment="Center"
+										Click="{eventBinder:EventBinding CreateNewServer}"
+										Icon="Add"
+										Text="Create Server" />
+								</StackPanel>
 							</materialControls:Card>
 						</Template>
 					</Setter>
