@@ -13,7 +13,7 @@
 		<ContentControl
 			Width="800"
 			Height="600"
-			ContentTemplate="{StaticResource SettingsPageTemplate}">
+			ContentTemplate="{DynamicResource SettingsPageTemplate}">
 			<ContentControl.Content>
 				<pages:SettingsViewModel />
 			</ContentControl.Content>
