@@ -56,7 +56,7 @@
 									<controls:PageNavButton
 										Margin="8"
 										HorizontalAlignment="Center"
-										Click="{eventBinder:EventBinding CreateNewServer}"
+										Click="{eventBinder:EventBinding CreateNewServerHost}"
 										Icon="Add"
 										Text="Create Server" />
 								</StackPanel>

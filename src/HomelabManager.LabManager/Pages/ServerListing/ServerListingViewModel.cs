@@ -29,7 +29,6 @@ public sealed class ServerListingViewModel : PageBaseViewModel
 
         if (Avalonia.Controls.Design.IsDesignMode)
         {
-            /*
             var mode = new Random().NextInt64(0, 3);
             switch (mode)
             {
@@ -44,9 +43,6 @@ public sealed class ServerListingViewModel : PageBaseViewModel
                     CurrentDisplayMode = ServerListingDisplayMode.HasServers;
                     break;
             }
-            */
-            _servers = _serverDataManager!.GetServers().Select(x => new ServerViewModel(x)).ToArray();
-            CurrentDisplayMode = ServerListingDisplayMode.HasServers;
         }
     }
 
@@ -78,10 +74,7 @@ public sealed class ServerListingViewModel : PageBaseViewModel
     /// <summary>
     /// Create a new Server.
     /// </summary>
-    public void CreateNewServer()
-    {
-
-    }
+    public Task CreateNewServerHost() => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()));
 
     /// <summary>
     /// Current display mode.

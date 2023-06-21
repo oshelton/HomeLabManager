@@ -30,8 +30,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     public override async Task NavigateTo(INavigationRequest request)
     {
-        if (request is not ServerListingNavigationRequest)
-            throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
+        if (request is not CreateEditServerNavigationRequest)
+            throw new InvalidOperationException("Expected navigation request type is CreateEditServerNavigationRequest.");
     }
 
     public override Task<bool> TryNavigateAway() => Task.FromResult(true);
