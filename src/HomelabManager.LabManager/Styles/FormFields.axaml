@@ -2,6 +2,8 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
 	<Design.PreviewWith>
 		<Border MinWidth="500" Padding="20">
@@ -28,7 +30,22 @@
 		</Border>
 	</Design.PreviewWith>
 
-	<Style Selector=":is(controls|FormField) materialIcons|MaterialIcon.TipIcon">
+	<Style Selector=":is(controls|FormField) Grid">
+		<Setter Property="(i:Interaction.Behaviors)">
+			<i:BehaviorCollectionTemplate>
+				<i:BehaviorCollection>
+					<ir:AdaptiveBehavior SourceControl="{Binding $parent}">
+						<ir:AdaptiveClassSetter
+							MinWidth="0"
+							MaxWidth="500"
+							ClassName="Small" />
+					</ir:AdaptiveBehavior>
+				</i:BehaviorCollection>
+			</i:BehaviorCollectionTemplate>
+		</Setter>
+	</Style>
+
+	<Style Selector=":is(controls|FormField) materialIcons|MaterialIcon#TipIcon">
 		<Setter Property="Margin" Value="0,8,0,0" />
 		<Setter Property="Height" Value="14" />
 		<Setter Property="Width" Value="14" />
@@ -41,27 +58,26 @@
 		<Setter Property="Margin" Value="4,4,4,4" />
 		<Setter Property="Template">
 			<ControlTemplate TargetType="{x:Type controls:BasicStringFormField}">
-				<Grid ToolTip.Tip="{TemplateBinding InfoTip}">
+				<Grid Name="Container" ToolTip.Tip="{TemplateBinding InfoTip}">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />
 						<ColumnDefinition Width="2*" />
 					</Grid.ColumnDefinitions>
 
 					<TextBlock
-						Grid.Column="0"
+						Name="Label"
 						Margin="8,0"
 						VerticalAlignment="Center"
-						Classes="Body1">
+						Classes="Body1"
+						TextTrimming="CharacterEllipsis">
 						<Run Text="{TemplateBinding Label}" />
 						<Run Text=":" />
 					</TextBlock>
 
-					<materialIcons:MaterialIcon
-						Grid.Column="0"
-						Classes="TipIcon"
-						IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
+					<materialIcons:MaterialIcon Name="TipIcon" IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
 
 					<TextBox
+						Name="FieldEntry"
 						Grid.Column="1"
 						Margin="16,0"
 						Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
