@@ -1,0 +1,45 @@
+<ResourceDictionary
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:eventBinder="using:EventBinder"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:page="using:HomeLabManager.Manager.Pages.CreateEditServer">
+	<Design.PreviewWith>
+		<ContentControl
+			Width="800"
+			Height="600"
+			ContentTemplate="{DynamicResource CreateEditServerPageTemplate}">
+			<ContentControl.Content>
+				<page:CreateEditServerViewModel />
+			</ContentControl.Content>
+		</ContentControl>
+	</Design.PreviewWith>
+
+	<DataTemplate x:Key="CreateEditServerPageTemplate" DataType="{x:Type page:CreateEditServerViewModel}">
+		<DockPanel IsEnabled="{Binding !IsSaving}">
+			<UniformGrid
+				HorizontalAlignment="Right"
+				Columns="2"
+				DockPanel.Dock="Bottom">
+				<controls:PageNavButton
+					Margin="0,0,6,0"
+					Click="{eventBinder:EventBinding SaveChangesAndNavigateBack}"
+					Icon="FloppyDisc"
+					IsEnabled="{Binding HasChanges}"
+					Text="Save" />
+				<controls:PageNavButton
+					Click="{eventBinder:EventBinding NavigationService.NavigateBack}"
+					Icon="Cancel"
+					IsOutline="True"
+					Text="Cancel" />
+			</UniformGrid>
+
+			<ScrollViewer DockPanel.Dock="Top" />
+		</DockPanel>
+	</DataTemplate>
+</ResourceDictionary>

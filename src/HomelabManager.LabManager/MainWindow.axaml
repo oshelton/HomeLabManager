@@ -23,6 +23,7 @@
 				<!--  Pages  -->
 				<ResourceInclude Source="/Pages/Home/HomePage.axaml" />
 				<ResourceInclude Source="/Pages/ServerListing/ServerListingPage.axaml" />
+				<ResourceInclude Source="/Pages/CreateEditServer/CreateEditServerPage.axaml" />
 				<ResourceInclude Source="/Pages/Settings/SettingsPage.axaml" />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
@@ -99,6 +100,7 @@
 					<!--  Pages  -->
 					<StaticResource ResourceKey="HomePageTemplate" />
 					<StaticResource ResourceKey="ServerListingPageTemplate" />
+					<StaticResource ResourceKey="CreateEditServerPageTemplate" />
 					<StaticResource ResourceKey="SettingsPageTemplate" />
 				</TransitioningContentControl.DataTemplates>
 			</TransitioningContentControl>
