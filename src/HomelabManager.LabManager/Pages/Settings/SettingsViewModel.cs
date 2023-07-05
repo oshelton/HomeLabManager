@@ -87,15 +87,20 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             .Subscribe(state => HasChanges = !state.Equals(_initialState));
     }
 
-    public override Task<bool> TryNavigateAway()
+    public override async Task<bool> TryNavigateAway()
     {
         if (!HasChanges)
         {
             _stateChangeSubscription!.Dispose();
-            return Task.FromResult(true);
+            return true;
         }
-
-        return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("There are unsaved changes on this page, they will be lost if you continue.");
+        else
+        {
+            var result = await Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("There are unsaved changes on this page, they will be lost if you continue.").ConfigureAwait(true);
+            if (result)
+                _stateChangeSubscription.Dispose();
+            return result;
+        }
     }
 
     public async Task OpenFolderPickerForRepoPath()
