@@ -4,6 +4,7 @@ using HomeLabManager.Manager.Pages.ServerListing;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework.Constraints;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
@@ -17,7 +18,7 @@ public sealed class ServerListingViewModelTests
     /// Test view model creation and initial state.
     /// </summary>
     [Test]
-    public void TestCreation()
+    public void Constructor_TestDefaultConstructionBehavior()
     {
         var serverListing = new ServerListingViewModel();
 
@@ -30,7 +31,7 @@ public sealed class ServerListingViewModelTests
     /// Test the logic executed when the page is navigated to.
     /// </summary>
     [Test]
-    public async Task TestNavigatingTo()
+    public async Task NavigatingTo_TestNavigatingToTheServerListingPage()
     {
         var serverListing = new ServerListingViewModel();
 
@@ -47,11 +48,12 @@ public sealed class ServerListingViewModelTests
     }
 
     [Test]
-    public async Task CreateCreateNewServerHost()
-    {
-        var serverListing = new ServerListingViewModel();
+    public async Task CreateNewServerHost_ConfirmCreateNewServerHostDefaultBehavior()
+    {    
+        var serverListing = new Mock<ServerListingViewModel>();
+        serverListing.SetupGet(x => x.Servers).Returns(Array.Empty<ServerViewModel>());
 
-        await serverListing.CreateNewServerHost().ConfigureAwait(false);
+        await serverListing.Object.CreateNewServerHost().ConfigureAwait(false);
 
         var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 

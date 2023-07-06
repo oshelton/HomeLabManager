@@ -9,6 +9,11 @@
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:page="using:HomeLabManager.Manager.Pages.CreateEditServer">
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceInclude Source="/Pages/CreateEditServer/Sections/MetadataEditView.axaml" />
+	</ResourceDictionary.MergedDictionaries>
+
 	<Design.PreviewWith>
 		<ContentControl
 			Width="800"
@@ -39,7 +44,13 @@
 					Text="Cancel" />
 			</UniformGrid>
 
-			<ScrollViewer DockPanel.Dock="Top" />
+			<ScrollViewer DockPanel.Dock="Top">
+				<StackPanel>
+					<StackPanel>
+						<ContentControl Content="{Binding Metadata}" ContentTemplate="{StaticResource MetadataEditorTemplate}" />
+					</StackPanel>
+				</StackPanel>
+			</ScrollViewer>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>

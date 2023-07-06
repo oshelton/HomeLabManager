@@ -6,7 +6,7 @@
 	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
 	<Design.PreviewWith>
-		<Border MinWidth="500" Padding="20">
+		<Border MinWidth="700" Padding="20">
 			<StackPanel>
 				<StackPanel.Styles>
 					<Style Selector="controls|BasicStringFormField.Red">
@@ -28,17 +28,17 @@
 				</controls:BasicStringFormField>
 
 				<StackPanel MaxWidth="300">
-					<controls:BasicStringFormField Label="Small Test" />
+					<controls:BasicStringFormField InfoTip="Small Field Test" Label="Small Test" />
 				</StackPanel>
 			</StackPanel>
 		</Border>
 	</Design.PreviewWith>
 
-	<Style Selector=":is(controls|FormField) Grid">
+	<Style Selector=":is(controls|FormField)">
 		<Setter Property="(i:Interaction.Behaviors)">
 			<i:BehaviorCollectionTemplate>
 				<i:BehaviorCollection>
-					<ir:AdaptiveBehavior SourceControl="{Binding $parent}">
+					<ir:AdaptiveBehavior SourceControl="{Binding}">
 						<ir:AdaptiveClassSetter
 							MinWidth="0"
 							MaxWidth="500"
@@ -50,7 +50,6 @@
 	</Style>
 
 	<Style Selector=":is(controls|FormField) materialIcons|MaterialIcon#TipIcon">
-		<Setter Property="Margin" Value="0,8,0,0" />
 		<Setter Property="Height" Value="14" />
 		<Setter Property="Width" Value="14" />
 		<Setter Property="Kind" Value="Information" />
@@ -62,15 +61,19 @@
 		<Setter Property="Margin" Value="4" />
 		<Setter Property="Template">
 			<ControlTemplate TargetType="{x:Type controls:BasicStringFormField}">
-				<Grid Name="Container" ToolTip.Tip="{TemplateBinding InfoTip}">
+				<Grid
+					Name="Container"
+					Margin="4"
+					VerticalAlignment="Top"
+					ToolTip.Tip="{TemplateBinding InfoTip}">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="2*" />
+						<ColumnDefinition Width="3*" />
 					</Grid.ColumnDefinitions>
 
 					<TextBlock
 						Name="Label"
-						Margin="8,0"
+						Margin="8,0,0,0"
 						VerticalAlignment="Center"
 						Classes="Body1"
 						TextTrimming="CharacterEllipsis">
@@ -78,12 +81,14 @@
 						<Run Text=":" />
 					</TextBlock>
 
-					<materialIcons:MaterialIcon Name="TipIcon" IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
+					<materialIcons:MaterialIcon
+						Name="TipIcon"
+						Margin="0,8,0,0"
+						IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
 
 					<TextBox
 						Name="FieldEntry"
 						Grid.Column="1"
-						Margin="16,0"
 						Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
 				</Grid>
 			</ControlTemplate>
@@ -94,11 +99,15 @@
 		<Setter Property="Margin" Value="4" />
 		<Setter Property="Template">
 			<ControlTemplate TargetType="{x:Type controls:BasicStringFormField}">
-				<StackPanel Name="Container" ToolTip.Tip="{TemplateBinding InfoTip}">
+				<StackPanel
+					Name="Container"
+					Margin="4,8,4,4"
+					VerticalAlignment="Top"
+					ToolTip.Tip="{TemplateBinding InfoTip}">
 					<Grid>
 						<TextBlock
 							Name="Label"
-							Margin="8,0"
+							Margin="8,0,0,0"
 							VerticalAlignment="Center"
 							Classes="Body1"
 							TextTrimming="CharacterEllipsis">
@@ -106,12 +115,15 @@
 							<Run Text=":" />
 						</TextBlock>
 
-						<materialIcons:MaterialIcon Name="TipIcon" IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
+						<materialIcons:MaterialIcon
+							Name="TipIcon"
+							Margin="-2,-9,0,0"
+							IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
 					</Grid>
 
 					<TextBox
 						Name="FieldEntry"
-						Margin="16,0"
+						Margin="32,0,0,0"
 						Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
 				</StackPanel>
 			</ControlTemplate>

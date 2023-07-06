@@ -30,4 +30,9 @@
   <ItemGroup>
     <ProjectReference Include="..\HomeLabManager.Common\HomeLabManager.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <AvaloniaXaml Update="Pages\CreateEditServer\Sections\MetadataEditView.axaml">
+      <SubType>Designer</SubType>
+    </AvaloniaXaml>
+  </ItemGroup>
 </Project>

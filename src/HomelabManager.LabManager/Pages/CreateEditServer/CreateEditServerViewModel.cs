@@ -1,6 +1,9 @@
-﻿using Avalonia.Threading;
+﻿using System.Collections.Generic;
+using System.Reactive.Linq;
+using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
@@ -10,39 +13,49 @@ using ReactiveUI;
 namespace HomeLabManager.Manager.Pages.CreateEditServer;
 
 /// <summary>
-/// Server Listing Page View Model.
+/// Create/Edit Server Page View Model.
 /// </summary>
 public sealed class CreateEditServerViewModel : ValidatedPageBaseViewModel
 {
-    // Design time constructor.
+    /// <summary>
+    /// Design time constructor.
+    /// </summary>
     public CreateEditServerViewModel()
     {
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
     }
 
-    public CreateEditServerViewModel(bool isNew, BaseServerDto server)
-        : this()
-    {
-        if (server is null)
-            throw new ArgumentNullException(nameof(server));
-
-        _isNew = isNew;
-        _isEditingServerHost = server is ServerHostDto;
-        _initialServerTitle = !_isNew ? server.Metadata.DisplayName : null;
-    }
-
+    /// Title of the page, a bit more logic trhan usual is used here since this page can be  abit more complicated than most.
     public override string Title => _isNew 
         ? $"Create New {(_isEditingServerHost ? "Server Host" : "Virtual Machine")}"
         : $"Editing {_initialServerTitle}";
 
     public override async Task NavigateTo(INavigationRequest request)
     {
-        if (request is not CreateEditServerNavigationRequest)
+        if (request is not CreateEditServerNavigationRequest realRequest)
             throw new InvalidOperationException("Expected navigation request type is CreateEditServerNavigationRequest.");
+
+        HasChanges = false;
+        _isNew = realRequest.IsNew;
+        _isEditingServerHost = realRequest.Server is ServerHostDto;
+        _initialServerTitle = !_isNew ? realRequest.Server.Metadata.DisplayName : null;
+
+        Metadata = new MetadataViewModel(realRequest.Server, realRequest.AllOtherDisplayNames, realRequest.AllOtherNames);
+
+        // Set up an observable to check when content has actually changed.
+        _hasChangesSubscription = this.WhenAnyValue(x => x.Metadata.HasChanges)
+            .Throttle(TimeSpan.FromSeconds(0.5))
+            .Subscribe(hasMetadataChanges => HasChanges = hasMetadataChanges);
     }
 
-    public override Task<bool> TryNavigateAway() => Task.FromResult(true);
+    public override Task<bool> TryNavigateAway()
+    {
+        _hasChangesSubscription?.Dispose();
+        Metadata.Dispose();
+
+        return Task.FromResult(true);
+    }
 
     public async Task SaveChangesAndNavigateBack()
     {
@@ -63,12 +76,20 @@ public sealed class CreateEditServerViewModel : ValidatedPageBaseViewModel
 
     public INavigationService NavigationService => _navigationService;
 
+    public MetadataViewModel Metadata
+    {
+        get => _metadata;
+        private set => this.RaiseAndSetIfChanged(ref _metadata, value);
+    }
+
+    /// Whether or not this page has changes.
     public bool HasChanges
     {
         get => _hasChanges;
         private set => this.RaiseAndSetIfChanged(ref _hasChanges, value);
     }
 
+    /// Whether or not this page is currently saving data.
     public bool IsSaving
     {
         get => _isSaving;
@@ -78,10 +99,14 @@ public sealed class CreateEditServerViewModel : ValidatedPageBaseViewModel
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
 
+    private MetadataViewModel _metadata;
+
     private bool _hasChanges;
     private bool _isSaving;
 
-    private readonly bool _isNew;
-    private readonly bool _isEditingServerHost;
-    private readonly string _initialServerTitle;
+    private bool _isNew;
+    private bool _isEditingServerHost;
+    private string _initialServerTitle;
+
+    private IDisposable _hasChangesSubscription;
 }

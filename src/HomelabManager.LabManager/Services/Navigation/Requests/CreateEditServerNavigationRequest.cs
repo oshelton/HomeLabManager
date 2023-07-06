@@ -9,18 +9,22 @@ namespace HomeLabManager.Manager.Services.Navigation.Requests
     /// </summary>
     public sealed class CreateEditServerNavigationRequest : INavigationRequest
     {
-        public CreateEditServerNavigationRequest(bool isNew, BaseServerDto server) 
+        public CreateEditServerNavigationRequest(bool isNew, BaseServerDto server, IReadOnlyList<string> allOtherDisplayNames, IReadOnlyList<string> allOtherNames) 
         {
-            _isNew = isNew;
-            _server = server ?? throw new ArgumentNullException(nameof(server));
+            IsNew = isNew;
+            Server = server ?? throw new ArgumentNullException(nameof(server));
+            AllOtherDisplayNames = allOtherDisplayNames ?? throw new ArgumentNullException(nameof(allOtherDisplayNames));
+            AllOtherNames = allOtherNames ?? throw new ArgumentNullException(nameof(allOtherNames));
         }
 
         /// <summary>
         /// Create instance of the Create/Edit server Page.
         /// </summary>
-        public PageBaseViewModel CreatePage() => new CreateEditServerViewModel(_isNew, _server);
+        public PageBaseViewModel CreatePage() => new CreateEditServerViewModel();
 
-        private bool _isNew;
-        private BaseServerDto _server;
+        public bool IsNew { get; private set; }
+        public BaseServerDto Server { get; private set; }
+        public IReadOnlyList<string> AllOtherDisplayNames { get; private set; }
+        public IReadOnlyList<string> AllOtherNames { get; private set; }
     }
 }

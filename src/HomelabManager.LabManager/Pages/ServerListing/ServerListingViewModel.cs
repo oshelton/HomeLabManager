@@ -19,7 +19,7 @@ public enum ServerListingDisplayMode
 /// <summary>
 /// Server Listing Page View Model.
 /// </summary>
-public sealed class ServerListingViewModel : PageBaseViewModel
+public class ServerListingViewModel : PageBaseViewModel
 {
     public ServerListingViewModel()
     {
@@ -74,7 +74,13 @@ public sealed class ServerListingViewModel : PageBaseViewModel
     /// <summary>
     /// Create a new Server.
     /// </summary>
-    public Task CreateNewServerHost() => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()));
+    public Task CreateNewServerHost() => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()
+    { 
+        Metadata = new ServerMetadataDto{ DisplayName = "New Server" },
+        Configuration = new ServerConfigurationDto(),
+        DockerCompose = new DockerComposeDto(),
+        VMs = Array.Empty<ServerVmDto>(),
+    }, Servers.Select(x => x.DisplayName).ToArray(), Servers.Select(x => x.Name).ToArray())); // TYhis will need to also support pulling these off of VMs when support for them is added.
 
     /// <summary>
     /// Current display mode.
@@ -88,7 +94,7 @@ public sealed class ServerListingViewModel : PageBaseViewModel
     /// <summary>
     /// Collection of servers.
     /// </summary>
-    public IReadOnlyList<ServerViewModel> Servers
+    public virtual IReadOnlyList<ServerViewModel> Servers
     {
         get => _servers;
         private set => this.RaiseAndSetIfChanged(ref _servers, value);
