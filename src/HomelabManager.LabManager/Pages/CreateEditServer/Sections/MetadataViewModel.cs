@@ -41,15 +41,15 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             builder.RuleFor(vm => vm.DisplayName)
                 .WithPropertyCascadeMode(CascadeMode.Stop)
                 .NotEmpty(ValidationMessageType.Error).WithMessage("Server/VM display name must not be empty.")
-                .Must(value => _allOtherDisplayNames.Any(x => x.ToUpperInvariant() == value.ToUpperInvariant()), ValidationMessageType.Error).WithMessage("A server/VMs display name must be unique.").Throttle(500);
+                .Must(value => !_allOtherDisplayNames.Any(x => x.ToUpperInvariant() == value.ToUpperInvariant()), ValidationMessageType.Error).WithMessage("A server/VMs display name must be unique.").Throttle(500);
 
             builder.RuleFor(vm => vm.Name)
                 .WithPropertyCascadeMode(CascadeMode.Stop)
                 .NotEmpty(ValidationMessageType.Error).WithMessage("Server/VM host name must not be empty.")
-                .Must(value => _allOtherNames.Any(x => x.ToUpperInvariant() == value.ToUpperInvariant()), ValidationMessageType.Error).WithMessage("A server/VMs host name must be unique.").Throttle(500);
+                .Must(value => !_allOtherNames.Any(x => x.ToUpperInvariant() == value.ToUpperInvariant()), ValidationMessageType.Error).WithMessage("A server/VMs host name must be unique.").Throttle(500);
 
             Validator = builder.Build(this);
-
+            
             DisplayName = sourceDto.Metadata.DisplayName;
             Name = sourceDto.Metadata.Name;
 
