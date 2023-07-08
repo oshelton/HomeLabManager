@@ -118,15 +118,43 @@ public sealed class MetadataViewModelTests
             Assert.That(editor.HasErrors, Is.True);
             Assert.That(editor.GetErrors(nameof(editor.Name)), Is.Not.Null);
 
-            editor.Name = "Hi!";
+            editor.Name = "Hi";
 
             await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
 
             Assert.That(editor.HasErrors, Is.False);
         }
 
+        // Test name meets expected format.
+        using (var editor = new MetadataViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
+        {
+            await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
+
+            Assert.That(editor.HasErrors, Is.False);
+
+            editor.Name = "-invalid";
+
+            await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
+
+            Assert.That(editor.HasErrors, Is.True);
+            Assert.That(editor.GetErrors(nameof(editor.Name)), Is.Not.Null);
+
+            editor.Name = "valid.google.com";
+
+            await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
+
+            Assert.That(editor.HasErrors, Is.False);
+
+            editor.Name = "!-invalid";
+
+            await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
+
+            Assert.That(editor.HasErrors, Is.True);
+            Assert.That(editor.GetErrors(nameof(editor.Name)), Is.Not.Null);
+        }
+
         var notUniqueName = "failed";
-        // Test uniqueness of display name.
+        // Test uniqueness of name.
         using (var editor = new MetadataViewModel(server, Array.Empty<string>(), new[] { notUniqueName }))
         {
             editor.Name = notUniqueName;
@@ -136,7 +164,7 @@ public sealed class MetadataViewModelTests
             Assert.That(editor.HasErrors, Is.True);
             Assert.That(editor.GetErrors(nameof(editor.Name)), Is.Not.Null);
 
-            editor.Name = "Hi!";
+            editor.Name = "Hi";
 
             await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
 

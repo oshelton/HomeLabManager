@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.Settings;
 using ReactiveUI;
@@ -46,6 +47,7 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             builder.RuleFor(vm => vm.Name)
                 .WithPropertyCascadeMode(CascadeMode.Stop)
                 .NotEmpty(ValidationMessageType.Error).WithMessage("Server/VM host name must not be empty.")
+                .Must(value => s_nameRequirementRegex.IsMatch(value)).WithMessage("Server/VM host name must complie with host name format requirements.").Throttle(500)
                 .Must(value => !_allOtherNames.Any(x => x.ToUpperInvariant() == value.ToUpperInvariant()), ValidationMessageType.Error).WithMessage("A server/VMs host name must be unique.").Throttle(500);
 
             Validator = builder.Build(this);
@@ -101,6 +103,9 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             private set => this.RaiseAndSetIfChanged(ref _hasChanges, value);
         }
 
+        private static readonly Regex s_nameRequirementRegex = new Regex("^(([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])\\.)*([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])$", 
+            RegexOptions.IgnoreCase | RegexOptions.Compiled); 
+
         private string _displayName;
         private string _name;
         private bool _hasChanges;
@@ -110,7 +115,6 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
         private TrackedPropertyState? _initialState;
         private IReadOnlyList<string> _allOtherDisplayNames;
         private IReadOnlyList<string> _allOtherNames;
-
 
         private struct TrackedPropertyState
         {
