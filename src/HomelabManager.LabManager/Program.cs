@@ -6,11 +6,17 @@ using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Splat;
 
 namespace HomeLabManager.Manager;
 
 internal class Program
 {
+    private sealed class RunMode: IModeDetector 
+    {
+        public bool? InUnitTestRunner() => false; 
+    }
+
     /// <summary>
     /// Mode to use for service creation.
     /// </summary>
@@ -40,6 +46,9 @@ internal class Program
         if (!Directory.Exists(s_coreConfigurationDirectory))
             Directory.CreateDirectory(s_coreConfigurationDirectory);
 
+        // Per https://www.reactiveui.net/docs/guidelines/framework/performance-optimization,
+        // overriding this to a simpler implementation can help startup performance.
+        Splat.ModeDetector.OverrideModeDetector(new RunMode());
         ServiceProvider = BuildServiceProvider(Avalonia.Controls.Design.IsDesignMode ? ServiceMode.Design : ServiceMode.Real);
 
         return AppBuilder.Configure<App>()
@@ -75,8 +84,8 @@ internal class Program
                 {
                     case ServiceMode.Real:
                         // Add Data Services.
-                        services.AddSingleton<ICoreConfigurationManager>(provider => new CoreConfigurationManager(s_coreConfigurationDirectory!));
-                        services.AddSingleton<IServerDataManager>(provider => new ServerDataManager(provider.GetService<ICoreConfigurationManager>()!));
+                        services.AddSingleton<ICoreConfigurationManager>(provider => new CoreConfigurationManager(s_coreConfigurationDirectory));
+                        services.AddSingleton<IServerDataManager>(provider => new ServerDataManager(provider.GetService<ICoreConfigurationManager>()));
                         
                         // Add non-data services.
                         services.AddSingleton<INavigationService>(provider => new NavigationService());
