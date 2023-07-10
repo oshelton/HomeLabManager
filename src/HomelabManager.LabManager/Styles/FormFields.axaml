@@ -1,7 +1,7 @@
 ﻿<Styles
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:controls="clr-namespace:HomeLabManager.Manager.Controls"
 	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
@@ -34,11 +34,15 @@
 		</Border>
 	</Design.PreviewWith>
 
-	<Style Selector=":is(controls|FormField)">
+	<Style Selector="controls|BasicStringFormField">
 		<Setter Property="(i:Interaction.Behaviors)">
 			<i:BehaviorCollectionTemplate>
 				<i:BehaviorCollection>
 					<ir:AdaptiveBehavior SourceControl="{Binding}">
+						<ir:AdaptiveClassSetter
+							MinWidth="500"
+							MaxWidth="Infinity"
+							ClassName="Default" />
 						<ir:AdaptiveClassSetter
 							MinWidth="0"
 							MaxWidth="500"
@@ -49,15 +53,34 @@
 		</Setter>
 	</Style>
 
-	<Style Selector=":is(controls|FormField) materialIcons|MaterialIcon#TipIcon">
+	<Style Selector="controls|BasicStringFormField materialIcons|MaterialIcon.InfoTip">
 		<Setter Property="Height" Value="14" />
 		<Setter Property="Width" Value="14" />
 		<Setter Property="Kind" Value="Information" />
 		<Setter Property="VerticalAlignment" Value="Top" />
 		<Setter Property="HorizontalAlignment" Value="Left" />
+		<Setter Property="IsVisible" Value="{Binding $parent[controls:BasicStringFormField].InfoTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+		<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[controls:BasicStringFormField].InfoTip}" />
 	</Style>
 
-	<Style Selector="controls|BasicStringFormField">
+	<Style Selector="controls|BasicStringFormField materialIcons|MaterialIcon.ValidationError">
+		<Setter Property="Height" Value="24" />
+		<Setter Property="Width" Value="24" />
+		<Setter Property="Kind" Value="Error" />
+		<Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}" />
+		<Setter Property="IsVisible" Value="{Binding $parent[controls:BasicStringFormField].(DataValidationErrors.Errors), Converter={x:Static ObjectConverters.IsNotNull}}" />
+		<Setter Property="(ToolTip.Tip)">
+			<Setter.Value>
+				<Template>
+					<ToolTip>
+						<DataValidationErrors MaxWidth="250" Errors="{Binding $parent[controls:BasicStringFormField].(DataValidationErrors.Errors)}" />
+					</ToolTip>
+				</Template>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style Selector="controls|BasicStringFormField.Default">
 		<Setter Property="Margin" Value="4" />
 		<Setter Property="Template">
 			<ControlTemplate TargetType="{x:Type controls:BasicStringFormField}">
@@ -65,30 +88,29 @@
 					Name="Container"
 					Margin="4"
 					VerticalAlignment="Top"
+					ColumnDefinitions="*,24,3*"
 					ToolTip.Tip="{TemplateBinding InfoTip}">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="3*" />
-					</Grid.ColumnDefinitions>
 
 					<TextBlock
 						Name="Label"
-						Margin="8,0,0,0"
-						VerticalAlignment="Center"
+						Margin="8,18,0,0"
+						VerticalAlignment="Top"
 						Classes="Body1"
 						TextTrimming="CharacterEllipsis">
 						<Run Text="{TemplateBinding Label}" />
 						<Run Text=":" />
 					</TextBlock>
 
+					<materialIcons:MaterialIcon Margin="0,8,0,0" Classes="InfoTip" />
+
 					<materialIcons:MaterialIcon
-						Name="TipIcon"
-						Margin="0,8,0,0"
-						IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
+						Grid.Column="1"
+						Margin="0,0,8,0"
+						Classes="ValidationError" />
 
 					<TextBox
 						Name="FieldEntry"
-						Grid.Column="1"
+						Grid.Column="2"
 						Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
 				</Grid>
 			</ControlTemplate>
@@ -102,8 +124,7 @@
 				<StackPanel
 					Name="Container"
 					Margin="4,8,4,4"
-					VerticalAlignment="Top"
-					ToolTip.Tip="{TemplateBinding InfoTip}">
+					VerticalAlignment="Top">
 					<Grid>
 						<TextBlock
 							Name="Label"
@@ -115,16 +136,20 @@
 							<Run Text=":" />
 						</TextBlock>
 
-						<materialIcons:MaterialIcon
-							Name="TipIcon"
-							Margin="-2,-9,0,0"
-							IsVisible="{Binding !!InfoTip, RelativeSource={RelativeSource TemplatedParent}}" />
+						<materialIcons:MaterialIcon Margin="-2,-9,0,0" Classes="InfoTip" />
 					</Grid>
 
-					<TextBox
-						Name="FieldEntry"
-						Margin="32,0,0,0"
-						Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+					<Grid>
+						<materialIcons:MaterialIcon
+							Margin="8,0,0,0"
+							HorizontalAlignment="Left"
+							Classes="ValidationError" />
+
+						<TextBox
+							Name="FieldEntry"
+							Margin="40,0,0,0"
+							Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+					</Grid>
 				</StackPanel>
 			</ControlTemplate>
 		</Setter>
