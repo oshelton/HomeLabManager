@@ -15,12 +15,12 @@
 			Height="600"
 			ContentTemplate="{DynamicResource MetadataEditorTemplate}">
 			<ContentControl.Content>
-				<sections:MetadataViewModel />
+				<sections:MetadataEditViewModel />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>
 
-	<DataTemplate x:Key="MetadataEditorTemplate" DataType="{x:Type sections:MetadataViewModel}">
+	<DataTemplate x:Key="MetadataEditorTemplate" DataType="{x:Type sections:MetadataEditViewModel}">
 		<materialControls:Card Margin="12">
 			<StackPanel>
 				<TextBlock

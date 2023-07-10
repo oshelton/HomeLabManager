@@ -41,7 +41,7 @@ public sealed class CreateEditServerViewModel : ValidatedPageBaseViewModel
         _isEditingServerHost = realRequest.Server is ServerHostDto;
         _initialServerTitle = !_isNew ? realRequest.Server.Metadata.DisplayName : null;
 
-        Metadata = new MetadataViewModel(realRequest.Server, realRequest.AllOtherDisplayNames, realRequest.AllOtherNames);
+        Metadata = new MetadataEditViewModel(realRequest.Server, realRequest.AllOtherDisplayNames, realRequest.AllOtherNames);
 
         // Set up an observable to check when content has actually changed.
         _hasChangesSubscription = this.WhenAnyValue(x => x.Metadata.HasChanges)
@@ -76,7 +76,7 @@ public sealed class CreateEditServerViewModel : ValidatedPageBaseViewModel
 
     public INavigationService NavigationService => _navigationService;
 
-    public MetadataViewModel Metadata
+    public MetadataEditViewModel Metadata
     {
         get => _metadata;
         private set => this.RaiseAndSetIfChanged(ref _metadata, value);
@@ -99,7 +99,7 @@ public sealed class CreateEditServerViewModel : ValidatedPageBaseViewModel
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
 
-    private MetadataViewModel _metadata;
+    private MetadataEditViewModel _metadata;
 
     private bool _hasChanges;
     private bool _isSaving;

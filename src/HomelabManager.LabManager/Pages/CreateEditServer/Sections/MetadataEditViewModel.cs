@@ -9,10 +9,10 @@ using ReactiveValidation.Extensions;
 namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
 {
     /// View Model for editing server metadata.
-    public sealed class MetadataViewModel: ValidatableViewModel, IDisposable
+    public sealed class MetadataEditViewModel: ValidatableViewModel, IDisposable
     {
         /// Design time constructor only, should not be used otherwise.
-        public MetadataViewModel() 
+        public MetadataEditViewModel() 
             : this(new ServerHostDto
             {
                 Metadata = new ServerMetadataDto { DisplayName = "New Server", Name = "TEST-NEW-SERVER" },
@@ -28,7 +28,7 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
         /// <param name="sourceDto">Base server dto to be edited.</param>
         /// <param name="allOtherDisplayNames">All other Server/VM display names, used for validation testing.</param>
         /// <param name="allOtherNames">All other Server/VM host names, used for validation purposes.</param>
-        public MetadataViewModel(BaseServerDto sourceDto, IReadOnlyList<string> allOtherDisplayNames, IReadOnlyList<string> allOtherNames) 
+        public MetadataEditViewModel(BaseServerDto sourceDto, IReadOnlyList<string> allOtherDisplayNames, IReadOnlyList<string> allOtherNames) 
         {
             if (sourceDto is null)
                 throw new ArgumentNullException(nameof(sourceDto));
@@ -37,7 +37,7 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             _allOtherNames = allOtherNames ?? throw new ArgumentNullException(nameof(allOtherNames));
 
             // Set up validation.
-            var builder = new ValidationBuilder<MetadataViewModel>();
+            var builder = new ValidationBuilder<MetadataEditViewModel>();
 
             builder.RuleFor(vm => vm.DisplayName)
                 .WithPropertyCascadeMode(CascadeMode.Stop)
@@ -63,23 +63,23 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             };
 
             // Set up an observable to check when content has actually changed.
-            _hasChangesSubscription = this.WhenAnyValue(x => x.DisplayName, x => x.Name,
+            _hasChanges = this.WhenAnyValue(x => x.DisplayName, x => x.Name,
                 (displayName, name) =>
                 {
-                    return new TrackedPropertyState()
+                    return !(new TrackedPropertyState()
                     {
                         DisplayName = displayName,
                         Name = name
-                    };
+                    }.Equals(_initialState));
                 })
                 .Throttle(TimeSpan.FromSeconds(0.5))
-                .Subscribe(state => HasChanges = !state.Equals(_initialState));
+                .ToProperty(this, nameof(HasChanges));
         }
 
         public void Dispose()
         {
             Validator?.Dispose();
-            _hasChangesSubscription?.Dispose();
+            _hasChanges?.Dispose();
         }
 
         /// The display name of the server or VM.
@@ -97,20 +97,15 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
         }
 
         /// Whether or not the metadata has changes.
-        public bool HasChanges
-        {
-            get => _hasChanges;
-            private set => this.RaiseAndSetIfChanged(ref _hasChanges, value);
-        }
+        public bool HasChanges => _hasChanges.Value;
 
         private static readonly Regex s_nameRequirementRegex = new Regex("^(([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])\\.)*([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])$", 
             RegexOptions.IgnoreCase | RegexOptions.Compiled); 
 
         private string _displayName;
         private string _name;
-        private bool _hasChanges;
 
-        private readonly IDisposable _hasChangesSubscription;
+        private readonly ObservableAsPropertyHelper<bool> _hasChanges;
 
         private TrackedPropertyState? _initialState;
         private IReadOnlyList<string> _allOtherDisplayNames;

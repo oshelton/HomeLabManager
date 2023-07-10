@@ -22,7 +22,7 @@ public sealed class MetadataViewModelTests
                 Name = "TEST-SERVER-NAME"
             }
         };
-        using (var editor = new MetadataViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
+        using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
         {
             Assert.That(editor.HasChanges, Is.False);
             Assert.That(editor.HasErrors, Is.False);
@@ -44,7 +44,7 @@ public sealed class MetadataViewModelTests
             }
         };
         // Test not-null/empty rule.
-        using (var editor = new MetadataViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
+        using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
         {
             Assert.That(editor.HasErrors, Is.False);
 
@@ -71,7 +71,7 @@ public sealed class MetadataViewModelTests
 
         var notUniqueDisplayName = "failed";
         // Test uniqueness of display name.
-        using (var editor = new MetadataViewModel(server, new[] { notUniqueDisplayName }, Array.Empty<string>()))
+        using (var editor = new MetadataEditViewModel(server, new[] { notUniqueDisplayName }, Array.Empty<string>()))
         {
             editor.DisplayName = notUniqueDisplayName;
 
@@ -100,7 +100,7 @@ public sealed class MetadataViewModelTests
             }
         };
         // Test not-null/empty rule.
-        using (var editor = new MetadataViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
+        using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
         {
             Assert.That(editor.HasErrors, Is.False);
 
@@ -126,7 +126,7 @@ public sealed class MetadataViewModelTests
         }
 
         // Test name meets expected format.
-        using (var editor = new MetadataViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
+        using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
         {
             await editor.Validator.WaitValidatingCompletedAsync().ConfigureAwait(false);
 
@@ -155,7 +155,7 @@ public sealed class MetadataViewModelTests
 
         var notUniqueName = "failed";
         // Test uniqueness of name.
-        using (var editor = new MetadataViewModel(server, Array.Empty<string>(), new[] { notUniqueName }))
+        using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), new[] { notUniqueName }))
         {
             editor.Name = notUniqueName;
 
