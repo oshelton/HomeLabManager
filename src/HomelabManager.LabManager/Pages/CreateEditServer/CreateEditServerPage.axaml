@@ -4,12 +4,10 @@
 	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:eventBinder="using:EventBinder"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:page="using:HomeLabManager.Manager.Pages.CreateEditServer">
-
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceInclude Source="/Pages/CreateEditServer/Sections/MetadataEditView.axaml" />
 	</ResourceDictionary.MergedDictionaries>
@@ -48,7 +46,7 @@
 					Text="Save" />
 
 				<controls:PageNavButton
-					Click="{eventBinder:EventBinding NavigationService.NavigateBack}"
+					Command="{Binding Cancel}"
 					Icon="Cancel"
 					IsOutline="True"
 					Text="Cancel" />

@@ -46,6 +46,9 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         Save = ReactiveCommand.CreateFromTask(SaveChangesAndNavigateBack, this.WhenAnyValue(x => x.CanSave).ObserveOn(RxApp.MainThreadScheduler))
             .DisposeWith(_disposables);
         Save.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
+
+        Cancel = ReactiveCommand.CreateFromTask(() => _navigationService.NavigateBack())
+            .DisposeWith(_disposables);
     }
 
     /// Title of the page, a bit more logic trhan usual is used here since this page can be  abit more complicated than most.
@@ -73,7 +76,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     public ReactiveCommand<Unit, Unit> Save { get; private set; }
 
-    public INavigationService NavigationService => _navigationService;
+    public ReactiveCommand<Unit, Unit> Cancel { get; private set; }
 
     public MetadataEditViewModel Metadata
     {
