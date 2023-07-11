@@ -17,12 +17,12 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class TestNavigationService: ReactiveObject, INavigationService
 {
-    public async Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel navigateBackToPage = null)
+    public async Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false)
     {
         if (request is null)
             throw new ArgumentNullException(nameof(request));
 
-        var destinationPage = navigateBackToPage ?? request.CreatePage();
+        var destinationPage = request.CreatePage();
 
         if (destinationPage is null)
             throw new InvalidOperationException("INavigationRequest must have a destination page.");
@@ -32,6 +32,8 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
             var result = await destinationPage.TryNavigateAway().ConfigureAwait(false);
             if (!result)
                 return false;
+            else
+                CurrentPage.Dispose();
         }
 
         await destinationPage.NavigateTo(request).ConfigureAwait(false);
@@ -40,8 +42,8 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
         {
             CurrentPage = destinationPage;
 
-            if (navigateBackToPage is null)
-                _navigationStack.Add((request, destinationPage));
+            if (!isBackNavigation)
+                _navigationStack.Add(request);
             else
                 _navigationStack.RemoveAt(_navigationStack.Count - 1);
             UpdateCanNavigateBack();
@@ -50,12 +52,12 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
         return true;
     }
 
-    public async Task NavigateBack()
+    public Task NavigateBack()
     {
         if (!CanNavigateBack)
-            return;
+            return Task.CompletedTask;
 
-        await NavigateTo(_navigationStack[^2].Request, _navigationStack[^2].Page).ConfigureAwait(false);
+        return NavigateTo(_navigationStack[^2], true);
     }
 
     /// <summary>
@@ -73,5 +75,5 @@ internal sealed class TestNavigationService: ReactiveObject, INavigationService
     /// </summary>
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
-    private readonly List<(INavigationRequest Request, PageBaseViewModel Page)> _navigationStack = new();
+    private readonly List<INavigationRequest> _navigationStack = new();
 }

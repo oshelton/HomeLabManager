@@ -29,14 +29,24 @@
 		<DockPanel IsEnabled="{Binding !IsSaving}">
 			<UniformGrid
 				HorizontalAlignment="Right"
-				Columns="2"
+				Columns="3"
 				DockPanel.Dock="Bottom">
+
+				<Border>
+					<materialIcons:MaterialIcon
+						Margin="0,0,8,0"
+						HorizontalAlignment="Right"
+						Classes="ValidationError"
+						IsVisible="{Binding HasErrors}"
+						ToolTip.Tip="Validation errors must be addressed before data can be saved." />
+				</Border>
+
 				<controls:PageNavButton
 					Margin="0,0,6,0"
-					Click="{eventBinder:EventBinding SaveChangesAndNavigateBack}"
+					Command="{Binding Save}"
 					Icon="FloppyDisc"
-					IsEnabled="{Binding HasChanges}"
 					Text="Save" />
+
 				<controls:PageNavButton
 					Click="{eventBinder:EventBinding NavigationService.NavigateBack}"
 					Icon="Cancel"

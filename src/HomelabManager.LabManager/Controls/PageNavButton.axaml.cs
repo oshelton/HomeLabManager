@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -27,6 +28,15 @@ namespace HomeLabManager.Manager.Controls
         /// </summary>
         public static readonly StyledProperty<bool> IsOutlineProperty =
             AvaloniaProperty.Register<PageNavButton, bool>(nameof(IsOutline), false);
+
+        /// <summary>
+        /// Defines the <see cref="Command"/> property.
+        /// </summary>
+        public static readonly DirectProperty<PageNavButton, ICommand> CommandProperty =
+            AvaloniaProperty.RegisterDirect<PageNavButton, ICommand>(
+                nameof(Command),
+                o => o.Command,
+                (o, v) => o.Command = v);
 
         /// <summary>
         /// Defines the <see cref="Click"/> event.
@@ -64,6 +74,19 @@ namespace HomeLabManager.Manager.Controls
         }
 
         /// <summary>
+        /// Gets or sets a value for the command associated with the button.
+        /// </summary>
+        public ICommand Command
+        {
+            get => _command;
+            set
+            {
+                if (SetAndRaise(CommandProperty, ref _command, value))
+                    button.Command = value;
+            }
+        }
+
+        /// <summary>
         /// Raised when the user clicks the button.
         /// </summary>
         public event EventHandler<RoutedEventArgs> Click
@@ -77,5 +100,7 @@ namespace HomeLabManager.Manager.Controls
             var eventArgs = new RoutedEventArgs { RoutedEvent = ClickEvent };
             RaiseEvent(eventArgs);
         }
+
+        private ICommand _command;
     }
 }

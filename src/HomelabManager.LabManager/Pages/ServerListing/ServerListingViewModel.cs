@@ -100,6 +100,8 @@ public class ServerListingViewModel : PageBaseViewModel
         private set => this.RaiseAndSetIfChanged(ref _servers, value);
     }
 
+    protected override void Dispose(bool isDisposing) { }
+
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;

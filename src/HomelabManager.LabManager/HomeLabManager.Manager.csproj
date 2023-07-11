@@ -35,4 +35,9 @@
       <SubType>Designer</SubType>
     </AvaloniaXaml>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Styles\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
 </Project>

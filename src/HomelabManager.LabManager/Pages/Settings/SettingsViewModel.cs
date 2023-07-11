@@ -44,6 +44,21 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
 
         Validator = builder.Build(this);
+
+        // Set up an observable to check when content has actually changed.
+        _stateChangeSubscription = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
+            (repoPath, gitPath, userName, pat) =>
+            {
+                return new TrackedPropertyState()
+                {
+                    HomeLabRepoDataPath = repoPath,
+                    GitConfigFilePath = gitPath,
+                    GithubUserName = userName,
+                    GithubPat = pat
+                };
+            })
+            .Throttle(TimeSpan.FromSeconds(0.5))
+            .Subscribe(state => HasChanges = !state.Equals(_initialState));
     }
 
     public override string Title => "Settings";
@@ -70,37 +85,14 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             GithubUserName = GithubUserName,
             GithubPat = GithubPat
         };
-
-        // Set up an observable to check when content has actually changed.
-        _stateChangeSubscription = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
-            (repoPath, gitPath, userName, pat) =>
-            {
-                return new TrackedPropertyState()
-                {
-                    HomeLabRepoDataPath = repoPath,
-                    GitConfigFilePath = gitPath,
-                    GithubUserName = userName,
-                    GithubPat = pat
-                };
-            })
-            .Throttle(TimeSpan.FromSeconds(0.5))
-            .Subscribe(state => HasChanges = !state.Equals(_initialState));
     }
 
-    public override async Task<bool> TryNavigateAway()
+    public override Task<bool> TryNavigateAway()
     {
         if (!HasChanges)
-        {
-            _stateChangeSubscription!.Dispose();
-            return true;
-        }
+            return Task.FromResult(true);
         else
-        {
-            var result = await Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("There are unsaved changes on this page, they will be lost if you continue.").ConfigureAwait(true);
-            if (result)
-                _stateChangeSubscription.Dispose();
-            return result;
-        }
+            return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("There are unsaved changes on this page, they will be lost if you continue.");
     }
 
     public async Task OpenFolderPickerForRepoPath()
@@ -185,6 +177,12 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     {
         get => _githubPat;
         set => this.RaiseAndSetIfChanged(ref _githubPat, value);
+    }
+
+    protected override void Dispose(bool isDisposing)
+    {
+        if (isDisposing)
+            _stateChangeSubscription.Dispose();
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;

@@ -17,20 +17,24 @@ public sealed class MetadataViewModelTests
         var request = new CreateEditServerNavigationRequest(true, new ServerHostDto() { Metadata = new ServerMetadataDto { DisplayName = "server" } }, Array.Empty<string>(), Array.Empty<string>());
         await newServer.NavigateTo(request).ConfigureAwait(false);
         Assert.That(newServer.Title, Is.EqualTo("Create New Server Host"));
+        newServer.Dispose();
         
         var newVM = new CreateEditServerViewModel();
         request = new CreateEditServerNavigationRequest(true, new ServerVmDto() { Metadata = new ServerMetadataDto { DisplayName = "vm" } }, Array.Empty<string>(), Array.Empty<string>());
         await newVM.NavigateTo(request).ConfigureAwait(false);
         Assert.That(newVM.Title, Is.EqualTo("Create New Virtual Machine"));
+        newVM.Dispose();
 
         var editingServer = new CreateEditServerViewModel();
         request = new CreateEditServerNavigationRequest(false, new ServerHostDto { Metadata = new ServerMetadataDto { DisplayName = "server" } }, Array.Empty<string>(), Array.Empty<string>());
         await editingServer.NavigateTo(request).ConfigureAwait(false);
         Assert.That(editingServer.Title, Is.EqualTo("Editing server"));
+        editingServer.Dispose();
 
         var editingVM = new CreateEditServerViewModel();
         request = new CreateEditServerNavigationRequest(false, new ServerVmDto { Metadata = new ServerMetadataDto { DisplayName = "vm" } }, Array.Empty<string>(), Array.Empty<string>());
         await editingVM.NavigateTo(request).ConfigureAwait(false);
         Assert.That(editingVM.Title, Is.EqualTo("Editing vm"));
+        editingVM.Dispose();
     }
 }

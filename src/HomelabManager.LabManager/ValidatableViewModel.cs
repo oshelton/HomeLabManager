@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveValidation;
 
@@ -28,7 +23,11 @@ namespace HomeLabManager.Manager
         }
 
         /// <inheritdoc />
-        public virtual void OnPropertyMessagesChanged(string propertyName) => ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        public virtual void OnPropertyMessagesChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            this.RaisePropertyChanged(nameof(HasErrors));
+        }
 
 
         #region INotifyDataErrorInfo

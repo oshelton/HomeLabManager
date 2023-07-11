@@ -25,6 +25,8 @@ public sealed class ServerListingViewModelTests
         Assert.That(serverListing.Title, Is.EqualTo("Server Listing"));
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.IsLoading));
         Assert.That(serverListing.Servers, Is.Null);
+
+        serverListing.Dispose();
     }
 
     /// <summary>
@@ -45,6 +47,8 @@ public sealed class ServerListingViewModelTests
 
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.HasServers));
         Assert.That(serverListing.Servers, Has.Count.EqualTo(3));
+
+        serverListing.Dispose();
     }
 
     [Test]

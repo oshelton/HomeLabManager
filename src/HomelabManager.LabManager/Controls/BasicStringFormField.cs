@@ -10,7 +10,7 @@ namespace HomeLabManager.Manager.Controls;
 public class BasicStringFormField : FormField
 {
     /// <summary>
-    /// Defines the <see cref="Value"/> property.
+    /// Defines the <see cref="StringValue"/> property.
     /// </summary>
     public static readonly DirectProperty<BasicStringFormField, string> StringValueProperty =
         AvaloniaProperty.RegisterDirect<BasicStringFormField, string>(
@@ -20,7 +20,6 @@ public class BasicStringFormField : FormField
             defaultBindingMode: Avalonia.Data.BindingMode.TwoWay,
             enableDataValidation: true);
 
-    private string _stringValue;
     /// <summary>
     /// Gets or sets a value for the Field's value.
     /// </summary>
@@ -40,4 +39,6 @@ public class BasicStringFormField : FormField
             DataValidationErrors.SetError(this, error);
         }
     }
+
+    private string _stringValue;
 }

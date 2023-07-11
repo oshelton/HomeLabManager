@@ -63,11 +63,7 @@
 		<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[controls:BasicStringFormField].InfoTip}" />
 	</Style>
 
-	<Style Selector="controls|BasicStringFormField materialIcons|MaterialIcon.ValidationError">
-		<Setter Property="Height" Value="24" />
-		<Setter Property="Width" Value="24" />
-		<Setter Property="Kind" Value="Error" />
-		<Setter Property="Foreground" Value="{DynamicResource ValidationErrorBrush}" />
+	<Style Selector="controls|BasicStringFormField materialIcons|MaterialIcon.FieldValidationError">
 		<Setter Property="IsVisible" Value="{Binding $parent[controls:BasicStringFormField].(DataValidationErrors.Errors), Converter={x:Static ObjectConverters.IsNotNull}}" />
 		<Setter Property="(ToolTip.Tip)">
 			<Setter.Value>
@@ -106,7 +102,7 @@
 					<materialIcons:MaterialIcon
 						Grid.Column="1"
 						Margin="0,0,8,0"
-						Classes="ValidationError" />
+						Classes="ValidationError, FieldValidationError" />
 
 					<TextBox
 						Name="FieldEntry"
@@ -143,7 +139,7 @@
 						<materialIcons:MaterialIcon
 							Margin="8,0,0,0"
 							HorizontalAlignment="Left"
-							Classes="ValidationError" />
+							Classes="ValidationError FieldValidationError" />
 
 						<TextBox
 							Name="FieldEntry"

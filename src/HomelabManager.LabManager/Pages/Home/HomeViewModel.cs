@@ -116,6 +116,8 @@ public sealed class HomeViewModel : PageBaseViewModel
         private set => this.RaiseAndSetIfChanged(ref _servers, value);
     }
 
+    protected override void Dispose(bool isDisposing) { }
+
     private readonly IServerDataManager _serverDataManager;
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;

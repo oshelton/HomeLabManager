@@ -22,6 +22,8 @@ public class HomeViewModelTests
         Assert.That(homePage.Title, Is.EqualTo("Home"));
         Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.NoRepoPath));
         Assert.That(homePage.Servers, Is.Null);
+
+        homePage.Dispose();
     }
 
     /// <summary>
@@ -42,5 +44,7 @@ public class HomeViewModelTests
 
         Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.HasServers));
         Assert.That(homePage.Servers!, Has.Count.EqualTo(3));
+
+        homePage.Dispose();
     }
 }
