@@ -43,7 +43,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             .ToProperty(this, nameof(HasErrors))
             .DisposeWith(_disposables);
 
-        Save = ReactiveCommand.CreateFromTask(SaveChangesAndNavigateBack, this.WhenAnyValue(x => x.CanSave).ObserveOn(SynchronizationContext.Current))
+        Save = ReactiveCommand.CreateFromTask(SaveChangesAndNavigateBack, this.WhenAnyValue(x => x.CanSave).ObserveOn(RxApp.MainThreadScheduler))
             .DisposeWith(_disposables);
         Save.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
     }
