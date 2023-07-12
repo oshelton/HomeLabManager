@@ -38,6 +38,12 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             .DisposeWith(_disposables);
 
         // Set up observable to monitor for validation issues.
+        _hasChanges = this.WhenAnyValue(x => x.Metadata.HasChanges)
+            .Throttle(TimeSpan.FromSeconds(0.5))
+            .ToProperty(this, nameof(HasChanges))
+            .DisposeWith(_disposables);
+
+        // Set up observable to monitor for validation issues.
         _hasErrors = this.WhenAnyValue(x => x.Metadata.HasErrors)
             .Throttle(TimeSpan.FromSeconds(0.5))
             .ToProperty(this, nameof(HasErrors))
@@ -47,7 +53,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             .DisposeWith(_disposables);
         Save.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
 
-        Cancel = ReactiveCommand.CreateFromTask(() => _navigationService.NavigateBack())
+        Cancel = ReactiveCommand.CreateFromTask(_navigationService.NavigateBack)
             .DisposeWith(_disposables);
     }
 
@@ -61,6 +67,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         if (request is not CreateEditServerNavigationRequest realRequest)
             throw new InvalidOperationException("Expected navigation request type is CreateEditServerNavigationRequest.");
 
+        _serverDto = realRequest.Server;
+
         _isNew = realRequest.IsNew;
         _isEditingServerHost = realRequest.Server is ServerHostDto;
         _initialServerTitle = !_isNew ? realRequest.Server.Metadata.DisplayName : null;
@@ -71,7 +79,10 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     public override Task<bool> TryNavigateAway()
     {
-        return Task.FromResult(true);
+        if (!HasChanges || IsSaving)
+            return Task.FromResult(true);
+        else
+            return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("Unsaved changes will be lost if you continue.");
     }
 
     public ReactiveCommand<Unit, Unit> Save { get; private set; }
@@ -84,8 +95,11 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         private set => this.RaiseAndSetIfChanged(ref _metadata, value);
     }
 
-    /// Whether or not this page has changes.
+    /// Whether or not this page has changes and is in a valid state to be saved.
     public bool CanSave => _canSave.Value;
+
+    /// Whether or not this page has changes, regardless of whether or not they are valid.
+    public bool HasChanges => _hasChanges.Value;
 
     /// Whether or not this page has any validation errors.
     public bool HasErrors => _hasErrors.Value;
@@ -103,8 +117,24 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
     {
         var (dialog, dialogTask) = SharedDialogs.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
+        // Incorporate updated information into Dto.
+        var updatedDto = _serverDto with
+        {
+            Metadata = _serverDto.Metadata with
+            {
+                DisplayName = Metadata.DisplayName,
+                Name = Metadata.Name,
+            }
+        };
+
         // Do the actual saving work.
-        //await Task.Run(() => ).ConfigureAwait(true);
+        await Task.Run(() => 
+        {
+            if (_isEditingServerHost)
+                _serverDataManager.AddUpdateServer(updatedDto as ServerHostDto);
+            else if (updatedDto is ServerVmDto vmDto)
+                _serverDataManager.AddUpdateServer(vmDto.Host);
+        }).ConfigureAwait(true);
 
         dialog.GetWindow().Close();
 
@@ -116,6 +146,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
     
     private readonly CompositeDisposable _disposables;
     private readonly ObservableAsPropertyHelper<bool> _canSave;
+    private readonly ObservableAsPropertyHelper<bool> _hasChanges;
     private readonly ObservableAsPropertyHelper<bool> _hasErrors;
     private readonly ObservableAsPropertyHelper<bool> _isSaving;
 
@@ -123,6 +154,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
     private MetadataEditViewModel _metadata;
 
     // Set once and read internally only fields.
+    private BaseServerDto _serverDto;
     private bool _isNew;
     private bool _isEditingServerHost;
     private string _initialServerTitle;

@@ -21,7 +21,7 @@ public sealed record ServerMetadataDto
     /// Path to the file the metadata came from.
     /// </summary>
     [YamlIgnore]
-    public string FileName { get; init; }
+    public string FileName { get; internal init; }
 
     /// <summary>
     /// Display name to use with the server.
@@ -66,7 +66,7 @@ public abstract record BaseServerDto
     /// <summary>
     /// Name of the directory the server dto came from.
     /// </summary>
-    public string Directory { get; init; }
+    public string Directory { get; internal init; }
 
     /// <summary>
     /// Unique id of this server, is the name of the directory the server lives in.
