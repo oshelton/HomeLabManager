@@ -7,7 +7,7 @@ namespace HomeLabManager.Manager.Controls;
 /// <summary>
 /// Simple string based form field class.
 /// </summary>
-public class BasicStringFormField : FormField
+public partial class BasicStringFormField : FormField
 {
     /// <summary>
     /// Defines the <see cref="StringValue"/> property.
@@ -19,6 +19,8 @@ public class BasicStringFormField : FormField
             (o, v) => o.StringValue = v,
             defaultBindingMode: Avalonia.Data.BindingMode.TwoWay,
             enableDataValidation: true);
+
+    public BasicStringFormField() => InitializeComponent();
 
     /// <summary>
     /// Gets or sets a value for the Field's value.

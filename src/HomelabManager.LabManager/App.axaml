@@ -16,6 +16,6 @@
 		<!--  Application Styles  -->
 		<StyleInclude Source="/Styles/Icons.axaml" />
 		<StyleInclude Source="/Styles/Buttons.axaml" />
-		<StyleInclude Source="/Styles/FormFields.axaml" />
+		<StyleInclude Source="/Styles/BasicStringFormFields.axaml" />
 	</Application.Styles>
 </Application>
