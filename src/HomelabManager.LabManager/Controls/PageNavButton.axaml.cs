@@ -1,7 +1,10 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml.Templates;
 using Material.Icons;
 
 namespace HomeLabManager.Manager.Controls
@@ -9,8 +12,11 @@ namespace HomeLabManager.Manager.Controls
     /// <summary>
     /// Reusable Page Nav Button control.
     /// </summary>
-    public partial class PageNavButton : UserControl
+    [TemplatePart(PartButtonName, typeof(Button))]
+    public partial class PageNavButton : TemplatedControl
     {
+        public const string PartButtonName = "PART_Button";
+
         /// <summary>
         /// Defines the <see cref="Icon"/> property.
         /// </summary>
@@ -37,6 +43,15 @@ namespace HomeLabManager.Manager.Controls
                 nameof(Command),
                 o => o.Command,
                 (o, v) => o.Command = v);
+
+        /// <summary>
+        /// Defines the <see cref="CommandParameter"/> property.
+        /// </summary>
+        public static readonly DirectProperty<PageNavButton, object> CommandParameterProperty =
+            AvaloniaProperty.RegisterDirect<PageNavButton, object>(
+                nameof(CommandParameter),
+                o => o.CommandParameter,
+                (o, v) => o.CommandParameter = v);
 
         /// <summary>
         /// Defines the <see cref="Click"/> event.
@@ -82,7 +97,20 @@ namespace HomeLabManager.Manager.Controls
             set
             {
                 if (SetAndRaise(CommandProperty, ref _command, value))
-                    button.Command = value;
+                    _button.Command = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value for the command parameter associated with the button.
+        /// </summary>
+        public object CommandParameter
+        {
+            get => _commandParameter;
+            set
+            {
+                if (SetAndRaise(CommandParameterProperty, ref _commandParameter, value))
+                    _button.CommandParameter = value;
             }
         }
 
@@ -101,6 +129,22 @@ namespace HomeLabManager.Manager.Controls
             RaiseEvent(eventArgs);
         }
 
+        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        {
+            if (e is null)
+                throw new ArgumentNullException(nameof(e));
+
+            base.OnApplyTemplate(e);
+
+            _button = e.NameScope.Get<Button>(PartButtonName);
+
+            if (_button is null)
+                throw new InvalidOperationException($"PageNavButton templates must define a {PartButtonName} Button element.");
+        }
+
         private ICommand _command;
+        private object _commandParameter;
+
+        private Button _button;
     }
 }
