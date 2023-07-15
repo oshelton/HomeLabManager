@@ -41,12 +41,12 @@
 
 				<controls:PageNavButton
 					Margin="0,0,6,0"
-					Command="{Binding Save}"
+					Command="{Binding SaveCommand}"
 					Icon="FloppyDisc"
 					Text="Save" />
 
 				<controls:PageNavButton
-					Command="{Binding Cancel}"
+					Command="{Binding CancelCommand}"
 					Icon="Cancel"
 					IsOutline="True"
 					Text="Cancel" />

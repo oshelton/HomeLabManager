@@ -49,11 +49,11 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             .ToProperty(this, nameof(HasErrors))
             .DisposeWith(_disposables);
 
-        Save = ReactiveCommand.CreateFromTask(SaveChangesAndNavigateBack, this.WhenAnyValue(x => x.CanSave).ObserveOn(RxApp.MainThreadScheduler))
+        SaveCommand = ReactiveCommand.CreateFromTask(Save, this.WhenAnyValue(x => x.CanSave).ObserveOn(RxApp.MainThreadScheduler))
             .DisposeWith(_disposables);
-        Save.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
+        SaveCommand.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
 
-        Cancel = ReactiveCommand.CreateFromTask(_navigationService.NavigateBack)
+        CancelCommand = ReactiveCommand.CreateFromTask(_navigationService.NavigateBack)
             .DisposeWith(_disposables);
     }
 
@@ -85,9 +85,9 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("Unsaved changes will be lost if you continue.");
     }
 
-    public ReactiveCommand<Unit, Unit> Save { get; private set; }
+    public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
-    public ReactiveCommand<Unit, Unit> Cancel { get; private set; }
+    public ReactiveCommand<Unit, Unit> CancelCommand { get; }
 
     public MetadataEditViewModel Metadata
     {
@@ -113,7 +113,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             _disposables.Dispose();
     }
 
-    private async Task SaveChangesAndNavigateBack()
+    private async Task Save()
     {
         var (dialog, dialogTask) = SharedDialogs.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
