@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml.Templates;
 using Material.Icons;
 
 namespace HomeLabManager.Manager.Controls
@@ -15,6 +14,9 @@ namespace HomeLabManager.Manager.Controls
     [TemplatePart(PartButtonName, typeof(Button))]
     public partial class PageNavButton : TemplatedControl
     {
+        /// <summary>
+        /// Name of the main Button Template part.
+        /// </summary>
         public const string PartButtonName = "PART_Button";
 
         /// <summary>
