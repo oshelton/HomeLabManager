@@ -96,7 +96,7 @@ namespace HomeLabManager.Manager.Controls
             get => _command;
             set
             {
-                if (SetAndRaise(CommandProperty, ref _command, value))
+                if (SetAndRaise(CommandProperty, ref _command, value) && _button is not null)
                     _button.Command = value;
             }
         }
@@ -109,7 +109,7 @@ namespace HomeLabManager.Manager.Controls
             get => _commandParameter;
             set
             {
-                if (SetAndRaise(CommandParameterProperty, ref _commandParameter, value))
+                if (SetAndRaise(CommandParameterProperty, ref _commandParameter, value) && _button is not null)
                     _button.CommandParameter = value;
             }
         }
@@ -137,6 +137,9 @@ namespace HomeLabManager.Manager.Controls
             base.OnApplyTemplate(e);
 
             _button = e.NameScope.Get<Button>(PartButtonName);
+
+            _button.Command = Command;
+            _button.CommandParameter = CommandParameter;
 
             if (_button is null)
                 throw new InvalidOperationException($"PageNavButton templates must define a {PartButtonName} Button element.");
