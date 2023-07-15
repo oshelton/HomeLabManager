@@ -1,12 +1,12 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 
 namespace HomeLabManager.Manager.Controls;
 
 /// <summary>
 /// Base class for simple form fields.
 /// </summary>
-public abstract class FormField : UserControl
+public abstract class FormField : TemplatedControl
 {
     /// <summary>
     /// Defines the <see cref="Label"/> property.
