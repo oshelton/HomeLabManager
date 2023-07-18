@@ -1,4 +1,7 @@
-﻿using HomeLabManager.Manager;
+﻿using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using Avalonia.Collections;
+using HomeLabManager.Manager;
 using HomeLabManager.Manager.Pages.CreateEditServer;
 using HomeLabManager.Manager.Pages.ServerListing;
 using HomeLabManager.Manager.Services.Navigation;
@@ -55,9 +58,9 @@ public sealed class ServerListingViewModelTests
     public async Task CreateNewServerHost_ConfirmCreateNewServerHostDefaultBehavior()
     {    
         var serverListing = new Mock<ServerListingViewModel>();
-        serverListing.SetupGet(x => x.Servers).Returns(Array.Empty<ServerViewModel>());
+        serverListing.SetupGet(x => x.Servers).Returns(new AvaloniaList<ServerViewModel>());
 
-        await serverListing.Object.CreateNewServerHost().ConfigureAwait(false);
+        await serverListing.Object.CreateNewServerHostCommand.Execute();
 
         var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 

@@ -36,6 +36,11 @@
     </AvaloniaXaml>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Controls\AddItemInlineSeperator.axaml.cs">
+      <DependentUpon>AddItemInlineSeperator.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Styles\Icons.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>

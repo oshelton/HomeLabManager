@@ -4,11 +4,11 @@
 	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:eventBinder="using:EventBinder"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:page="using:HomeLabManager.Manager.Pages.ServerListing">
+	xmlns:page="using:HomeLabManager.Manager.Pages.ServerListing"
+	xmlns:sys="clr-namespace:System;assembly=mscorlib">
 	<Design.PreviewWith>
 		<ContentControl
 			Width="800"
@@ -56,7 +56,7 @@
 									<controls:PageNavButton
 										Margin="8"
 										HorizontalAlignment="Center"
-										Click="{eventBinder:EventBinding CreateNewServerHost}"
+										Command="{Binding CreateNewServerHostCommand}"
 										Icon="Add"
 										Text="Create Server" />
 								</StackPanel>
@@ -68,27 +68,47 @@
 				<Style Selector="Border.ServerDisplay">
 					<Setter Property="Child">
 						<Template>
-							<ItemsRepeater Margin="12" ItemsSource="{Binding Servers}">
-								<ItemsRepeater.Layout>
-									<StackLayout Orientation="Vertical" Spacing="8" />
-								</ItemsRepeater.Layout>
+							<StackPanel Margin="12">
+								<Border Margin="8">
+									<Grid ColumnDefinitions="*,Auto,*">
+										<Separator Margin="8" />
+										<materialControls:FloatingButton
+											Grid.Column="1"
+											Classes="Mini Dark"
+											Command="{Binding CreateNewServerHostCommand}"
+											ToolTip.Tip="Create a new Server Here.">
+											<materialControls:FloatingButton.CommandParameter>
+												<sys:Int32>0</sys:Int32>
+											</materialControls:FloatingButton.CommandParameter>
 
-								<ItemsRepeater.ItemTemplate>
-									<DataTemplate>
-										<materialControls:Card>
-											<Grid>
+											<materialIcons:MaterialIcon Kind="Add" />
+										</materialControls:FloatingButton>
+										<Separator Grid.Column="2" Margin="8" />
+									</Grid>
+								</Border>
 
-												<TextBlock
-													Classes="Headline6"
-													MaxLines="2"
-													Text="{Binding DisplayName}"
-													TextTrimming="CharacterEllipsis"
-													TextWrapping="Wrap" />
-											</Grid>
-										</materialControls:Card>
-									</DataTemplate>
-								</ItemsRepeater.ItemTemplate>
-							</ItemsRepeater>
+								<ItemsRepeater ItemsSource="{Binding Servers}">
+									<ItemsRepeater.Layout>
+										<StackLayout Orientation="Vertical" Spacing="8" />
+									</ItemsRepeater.Layout>
+
+									<ItemsRepeater.ItemTemplate>
+										<DataTemplate>
+											<materialControls:Card>
+												<Grid>
+
+													<TextBlock
+														Classes="Headline6"
+														MaxLines="2"
+														Text="{Binding DisplayName}"
+														TextTrimming="CharacterEllipsis"
+														TextWrapping="Wrap" />
+												</Grid>
+											</materialControls:Card>
+										</DataTemplate>
+									</ItemsRepeater.ItemTemplate>
+								</ItemsRepeater>
+							</StackPanel>
 						</Template>
 					</Setter>
 				</Style>

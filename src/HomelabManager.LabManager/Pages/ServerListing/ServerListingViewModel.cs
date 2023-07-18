@@ -1,4 +1,8 @@
-﻿using Avalonia.Threading;
+﻿using System.Collections.ObjectModel;
+using System.Reactive;
+using System.Reactive.Disposables;
+using Avalonia.Collections;
+using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Services.Navigation;
@@ -39,11 +43,16 @@ public class ServerListingViewModel : PageBaseViewModel
                     CurrentDisplayMode = ServerListingDisplayMode.NoServers;
                     break;
                 case 2:
-                    _servers = _serverDataManager!.GetServers().Select(x => new ServerViewModel(x)).ToArray();
+                    _servers = new AvaloniaList<ServerViewModel>(_serverDataManager.GetServers().Select(x => new ServerViewModel(x)).ToArray());
                     CurrentDisplayMode = ServerListingDisplayMode.HasServers;
                     break;
             }
         }
+
+        _disposables = new CompositeDisposable();
+
+        CreateNewServerHostCommand = ReactiveCommand.CreateFromTask<int>(CreateNewServerHost)
+            .DisposeWith(_disposables);
     }
 
     public override string Title => "Server Listing";
@@ -56,31 +65,19 @@ public class ServerListingViewModel : PageBaseViewModel
         // Load Servers.
         CurrentDisplayMode = ServerListingDisplayMode.IsLoading;
 
-        IReadOnlyList<ServerViewModel> servers = null;
+        AvaloniaList<ServerViewModel> servers = null;
         await Task.Run(async () =>
         {
-            servers = _serverDataManager.GetServers().Select(x => new ServerViewModel(x)).ToArray();
-        }).ConfigureAwait(false);
+            servers = new AvaloniaList<ServerViewModel>(_serverDataManager.GetServers().Select(x => new ServerViewModel(x)));
+        }).ConfigureAwait(true);
 
-        DispatcherHelper.PostToUIThread(() =>
-        {
-            Servers = servers;
-            CurrentDisplayMode = (servers?.Count ?? 0) != 0 ? ServerListingDisplayMode.HasServers : ServerListingDisplayMode.NoServers;
-        }, DispatcherPriority.Input);
+        Servers = servers;
+        CurrentDisplayMode = (servers?.Count ?? 0) != 0 ? ServerListingDisplayMode.HasServers : ServerListingDisplayMode.NoServers;
     }
 
     public override Task<bool> TryNavigateAway() => Task.FromResult(true);
 
-    /// <summary>
-    /// Create a new Server.
-    /// </summary>
-    public Task CreateNewServerHost() => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()
-    { 
-        Metadata = new ServerMetadataDto{ DisplayName = "New Server" },
-        Configuration = new ServerConfigurationDto(),
-        DockerCompose = new DockerComposeDto(),
-        VMs = Array.Empty<ServerVmDto>(),
-    }, Servers.Select(x => x.DisplayName).ToArray(), Servers.Select(x => x.Name).ToArray())); // TYhis will need to also support pulling these off of VMs when support for them is added.
+    public ReactiveCommand<int, Unit> CreateNewServerHostCommand { get; }
 
     /// <summary>
     /// Current display mode.
@@ -94,18 +91,32 @@ public class ServerListingViewModel : PageBaseViewModel
     /// <summary>
     /// Collection of servers.
     /// </summary>
-    public virtual IReadOnlyList<ServerViewModel> Servers
+    public virtual IAvaloniaReadOnlyList<ServerViewModel> Servers
     {
         get => _servers;
-        private set => this.RaiseAndSetIfChanged(ref _servers, value);
+        private set => this.RaiseAndSetIfChanged(ref _servers, (AvaloniaList<ServerViewModel>)value);
     }
 
-    protected override void Dispose(bool isDisposing) { }
+    protected override void Dispose(bool isDisposing) => _disposables.Dispose();
+
+    /// <summary>
+    /// Create a new Server.
+    /// </summary>
+    private Task CreateNewServerHost(int atIndex = 0) => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()
+    {
+        Metadata = new ServerMetadataDto { DisplayName = "New Server" },
+        Configuration = new ServerConfigurationDto(),
+        DockerCompose = new DockerComposeDto(),
+        VMs = Array.Empty<ServerVmDto>(),
+    }, Servers.Select(x => x.DisplayName).ToArray(), Servers.Select(x => x.Name).ToArray())); // TYhis will need to also support pulling these off of VMs when support for them is added.
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
 
+    private readonly CompositeDisposable _disposables;
+
+    // Property backing fields.
     private ServerListingDisplayMode _currentDisplayMode;
-    private IReadOnlyList<ServerViewModel> _servers;
+    private AvaloniaList<ServerViewModel> _servers;
 }
