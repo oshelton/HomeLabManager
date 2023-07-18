@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using HomeLabManager.Common.Data.Git.Server;
 using ReactiveUI;
 
@@ -15,10 +17,10 @@ public sealed class ServerViewModel : ReactiveObject
         if (dto is null)
             throw new ArgumentNullException(nameof(dto));
 
-        Name = dto.Metadata?.Name;
-        DisplayName = dto.Metadata?.DisplayName;
+        DisplayName = dto.Metadata.DisplayName;
+        Name = dto.Metadata.Name;
     }
 
-    public string Name { get; }
     public string DisplayName { get; }
+    public string Name { get; }
 }
