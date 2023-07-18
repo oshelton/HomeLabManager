@@ -138,13 +138,10 @@ namespace HomeLabManager.Manager.Controls
 
             base.OnApplyTemplate(e);
 
-            _button = e.NameScope.Get<Button>(PartButtonName);
+            _button = e.NameScope.Get<Button>(PartButtonName) ?? throw new InvalidOperationException($"PageNavButton templates must define a {PartButtonName} Button element.");
 
             _button.Command = Command;
             _button.CommandParameter = CommandParameter;
-
-            if (_button is null)
-                throw new InvalidOperationException($"PageNavButton templates must define a {PartButtonName} Button element.");
         }
 
         private ICommand _command;
