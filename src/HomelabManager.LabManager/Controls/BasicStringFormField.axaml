@@ -14,7 +14,7 @@
 			<Setter Property="(i:Interaction.Behaviors)">
 				<i:BehaviorCollectionTemplate>
 					<i:BehaviorCollection>
-						<ir:AdaptiveBehavior SourceControl="{Binding}">
+						<ir:AdaptiveBehavior SourceControl="{Binding $self}">
 							<ir:AdaptiveClassSetter
 								MinWidth="500"
 								MaxWidth="Infinity"
@@ -60,8 +60,7 @@
 						Name="Container"
 						Margin="4"
 						VerticalAlignment="Top"
-						ColumnDefinitions="*,24,3*"
-						ToolTip.Tip="{TemplateBinding InfoTip}">
+						ColumnDefinitions="*,24,3*">
 
 						<TextBlock
 							Name="Label"
@@ -78,7 +77,7 @@
 						<materialIcons:MaterialIcon
 							Grid.Column="1"
 							Margin="0,0,8,0"
-							Classes="ValidationError, FieldValidationError" />
+							Classes="ValidationError FieldValidationError" />
 
 						<TextBox
 							Name="FieldEntry"
