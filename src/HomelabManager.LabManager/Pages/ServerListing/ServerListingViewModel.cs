@@ -51,7 +51,7 @@ public class ServerListingViewModel : PageBaseViewModel
 
         _disposables = new CompositeDisposable();
 
-        CreateNewServerHostCommand = ReactiveCommand.CreateFromTask<int>(CreateNewServerHost)
+        CreateNewServerHostCommand = ReactiveCommand.CreateFromTask<int?>(CreateNewServerHost)
             .DisposeWith(_disposables);
     }
 
@@ -68,7 +68,9 @@ public class ServerListingViewModel : PageBaseViewModel
         AvaloniaList<ServerViewModel> servers = null;
         await Task.Run(async () =>
         {
-            servers = new AvaloniaList<ServerViewModel>(_serverDataManager.GetServers().Select(x => new ServerViewModel(x)));
+            servers = new AvaloniaList<ServerViewModel>(_serverDataManager.GetServers()
+                .Select(x => new ServerViewModel(x))
+                .OrderBy(x => x.DisplayIndex));
         }).ConfigureAwait(true);
 
         Servers = servers;
@@ -77,7 +79,7 @@ public class ServerListingViewModel : PageBaseViewModel
 
     public override Task<bool> TryNavigateAway() => Task.FromResult(true);
 
-    public ReactiveCommand<int, Unit> CreateNewServerHostCommand { get; }
+    public ReactiveCommand<int?, Unit> CreateNewServerHostCommand { get; }
 
     /// <summary>
     /// Current display mode.
@@ -102,13 +104,13 @@ public class ServerListingViewModel : PageBaseViewModel
     /// <summary>
     /// Create a new Server.
     /// </summary>
-    private Task CreateNewServerHost(int atIndex = 0) => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()
+    private Task CreateNewServerHost(int? afterIndex = null) => _navigationService.NavigateTo(new CreateEditServerNavigationRequest(true, new ServerHostDto()
     {
         Metadata = new ServerMetadataDto { DisplayName = "New Server" },
         Configuration = new ServerConfigurationDto(),
         DockerCompose = new DockerComposeDto(),
         VMs = Array.Empty<ServerVmDto>(),
-    }, Servers.Select(x => x.DisplayName).ToArray(), Servers.Select(x => x.Name).ToArray())); // TYhis will need to also support pulling these off of VMs when support for them is added.
+    }, afterIndex));
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly IServerDataManager _serverDataManager;

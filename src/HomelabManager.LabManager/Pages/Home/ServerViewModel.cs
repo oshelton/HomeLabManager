@@ -15,8 +15,11 @@ public sealed class ServerViewModel: ReactiveObject
         if (dto is null)
             throw new ArgumentNullException(nameof(dto));
 
-        Name = dto.Metadata?.Name;
+        Name = dto.Metadata.Name;
+        DisplayIndex = dto.Metadata.DisplayIndex;
     }
 
     public string Name { get; }
+
+    public int DisplayIndex { get; }
 }

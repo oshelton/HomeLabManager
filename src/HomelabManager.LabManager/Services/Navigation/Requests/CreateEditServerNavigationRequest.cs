@@ -9,12 +9,11 @@ namespace HomeLabManager.Manager.Services.Navigation.Requests
     /// </summary>
     public sealed class CreateEditServerNavigationRequest : INavigationRequest
     {
-        public CreateEditServerNavigationRequest(bool isNew, BaseServerDto server, IReadOnlyList<string> allOtherDisplayNames, IReadOnlyList<string> allOtherNames) 
+        public CreateEditServerNavigationRequest(bool isNew, BaseServerDto server, int? afterIndex = null) 
         {
             IsNew = isNew;
             Server = server ?? throw new ArgumentNullException(nameof(server));
-            AllOtherDisplayNames = allOtherDisplayNames ?? throw new ArgumentNullException(nameof(allOtherDisplayNames));
-            AllOtherNames = allOtherNames ?? throw new ArgumentNullException(nameof(allOtherNames));
+            AfterIndex = afterIndex;
         }
 
         /// <summary>
@@ -22,9 +21,8 @@ namespace HomeLabManager.Manager.Services.Navigation.Requests
         /// </summary>
         public PageBaseViewModel CreatePage() => new CreateEditServerViewModel();
 
-        public bool IsNew { get; private set; }
-        public BaseServerDto Server { get; private set; }
-        public IReadOnlyList<string> AllOtherDisplayNames { get; private set; }
-        public IReadOnlyList<string> AllOtherNames { get; private set; }
+        public bool IsNew { get; }
+        public BaseServerDto Server { get; }
+        public int? AfterIndex { get; }
     }
 }

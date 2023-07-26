@@ -19,8 +19,10 @@ public sealed class ServerViewModel : ReactiveObject
 
         DisplayName = dto.Metadata.DisplayName;
         Name = dto.Metadata.Name;
+        DisplayIndex = dto.Metadata.DisplayIndex;
     }
 
     public string DisplayName { get; }
     public string Name { get; }
+    public int DisplayIndex { get; }
 }

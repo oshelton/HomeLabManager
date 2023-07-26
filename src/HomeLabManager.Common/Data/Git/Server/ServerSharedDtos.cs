@@ -27,22 +27,31 @@ public sealed record ServerMetadataDto
     /// Display name to use with the server.
     /// </summary>
     public string DisplayName { get; init; }
+
     /// <summary>
     /// Computer/Host name of the server.
     /// </summary>
     public string Name { get; init; }
+
     /// <summary>
     /// IP Address of the server; should be DHCP reserved or static for best results.
     /// </summary>
     public string IPAddress { get; set; }
+
     /// <summary>
     /// Description of the server.
     /// </summary>
     public string Description { get; init; }
+
     /// <summary>
     /// Underlying kind of the server, controls how the server can be nteracted with.
     /// </summary>
     public ServerKind? Kind { get; init; }
+
+    /// <summary>
+    /// Index position that the server should appear at.
+    /// </summary>
+    public int DisplayIndex { get; init; }
 }
 
 /// <summary>

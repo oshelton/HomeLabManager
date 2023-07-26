@@ -22,6 +22,7 @@
 
 	<DataTemplate x:Key="ServerListingPageTemplate" DataType="{x:Type page:ServerListingViewModel}">
 		<Border
+			Name="root"
 			Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.IsLoading}}"
 			Classes.NoServers="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.NoServers}}"
 			Classes.ServerDisplay="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.HasServers}}">
@@ -69,23 +70,10 @@
 					<Setter Property="Child">
 						<Template>
 							<StackPanel Margin="12">
-								<Border Margin="8">
-									<Grid ColumnDefinitions="*,Auto,*">
-										<Separator Margin="8" />
-										<materialControls:FloatingButton
-											Grid.Column="1"
-											Classes="Mini Dark"
-											Command="{Binding CreateNewServerHostCommand}"
-											ToolTip.Tip="Create a new Server Here.">
-											<materialControls:FloatingButton.CommandParameter>
-												<sys:Int32>0</sys:Int32>
-											</materialControls:FloatingButton.CommandParameter>
-
-											<materialIcons:MaterialIcon Kind="Add" />
-										</materialControls:FloatingButton>
-										<Separator Grid.Column="2" Margin="8" />
-									</Grid>
-								</Border>
+								<controls:AddItemInlineSeperator
+									Margin="0,0,0,4"
+									Command="{Binding CreateNewServerHostCommand}"
+									Text="Create New Server Here" />
 
 								<ItemsRepeater ItemsSource="{Binding Servers}">
 									<ItemsRepeater.Layout>
@@ -94,17 +82,24 @@
 
 									<ItemsRepeater.ItemTemplate>
 										<DataTemplate>
-											<materialControls:Card>
-												<Grid>
+											<StackPanel>
+												<materialControls:Card>
+													<Grid>
+														<TextBlock
+															Classes="Headline6"
+															MaxLines="2"
+															Text="{Binding DisplayName}"
+															TextTrimming="CharacterEllipsis"
+															TextWrapping="Wrap" />
+													</Grid>
+												</materialControls:Card>
 
-													<TextBlock
-														Classes="Headline6"
-														MaxLines="2"
-														Text="{Binding DisplayName}"
-														TextTrimming="CharacterEllipsis"
-														TextWrapping="Wrap" />
-												</Grid>
-											</materialControls:Card>
+												<controls:AddItemInlineSeperator
+													Margin="0,8,0,0"
+													Command="{Binding #root.DataContext.CreateNewServerHostCommand}"
+													CommandParameter="{Binding DisplayIndex}"
+													Text="Create New Server Here" />
+											</StackPanel>
 										</DataTemplate>
 									</ItemsRepeater.ItemTemplate>
 								</ItemsRepeater>

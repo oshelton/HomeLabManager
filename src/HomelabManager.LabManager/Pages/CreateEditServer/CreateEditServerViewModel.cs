@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Avalonia;
-using Avalonia.Threading;
-using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
 using HomeLabManager.Manager.Services.Navigation;
@@ -57,7 +53,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             .DisposeWith(_disposables);
     }
 
-    /// Title of the page, a bit more logic trhan usual is used here since this page can be  abit more complicated than most.
+    /// Title of the page, a bit more logic than usual is used here since this page can be  abit more complicated than most.
     public override string Title => _isNew 
         ? $"Create New {(_isEditingServerHost ? "Server Host" : "Virtual Machine")}"
         : $"Editing {_initialServerTitle}";
@@ -72,9 +68,31 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         _isNew = realRequest.IsNew;
         _isEditingServerHost = realRequest.Server is ServerHostDto;
         _initialServerTitle = !_isNew ? realRequest.Server.Metadata.DisplayName : null;
+        _afterIndex = realRequest.AfterIndex;
 
-        Metadata = new MetadataEditViewModel(realRequest.Server, realRequest.AllOtherDisplayNames, realRequest.AllOtherNames)
+        var allServers = await Task.Run(() => _serverDataManager.GetServers()).ConfigureAwait(true);
+
+        var flattenedServerList = allServers.Except(new[] { _serverDto as ServerHostDto })
+            .Cast<BaseServerDto>()
+            .Union(allServers.SelectMany(x => x.VMs).Except(new[] { _serverDto as ServerVmDto }))
+            .ToList();
+
+        var allOtherDisplayNames = flattenedServerList.Select(x => x.Metadata.DisplayName).ToList();
+        var allOtherNames = flattenedServerList.Select(x => x.Metadata.Name).ToList();
+
+        Metadata = new MetadataEditViewModel(realRequest.Server, allOtherDisplayNames, allOtherNames)
             .DisposeWith(_disposables);
+
+        if (_isEditingServerHost)
+        {
+            var host = _serverDto as ServerHostDto;
+            _allExistingSiblingServers = allServers.Except(new[] { host }).ToList();
+        }
+        else
+        {
+            var vm = _serverDto as ServerVmDto;
+            _allExistingSiblingServers = vm.Host.VMs.Except(new[] { vm }).ToList();
+        }
     }
 
     public override Task<bool> TryNavigateAway()
@@ -124,6 +142,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             {
                 DisplayName = Metadata.DisplayName,
                 Name = Metadata.Name,
+                DisplayIndex = _afterIndex.HasValue ? _afterIndex.Value + 1 : 0,
             }
         };
 
@@ -131,9 +150,39 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         await Task.Run(() => 
         {
             if (_isEditingServerHost)
+            {
                 _serverDataManager.AddUpdateServer(updatedDto as ServerHostDto);
+
+                if (_isNew)
+                {
+                    var otherAffectedServers = _allExistingSiblingServers.Where(x => x.Metadata.DisplayIndex >= updatedDto.Metadata.DisplayIndex)
+                        .Select(x => x with { Metadata = x.Metadata with { DisplayIndex = x.Metadata.DisplayIndex + 1 } })
+                        .Cast<ServerHostDto>();
+
+                    foreach (var host in otherAffectedServers)
+                    {
+                        _serverDataManager.AddUpdateServer(host);
+                    }
+                }
+            }
             else if (updatedDto is ServerVmDto vmDto)
-                _serverDataManager.AddUpdateServer(vmDto.Host);
+            {
+                var host = vmDto.Host;
+                if (_isNew)
+                {
+                    host.VMs = host.VMs.Select(x => x with 
+                    { 
+                        Metadata = x.Metadata with 
+                        { 
+                            DisplayIndex = x == vmDto ? x.Metadata.DisplayIndex : (
+                                x.Metadata.DisplayIndex < _afterIndex ? x.Metadata.DisplayIndex : x.Metadata.DisplayIndex + 1
+                            )
+                        } 
+                    }).ToList();
+                }
+                
+                _serverDataManager.AddUpdateServer(host);
+            }
         }).ConfigureAwait(true);
 
         dialog.GetWindow().Close();
@@ -158,4 +207,6 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
     private bool _isNew;
     private bool _isEditingServerHost;
     private string _initialServerTitle;
+    private int? _afterIndex;
+    private IReadOnlyList<BaseServerDto> _allExistingSiblingServers;
 }

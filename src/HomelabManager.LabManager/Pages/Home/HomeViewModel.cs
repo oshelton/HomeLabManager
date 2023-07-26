@@ -47,7 +47,10 @@ public sealed class HomeViewModel : PageBaseViewModel
                     CurrentDisplayMode = HomeDisplayMode.NoServers;
                     break;
                 case 4:
-                    _servers = _serverDataManager!.GetServers().Select(x => new ServerViewModel(x)).ToArray();
+                    _servers = _serverDataManager.GetServers()
+                        .Select(x => new ServerViewModel(x))
+                        .OrderBy(x => x.DisplayIndex)
+                        .ToArray();
                     CurrentDisplayMode = HomeDisplayMode.HasServers;
                     break;
             }
@@ -82,7 +85,9 @@ public sealed class HomeViewModel : PageBaseViewModel
         IReadOnlyList<ServerViewModel> servers = null;
         await Task.Run(async () =>
         {
-            servers = _serverDataManager!.GetServers().Select(x => new ServerViewModel(x)).ToArray();
+            servers = _serverDataManager.GetServers().Select(x => new ServerViewModel(x))
+                .OrderBy(x => x.DisplayIndex)
+                .ToArray();
         }).ConfigureAwait(false);
 
         DispatcherHelper.PostToUIThread(() =>
