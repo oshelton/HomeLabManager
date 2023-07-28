@@ -1,13 +1,10 @@
-﻿using System.Collections.ObjectModel;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Reactive.Disposables;
 using Avalonia.Collections;
-using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.Manager.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
