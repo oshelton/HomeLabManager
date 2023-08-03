@@ -16,8 +16,6 @@ internal sealed class DesignServerDataManager: IServerDataManager
 
     public IReadOnlyList<ServerHostDto> GetServers()
     {
-        Thread.Sleep(10000);
-
         return m_servers;
     }
 
