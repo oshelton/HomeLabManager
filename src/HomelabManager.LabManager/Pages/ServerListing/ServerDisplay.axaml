@@ -1,0 +1,83 @@
+<ResourceDictionary
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:page="using:HomeLabManager.Manager.Pages.ServerListing"
+	xmlns:sys="clr-namespace:System;assembly=mscorlib">
+	<Design.PreviewWith>
+		<ContentControl
+			Width="800"
+			Height="600"
+			ContentTemplate="{DynamicResource ServerDisplayTemplate}">
+			<ContentControl.Content>
+				<page:ServerViewModel />
+			</ContentControl.Content>
+		</ContentControl>
+	</Design.PreviewWith>
+
+	<DataTemplate x:Key="ServerDisplayTemplate" DataType="{x:Type page:ServerViewModel}">
+		<materialControls:Card>
+			<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+				<TextBlock
+					Name="DisplayNameText"
+					Classes="Headline6"
+					Text="{Binding DisplayName}"
+					TextTrimming="CharacterEllipsis" />
+
+				<StackPanel
+					Grid.Column="1"
+					Orientation="Horizontal"
+					Spacing="0">
+					<Button
+						Margin="8,8,4,8"
+						Classes="CardCommandIconButton BasicAction"
+						Command="{Binding ParentListingViewModel.EditServerCommand}"
+						CommandParameter="{Binding}"
+						ToolTip.Tip="Edit the Server">
+						<materialIcons:MaterialIcon Kind="Edit" />
+					</Button>
+
+					<Button
+						Margin="4,8,2,8"
+						Classes="CardCommandIconButton BasicAction"
+						Command="{Binding ParentListingViewModel.MoveServerUpCommand}"
+						CommandParameter="{Binding}"
+						IsEnabled="{Binding CanMoveUp}"
+						ToolTip.Tip="Move this server up">
+						<materialIcons:MaterialIcon Kind="ArrowUp" />
+					</Button>
+
+					<Button
+						Margin="2,8,4,8"
+						Classes="CardCommandIconButton BasicAction"
+						Command="{Binding ParentListingViewModel.MoveServerDownCommand}"
+						CommandParameter="{Binding}"
+						IsEnabled="{Binding CanMoveDown}"
+						ToolTip.Tip="Move this server down">
+						<materialIcons:MaterialIcon Kind="ArrowDown" />
+					</Button>
+
+					<Button
+						Margin="4,8,8,8"
+						Classes="CardCommandIconButton"
+						Command="{Binding ParentListingViewModel.DeleteServerCommand}"
+						CommandParameter="{Binding}"
+						ToolTip.Tip="Delete this server">
+						<materialIcons:MaterialIcon Kind="Delete" />
+					</Button>
+				</StackPanel>
+
+				<TextBlock
+					Grid.Row="1"
+					Classes="Headline7"
+					Text="{Binding Name}"
+					TextTrimming="CharacterEllipsis" />
+			</Grid>
+		</materialControls:Card>
+	</DataTemplate>
+</ResourceDictionary>

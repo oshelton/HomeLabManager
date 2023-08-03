@@ -75,24 +75,24 @@
 									Command="{Binding CreateNewServerHostCommand}"
 									Text="Create New Server Here" />
 
-								<ItemsRepeater ItemsSource="{Binding Servers}">
+								<ItemsRepeater ItemsSource="{Binding SortedServers}">
 									<ItemsRepeater.Layout>
 										<StackLayout Orientation="Vertical" Spacing="8" />
 									</ItemsRepeater.Layout>
 
+									<ItemsRepeater.Resources>
+										<ResourceDictionary>
+											<ResourceDictionary.MergedDictionaries>
+												<!--  Server Display  -->
+												<ResourceInclude Source="/Pages/ServerListing/ServerDisplay.axaml" />
+											</ResourceDictionary.MergedDictionaries>
+										</ResourceDictionary>
+									</ItemsRepeater.Resources>
+
 									<ItemsRepeater.ItemTemplate>
 										<DataTemplate>
 											<StackPanel>
-												<materialControls:Card>
-													<Grid>
-														<TextBlock
-															Classes="Headline6"
-															MaxLines="2"
-															Text="{Binding DisplayName}"
-															TextTrimming="CharacterEllipsis"
-															TextWrapping="Wrap" />
-													</Grid>
-												</materialControls:Card>
+												<ContentControl Content="{Binding}" ContentTemplate="{StaticResource ServerDisplayTemplate}" />
 
 												<controls:AddItemInlineSeperator
 													Margin="0,8,0,0"
