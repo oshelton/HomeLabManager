@@ -6,7 +6,7 @@ namespace HomeLabManager.CommonTests;
 /// <summary>
 /// Test CommonConverters.
 /// </summary>
-public class ConverterTests
+public sealed class ConverterTests
 {
     [Test]
     public void ObjectsAreEqual()

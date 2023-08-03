@@ -18,7 +18,7 @@ public interface INavigationService
     /// Navigate to a page using a NavigationRequest.
     /// </summary>
     /// <returns>false if navigation fails, true if it succeeds.</returns>
-    Task<bool> NavigateTo(INavigationRequest request, PageBaseViewModel navigateBackToPage = null);
+    Task<bool> NavigateTo(INavigationRequest request, bool isBackNavigation = false);
     
     /// <summary>
     /// Navigate back to the previous page.

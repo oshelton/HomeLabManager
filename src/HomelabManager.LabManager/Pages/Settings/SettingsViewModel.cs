@@ -21,8 +21,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 {
     public SettingsViewModel()
     {
-        _coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
-        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
+        _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
+        _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 
         var builder = new ValidationBuilder<SettingsViewModel>();
 
@@ -44,6 +44,21 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
 
         Validator = builder.Build(this);
+
+        // Set up an observable to check when content has actually changed.
+        _stateChangeSubscription = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
+            (repoPath, gitPath, userName, pat) =>
+            {
+                return new TrackedPropertyState()
+                {
+                    HomeLabRepoDataPath = repoPath,
+                    GitConfigFilePath = gitPath,
+                    GithubUserName = userName,
+                    GithubPat = pat
+                };
+            })
+            .Throttle(TimeSpan.FromSeconds(0.5))
+            .Subscribe(state => HasChanges = !state.Equals(_initialState));
     }
 
     public override string Title => "Settings";
@@ -70,32 +85,14 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
             GithubUserName = GithubUserName,
             GithubPat = GithubPat
         };
-
-        // Set up an observable to check when content has actually changed.
-        _stateChangeSubscription = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
-            (repoPath, gitPath, userName, pat) =>
-            {
-                return new TrackedPropertyState()
-                {
-                    HomeLabRepoDataPath = repoPath,
-                    GitConfigFilePath = gitPath,
-                    GithubUserName = userName,
-                    GithubPat = pat
-                };
-            })
-            .Throttle(TimeSpan.FromSeconds(0.5))
-            .Subscribe(state => HasChanges = !state.Equals(_initialState));
     }
 
     public override Task<bool> TryNavigateAway()
     {
         if (!HasChanges)
-        {
-            _stateChangeSubscription!.Dispose();
             return Task.FromResult(true);
-        }
-
-        return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("There are unsaved changes on this page, they will be lost if you continue.");
+        else
+            return Utils.SharedDialogs.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
     }
 
     public async Task OpenFolderPickerForRepoPath()
@@ -182,8 +179,14 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         set => this.RaiseAndSetIfChanged(ref _githubPat, value);
     }
 
-    private ICoreConfigurationManager _coreConfigurationManager;
-    private INavigationService _navigationService;
+    protected override void Dispose(bool isDisposing)
+    {
+        if (isDisposing)
+            _stateChangeSubscription.Dispose();
+    }
+
+    private readonly ICoreConfigurationManager _coreConfigurationManager;
+    private readonly INavigationService _navigationService;
     
     private bool _hasChanges;
     private bool _isSaving;

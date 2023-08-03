@@ -2,27 +2,68 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+	xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
 	<Design.PreviewWith>
 		<Border Padding="20">
-			<controls:PageNavButton Icon="Toolbox" Text="Tools" />
+			<WrapPanel MaxWidth="800" Orientation="Horizontal">
+				<controls:PageNavButton
+					Margin="4"
+					Icon="Toolbox"
+					Text="Tools" />
+
+				<Button Margin="4" Classes="CardCommandIconButton BasicAction">
+					<materialIcons:MaterialIcon Kind="Square" />
+				</Button>
+
+				<Button Margin="4" Classes="CardCommandIconButton">
+					<materialIcons:MaterialIcon Kind="About" />
+				</Button>
+			</WrapPanel>
 		</Border>
 	</Design.PreviewWith>
 
-	<Style Selector=":is(Button) StackPanel">
+	<!--  PageNavButton default styles.  -->
+	<Style Selector=":is(controls|PageNavButton) StackPanel">
 		<Setter Property="Margin" Value="4,4,4,4" />
 		<Setter Property="Orientation" Value="Horizontal" />
 	</Style>
 
-	<Style Selector=":is(Button) materialIcons|MaterialIcon">
+	<Style Selector=":is(controls|PageNavButton) materialIcons|MaterialIcon">
 		<Setter Property="Width" Value="24" />
 		<Setter Property="Height" Value="24" />
 	</Style>
 
-	<Style Selector=":is(Button) TextBlock">
+	<Style Selector=":is(controls|PageNavButton) TextBlock">
 		<Setter Property="VerticalAlignment" Value="Bottom" />
 		<Setter Property="FontWeight" Value="Medium" />
 		<Setter Property="Padding" Value="0,0,0,1" />
 		<Setter Property="FontSize" Value="16" />
+	</Style>
+
+	<!--  Card Command Button Styles  -->
+	<Style Selector="Button.CardCommandIconButton">
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="Padding" Value="4" />
+		<Setter Property="(i:Interaction.Behaviors)">
+			<i:BehaviorCollectionTemplate>
+				<i:BehaviorCollection>
+					<iac:RoutedEventTriggerBehavior RoutedEvent="{x:Static Control.LoadedEvent}" RoutingStrategies="Direct">
+						<iac:AddClassAction ClassName="Flat" />
+					</iac:RoutedEventTriggerBehavior>
+				</i:BehaviorCollection>
+			</i:BehaviorCollectionTemplate>
+		</Setter>
+	</Style>
+
+	<Style Selector="Button.CardCommandIconButton materialIcons|MaterialIcon">
+		<Setter Property="Width" Value="16" />
+		<Setter Property="Height" Value="16" />
+	</Style>
+
+	<Style Selector="Button.BasicAction">
+		<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
 	</Style>
 </Styles>

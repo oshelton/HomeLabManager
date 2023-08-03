@@ -1,0 +1,113 @@
+<ResourceDictionary
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:page="using:HomeLabManager.Manager.Pages.ServerListing"
+	xmlns:sys="clr-namespace:System;assembly=mscorlib">
+	<Design.PreviewWith>
+		<ContentControl
+			Width="800"
+			Height="600"
+			ContentTemplate="{DynamicResource ServerListingPageTemplate}">
+			<ContentControl.Content>
+				<page:ServerListingViewModel />
+			</ContentControl.Content>
+		</ContentControl>
+	</Design.PreviewWith>
+
+	<DataTemplate x:Key="ServerListingPageTemplate" DataType="{x:Type page:ServerListingViewModel}">
+		<Border
+			Name="root"
+			Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.IsLoading}}"
+			Classes.NoServers="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.NoServers}}"
+			Classes.ServerDisplay="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.HasServers}}">
+			<Border.Styles>
+				<Style Selector="Border.IsLoading">
+					<Setter Property="Child">
+						<Template>
+							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+								<StackPanel Margin="8">
+									<ProgressBar Classes="circular" IsIndeterminate="True" />
+									<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Servers...</TextBlock>
+								</StackPanel>
+							</materialControls:Card>
+						</Template>
+					</Setter>
+				</Style>
+
+				<Style Selector="Border.NoServers">
+					<Setter Property="Child">
+						<Template>
+							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+								<StackPanel>
+									<TextBlock
+										Margin="8"
+										Classes="Body1"
+										TextAlignment="Center">
+										<Run Text="No Servers Exist." />
+										<LineBreak />
+										<Run Text="Create a new one with the button below." />
+									</TextBlock>
+
+									<controls:PageNavButton
+										Margin="8"
+										HorizontalAlignment="Center"
+										Command="{Binding CreateNewServerHostCommand}"
+										Icon="Add"
+										Text="Create Server" />
+								</StackPanel>
+							</materialControls:Card>
+						</Template>
+					</Setter>
+				</Style>
+
+				<Style Selector="Border.ServerDisplay">
+					<Setter Property="Child">
+						<Template>
+							<StackPanel Margin="12">
+								<controls:AddItemInlineSeperator
+									Margin="0,0,0,4"
+									Command="{Binding CreateNewServerHostCommand}"
+									Text="Create New Server Here" />
+
+								<ItemsRepeater ItemsSource="{Binding SortedServers}">
+									<ItemsRepeater.Layout>
+										<StackLayout Orientation="Vertical" Spacing="8" />
+									</ItemsRepeater.Layout>
+
+									<ItemsRepeater.Resources>
+										<ResourceDictionary>
+											<ResourceDictionary.MergedDictionaries>
+												<!--  Server Display  -->
+												<ResourceInclude Source="/Pages/ServerListing/ServerDisplay.axaml" />
+											</ResourceDictionary.MergedDictionaries>
+										</ResourceDictionary>
+									</ItemsRepeater.Resources>
+
+									<ItemsRepeater.ItemTemplate>
+										<DataTemplate>
+											<StackPanel>
+												<ContentControl Content="{Binding}" ContentTemplate="{StaticResource ServerDisplayTemplate}" />
+
+												<controls:AddItemInlineSeperator
+													Margin="0,8,0,0"
+													Command="{Binding #root.DataContext.CreateNewServerHostCommand}"
+													CommandParameter="{Binding DisplayIndex}"
+													Text="Create New Server Here" />
+											</StackPanel>
+										</DataTemplate>
+									</ItemsRepeater.ItemTemplate>
+								</ItemsRepeater>
+							</StackPanel>
+						</Template>
+					</Setter>
+				</Style>
+			</Border.Styles>
+		</Border>
+	</DataTemplate>
+</ResourceDictionary>

@@ -1,0 +1,48 @@
+<ResourceDictionary
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:eventBinder="using:EventBinder"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sections="using:HomeLabManager.Manager.Pages.CreateEditServer.Sections">
+	<Design.PreviewWith>
+		<ContentControl
+			Width="800"
+			Height="600"
+			ContentTemplate="{DynamicResource MetadataEditorTemplate}">
+			<ContentControl.Content>
+				<sections:MetadataEditViewModel />
+			</ContentControl.Content>
+		</ContentControl>
+	</Design.PreviewWith>
+
+	<DataTemplate x:Key="MetadataEditorTemplate" DataType="{x:Type sections:MetadataEditViewModel}">
+		<materialControls:Card Margin="12">
+			<StackPanel>
+				<TextBlock
+					Margin="0,0,0,8"
+					Classes="Headline5"
+					Text="Metadata" />
+
+				<Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto">
+					<controls:BasicStringFormField
+						Name="displayNameField"
+						InfoTip="The easily readable display name of the Server or VM."
+						Label="Display Name"
+						StringValue="{Binding DisplayName}" />
+
+					<controls:BasicStringFormField
+						Name="nameField"
+						Grid.Column="1"
+						InfoTip="The Hostname/Computer name of the server or VM."
+						Label="Name"
+						StringValue="{Binding Name}" />
+				</Grid>
+			</StackPanel>
+		</materialControls:Card>
+	</DataTemplate>
+</ResourceDictionary>

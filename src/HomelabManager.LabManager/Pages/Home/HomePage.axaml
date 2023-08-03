@@ -26,7 +26,12 @@
 				HorizontalAlignment="Right"
 				Columns="4"
 				DockPanel.Dock="Bottom">
-				<controls:PageNavButton Icon="Web" Text="Servers" />
+				<controls:PageNavButton
+					x:Name="serversButton"
+					Click="{eventBinder:EventBinding NavigateToServerListing}"
+					Icon="Web"
+					Text="Servers"
+					ToolTip.Tip="Navigate to the Server Listing page." />
 				<controls:PageNavButton
 					Margin="6,0,0,0"
 					Icon="Console"

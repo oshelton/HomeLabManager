@@ -12,7 +12,7 @@ namespace HomeLabManager.Manager.Controls
     /// Reusable Page Nav Button control.
     /// </summary>
     [TemplatePart(PartButtonName, typeof(Button))]
-    public partial class PageNavButton : TemplatedControl
+    public partial class AddItemInlineSeperator : TemplatedControl
     {
         /// <summary>
         /// Name of the main Button Template part.
@@ -23,25 +23,19 @@ namespace HomeLabManager.Manager.Controls
         /// Defines the <see cref="Icon"/> property.
         /// </summary>
         public static readonly StyledProperty<MaterialIconKind> IconProperty =
-            AvaloniaProperty.Register<PageNavButton, MaterialIconKind>(nameof(Icon), MaterialIconKind.SimpleIcons);
+            AvaloniaProperty.Register<AddItemInlineSeperator, MaterialIconKind>(nameof(Icon), MaterialIconKind.CirclesAdd);
 
         /// <summary>
         /// Defines the <see cref="Text"/> property.
         /// </summary>
         public static readonly StyledProperty<string> TextProperty =
-            AvaloniaProperty.Register<PageNavButton, string>(nameof(Text), "Nav Button");
-
-        /// <summary>
-        /// Defines the <see cref="IsOutline"/> property.
-        /// </summary>
-        public static readonly StyledProperty<bool> IsOutlineProperty =
-            AvaloniaProperty.Register<PageNavButton, bool>(nameof(IsOutline), false);
+            AvaloniaProperty.Register<AddItemInlineSeperator, string>(nameof(Text), "");
 
         /// <summary>
         /// Defines the <see cref="Command"/> property.
         /// </summary>
-        public static readonly DirectProperty<PageNavButton, ICommand> CommandProperty =
-            AvaloniaProperty.RegisterDirect<PageNavButton, ICommand>(
+        public static readonly DirectProperty<AddItemInlineSeperator, ICommand> CommandProperty =
+            AvaloniaProperty.RegisterDirect<AddItemInlineSeperator, ICommand>(
                 nameof(Command),
                 o => o.Command,
                 (o, v) => o.Command = v);
@@ -49,8 +43,8 @@ namespace HomeLabManager.Manager.Controls
         /// <summary>
         /// Defines the <see cref="CommandParameter"/> property.
         /// </summary>
-        public static readonly DirectProperty<PageNavButton, object> CommandParameterProperty =
-            AvaloniaProperty.RegisterDirect<PageNavButton, object>(
+        public static readonly DirectProperty<AddItemInlineSeperator, object> CommandParameterProperty =
+            AvaloniaProperty.RegisterDirect<AddItemInlineSeperator, object>(
                 nameof(CommandParameter),
                 o => o.CommandParameter,
                 (o, v) => o.CommandParameter = v);
@@ -59,9 +53,9 @@ namespace HomeLabManager.Manager.Controls
         /// Defines the <see cref="Click"/> event.
         /// </summary>
         public static readonly RoutedEvent<RoutedEventArgs> ClickEvent =
-            RoutedEvent.Register<PageNavButton, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble);
+            RoutedEvent.Register<AddItemInlineSeperator, RoutedEventArgs>(nameof(Click), RoutingStrategies.Bubble);
 
-        public PageNavButton() => InitializeComponent();
+        public AddItemInlineSeperator() => InitializeComponent();
 
         /// <summary>
         /// Gets or sets a value for the Button's Icon.
@@ -79,15 +73,6 @@ namespace HomeLabManager.Manager.Controls
         {
             get => GetValue(TextProperty);
             set => SetValue(TextProperty, value);
-        }
-
-        /// <summary>
-        /// Gets or sets a value for if the button should be an outline button or not.
-        /// </summary>
-        public bool IsOutline
-        {
-            get => GetValue(IsOutlineProperty);
-            set => SetValue(IsOutlineProperty, value);
         }
 
         /// <summary>

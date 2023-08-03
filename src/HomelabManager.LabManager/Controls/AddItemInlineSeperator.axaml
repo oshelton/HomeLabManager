@@ -1,0 +1,64 @@
+<TemplatedControl
+	x:Class="HomeLabManager.Manager.Controls.AddItemInlineSeperator"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	d:DesignHeight="50"
+	d:DesignWidth="300"
+	mc:Ignorable="d">
+	<TemplatedControl.Template>
+		<ControlTemplate>
+			<Button
+				x:Name="{x:Static controls:AddItemInlineSeperator.PartButtonName}"
+				HorizontalContentAlignment="Stretch"
+				VerticalContentAlignment="Center"
+				Classes="Flat"
+				Click="OnButtonClick"
+				DataContext="{Binding $parent}"
+				ToolTip.Tip="{Binding (ToolTip.Tip)}">
+				<Button.Styles>
+					<Style Selector="Button">
+						<Setter Property="Padding" Value="0" />
+						<Setter Property="MinHeight" Value="40" />
+					</Style>
+				</Button.Styles>
+
+				<Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto,Auto,*">
+					<Grid.Transitions>
+						<Transitions>
+							<DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+						</Transitions>
+					</Grid.Transitions>
+
+					<Grid.Styles>
+						<Style Selector="Button Grid">
+							<Setter Property="Opacity" Value="0" />
+							<Setter Property="MinHeight" Value="40" />
+						</Style>
+
+						<Style Selector="Button:pointerover Grid">
+							<Setter Property="Opacity" Value="1" />
+						</Style>
+					</Grid.Styles>
+					<Separator Margin="16" Foreground="{Binding $parent[Button].Foreground}" />
+
+					<materialIcons:MaterialIcon Grid.Column="1" Kind="{Binding Icon}" />
+
+					<TextBlock
+						Grid.Column="2"
+						Margin="4,2,0,0"
+						VerticalAlignment="Center"
+						Text="{Binding Text}" />
+
+					<Separator
+						Grid.Column="3"
+						Margin="12,16,16,16"
+						Foreground="{Binding $parent[Button].Foreground}" />
+				</Grid>
+			</Button>
+		</ControlTemplate>
+	</TemplatedControl.Template>
+</TemplatedControl>

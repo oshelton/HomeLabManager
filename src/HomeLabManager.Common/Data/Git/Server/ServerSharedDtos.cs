@@ -21,28 +21,37 @@ public sealed record ServerMetadataDto
     /// Path to the file the metadata came from.
     /// </summary>
     [YamlIgnore]
-    public string FileName { get; init; }
+    public string FileName { get; internal init; }
 
     /// <summary>
     /// Display name to use with the server.
     /// </summary>
     public string DisplayName { get; init; }
+
     /// <summary>
     /// Computer/Host name of the server.
     /// </summary>
     public string Name { get; init; }
+
     /// <summary>
     /// IP Address of the server; should be DHCP reserved or static for best results.
     /// </summary>
     public string IPAddress { get; set; }
+
     /// <summary>
     /// Description of the server.
     /// </summary>
     public string Description { get; init; }
+
     /// <summary>
     /// Underlying kind of the server, controls how the server can be nteracted with.
     /// </summary>
     public ServerKind? Kind { get; init; }
+
+    /// <summary>
+    /// Index position that the server should appear at.
+    /// </summary>
+    public int DisplayIndex { get; init; }
 }
 
 /// <summary>
@@ -66,7 +75,7 @@ public abstract record BaseServerDto
     /// <summary>
     /// Name of the directory the server dto came from.
     /// </summary>
-    public string Directory { get; init; }
+    public string Directory { get; internal init; }
 
     /// <summary>
     /// Unique id of this server, is the name of the directory the server lives in.
