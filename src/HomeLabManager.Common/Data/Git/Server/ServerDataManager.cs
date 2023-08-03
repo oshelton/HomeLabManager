@@ -62,13 +62,7 @@ public sealed class ServerDataManager : IServerDataManager
             foreach (var serverDirectory in Directory.EnumerateDirectories(serversDir))
             {
                 var serverHostDto = readServerDto<ServerHostDto>(serverDirectory);
-                serverHostDto.VMs = Directory.EnumerateDirectories(serverDirectory, $"{ServerVmDto.UniqueIdPrefix}*").Select(vmDir =>
-                {
-                    var vm = readServerDto<ServerVmDto>(vmDir);
-                    vm.Host = serverHostDto;
-
-                    return vm;
-                }).ToList();
+                serverHostDto.VMs = Directory.EnumerateDirectories(serverDirectory, $"{ServerVmDto.UniqueIdPrefix}*").Select(readServerDto<ServerVmDto>).ToList();
                 foundServerDtos.Add(serverHostDto);
             }
         }
