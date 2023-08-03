@@ -15,5 +15,21 @@ public sealed record ServerHostDto : BaseServerDto
     /// List of VMs associated with this physical host.
     /// </summary>
     [YamlIgnore]
-    public IReadOnlyList<ServerVmDto> VMs { get; set; } = Array.Empty<ServerVmDto>();
+    public IReadOnlyList<ServerVmDto> VMs 
+    {
+        get => _vms;
+        set
+        {
+            if (_vms != value)
+            {
+                _vms = value;
+                foreach (var vm in _vms) 
+                {
+                    vm.Host = this;
+                }
+            }
+        }
+    }
+
+    private IReadOnlyList<ServerVmDto> _vms = Array.Empty<ServerVmDto>();
 }
