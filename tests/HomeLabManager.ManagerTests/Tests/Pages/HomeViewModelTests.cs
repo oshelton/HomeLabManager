@@ -36,8 +36,6 @@ public class HomeViewModelTests
 
         var navigateTask = homePage.NavigateTo(new HomeNavigationRequest());
 
-        await Task.Delay(1000).ConfigureAwait(true);
-
         Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.IsLoading));
 
         await navigateTask.ConfigureAwait(true);

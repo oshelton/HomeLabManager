@@ -28,7 +28,7 @@ public sealed class ServerListingViewModelTests
 
         Assert.That(serverListing.Title, Is.EqualTo("Server Listing"));
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.IsLoading));
-        Assert.That(serverListing.SortedServers, Is.Null);
+        Assert.That(serverListing.SortedServers, Is.Empty);
 
         serverListing.Dispose();
     }
@@ -37,13 +37,12 @@ public sealed class ServerListingViewModelTests
     /// Test the logic executed when the page is navigated to.
     /// </summary>
     [Test]
+    [Ignore("Until we get a mocked server data manager.")]
     public async Task NavigatingTo_TestNavigatingToTheServerListingPage()
     {
         var serverListing = new ServerListingViewModel();
 
         var navigateTask = serverListing.NavigateTo(new ServerListingNavigationRequest());
-
-        await Task.Delay(1000).ConfigureAwait(true);
 
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.IsLoading));
 
