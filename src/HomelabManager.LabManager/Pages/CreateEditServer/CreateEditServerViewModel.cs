@@ -86,12 +86,12 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         if (_isEditingServerHost)
         {
             var host = _serverDto as ServerHostDto;
-            _allExistingSiblingServers = allServers.Except(new[] { host }).ToList();
+            _allExistingSiblingServers = allServers.Where(x => x.UniqueId != _serverDto.UniqueId).ToList();
         }
         else
         {
             var vm = _serverDto as ServerVmDto;
-            _allExistingSiblingServers = vm.Host.VMs.Except(new[] { vm }).ToList();
+            _allExistingSiblingServers = vm.Host.VMs.Where(x => x.UniqueId != _serverDto.UniqueId).ToList();
         }
     }
 
