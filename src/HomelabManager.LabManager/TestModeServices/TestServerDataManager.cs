@@ -16,8 +16,6 @@ internal sealed class TestServerDataManager: IServerDataManager
 
     public IReadOnlyList<ServerHostDto> GetServers()
     {
-        Thread.Sleep(10000);
-
         return m_servers;
     }
 
