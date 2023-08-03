@@ -13,7 +13,7 @@ public static class SharedDialogs
     /// Create and show a simple confirmation dialog.
     /// </summary>
     /// <param name="content">Content to display in the dialog or nothing if none is provided.</param>
-    public static async Task<bool> ShowSimpleConfirmLeaveDialog(string content = null)
+    public static async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
         {

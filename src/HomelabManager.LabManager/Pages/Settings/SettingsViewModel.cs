@@ -92,7 +92,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         if (!HasChanges)
             return Task.FromResult(true);
         else
-            return Utils.SharedDialogs.ShowSimpleConfirmLeaveDialog("Unsaved changes will be lost if you continue.");
+            return Utils.SharedDialogs.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
     }
 
     public async Task OpenFolderPickerForRepoPath()
