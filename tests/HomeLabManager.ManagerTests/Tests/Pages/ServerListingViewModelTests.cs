@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Avalonia.Collections;
 using HomeLabManager.Manager;
@@ -27,7 +28,7 @@ public sealed class ServerListingViewModelTests
 
         Assert.That(serverListing.Title, Is.EqualTo("Server Listing"));
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.IsLoading));
-        Assert.That(serverListing.Servers, Is.Null);
+        Assert.That(serverListing.SortedServers, Is.Null);
 
         serverListing.Dispose();
     }
@@ -49,7 +50,7 @@ public sealed class ServerListingViewModelTests
         await navigateTask.ConfigureAwait(true);
 
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.HasServers));
-        Assert.That(serverListing.Servers, Has.Count.EqualTo(3));
+        Assert.That(serverListing.SortedServers, Has.Count.EqualTo(3));
 
         serverListing.Dispose();
     }
@@ -58,7 +59,7 @@ public sealed class ServerListingViewModelTests
     public async Task CreateNewServerHost_ConfirmCreateNewServerHostDefaultBehavior()
     {    
         var serverListing = new Mock<ServerListingViewModel>();
-        serverListing.SetupGet(x => x.Servers).Returns(new AvaloniaList<ServerViewModel>());
+        serverListing.SetupGet(x => x.SortedServers).Returns(new ReadOnlyObservableCollection<ServerViewModel>(new ObservableCollection<ServerViewModel>()));
 
         await serverListing.Object.CreateNewServerHostCommand.Execute();
 
