@@ -72,9 +72,9 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
         var allServers = await Task.Run(() => _serverDataManager.GetServers()).ConfigureAwait(true);
 
-        var flattenedServerList = allServers.Except(new[] { _serverDto as ServerHostDto })
+        var flattenedServerList = allServers.Where(x => x.UniqueId != _serverDto.UniqueId)
             .Cast<BaseServerDto>()
-            .Union(allServers.SelectMany(x => x.VMs).Except(new[] { _serverDto as ServerVmDto }))
+            .Union(allServers.SelectMany(x => x.VMs).Where(x => x.UniqueId != _serverDto.UniqueId))
             .ToList();
 
         var allOtherDisplayNames = flattenedServerList.Select(x => x.Metadata.DisplayName).ToList();
