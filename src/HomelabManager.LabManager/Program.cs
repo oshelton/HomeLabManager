@@ -25,7 +25,6 @@ internal class Program
     {
         Real,
         Design,
-        Testing,
     }
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -61,10 +60,13 @@ internal class Program
     /// <summary>
     /// Sets up a test app environment.
     /// </summary>
-    public static void BuildTestApp()
+    public static void BuildTestApp(ServiceOverrides overrides)
     {
+        if (overrides is null)
+            throw new ArgumentNullException(nameof(overrides));
+
         IsInTestingMode = true;
-        ServiceProvider = BuildServiceProvider(ServiceMode.Testing);
+        ServiceProvider = BuildServiceProvider(ServiceMode.Real, overrides);
     }
 
     /// <summary>
@@ -77,8 +79,10 @@ internal class Program
     /// </summary>
     public static bool IsInTestingMode { get; private set; }
 
-    private static IHost BuildServiceProvider(ServiceMode mode)
+    private static IHost BuildServiceProvider(ServiceMode mode, ServiceOverrides overrides = null)
     {
+        overrides = overrides ?? new ServiceOverrides();
+
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
@@ -86,11 +90,11 @@ internal class Program
                 {
                     case ServiceMode.Real:
                         // Add Data Services.
-                        services.AddSingleton<ICoreConfigurationManager>(provider => new CoreConfigurationManager(s_coreConfigurationDirectory));
-                        services.AddSingleton<IServerDataManager>(provider => new ServerDataManager(provider.GetService<ICoreConfigurationManager>()));
+                        services.AddSingleton(provider => overrides.CoreConfigurationManagerServiceBuilder?.Invoke() ?? new CoreConfigurationManager(s_coreConfigurationDirectory));
+                        services.AddSingleton(provider => overrides.ServerDataManagerServiceBuilder?.Invoke() ?? new ServerDataManager(provider.GetService<ICoreConfigurationManager>()));
                         
                         // Add non-data services.
-                        services.AddSingleton<INavigationService>(provider => new NavigationService());
+                        services.AddSingleton(provider => overrides.NavigationServiceBuilder?.Invoke() ?? new NavigationService());
                         break;
                     case ServiceMode.Design:
                         // Add Data Services.
@@ -99,14 +103,6 @@ internal class Program
 
                         // Add non-data services.
                         services.AddSingleton<INavigationService>(provider => new DesignNavigationService());
-                        break;
-                    case ServiceMode.Testing:
-                        // Add Data Services.
-                        services.AddSingleton<ICoreConfigurationManager>(provider => new TestCoreConfigurationManager());
-                        services.AddSingleton<IServerDataManager>(provider => new TestServerDataManager());
-
-                        // Add non-data services.
-                        services.AddSingleton<INavigationService>(provider => new TestNavigationService());
                         break;
                 }
             })
