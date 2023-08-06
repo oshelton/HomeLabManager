@@ -44,5 +44,9 @@ public class MainWindowViewModelTests
         _services.MockNavigationService.Verify(x => x.NavigateTo(It.IsAny<HomeNavigationRequest>(), false), Times.Once());
     }
 
-    private (Mock<ICoreConfigurationManager> MockCoreConfigManager, Mock<IServerDataManager> MockServerDatamanager, Mock<INavigationService> MockNavigationService) _services;
+    private (
+        Mock<ICoreConfigurationManager> MockCoreConfigManager, 
+        Mock<IServerDataManager> MockServerDatamanager, 
+        Mock<INavigationService> MockNavigationService
+    ) _services;
 }
