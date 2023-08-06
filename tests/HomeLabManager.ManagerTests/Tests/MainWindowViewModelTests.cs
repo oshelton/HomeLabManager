@@ -1,5 +1,11 @@
-﻿using HomeLabManager.Manager;
+﻿using System.Reactive.Subjects;
+using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Manager;
 using HomeLabManager.Manager.Pages.Home;
+using HomeLabManager.Manager.Services.Navigation;
+using HomeLabManager.Manager.Services.Navigation.Requests;
+using Moq;
 
 namespace HomeLabManager.ManagerTests.Tests;
 
@@ -9,7 +15,8 @@ namespace HomeLabManager.ManagerTests.Tests;
 public class MainWindowViewModelTests
 {
     [SetUp]
-    public void SetUp() => Utils.RegisterTestServices();
+    public void Setup() => _services = Utils.RegisterTestServices();
+
 
     /// <summary>
     /// Test basic Main Window View Model Creation.
@@ -28,11 +35,14 @@ public class MainWindowViewModelTests
     [Test]
     public async Task TestInitialization()
     {
+        var navigateToSetup = _services.MockNavigationService.Setup(x => x.NavigateTo(It.IsAny<HomeNavigationRequest>(), false));
+
         var mainWindow = new MainWindowViewModel();
 
         await mainWindow.WindowLoaded().ConfigureAwait(true);
 
-        Assert.That(mainWindow.NavigationService.CurrentPage, Is.Not.Null);
-        Assert.That(mainWindow.NavigationService.CurrentPage.GetType(), Is.EqualTo(typeof(HomeViewModel)));
+        _services.MockNavigationService.Verify(x => x.NavigateTo(It.IsAny<HomeNavigationRequest>(), false), Times.Once());
     }
+
+    private (Mock<ICoreConfigurationManager> MockCoreConfigManager, Mock<IServerDataManager> MockServerDatamanager, Mock<INavigationService> MockNavigationService) _services;
 }
