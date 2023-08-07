@@ -25,7 +25,7 @@ internal static class MockCoreServerDataManagerExtensions
     /// <param name="mockService">Mock service to set up.</param>
     /// <param name="numberServers">Number of servers to create.</param>
     /// <returns>Read only list of created servers.</returns>
-    public static IReadOnlyList<ServerHostDto> SetupSimpleServers(this Mock<IServerDataManager> mockService, int numberServers)
+    public static IReadOnlyList<ServerHostDto> SetupSimpleServers(this Mock<IServerDataManager> mockService, int numberServers, Func<int, IReadOnlyList<ServerVmDto>> createVMs = null)
     {
         var servers = new List<ServerHostDto>();
         for (var i = 0; i < numberServers; i++)
@@ -38,7 +38,9 @@ internal static class MockCoreServerDataManagerExtensions
                         Name = $"HOST-{i + 1}"
                     },
                     DockerCompose = new DockerComposeDto(),
-                    Configuration = new ServerConfigurationDto()
+                    Configuration = new ServerConfigurationDto(),
+
+                    VMs = createVMs?.Invoke(i)
                 }
             );
         }
