@@ -3,6 +3,7 @@ using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
+using HomeLabManager.ManagerTests.MockServiceExtensions;
 using Moq;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
@@ -42,34 +43,7 @@ public class HomeViewModelTests
                 HomeLabRepoDataPath = Path.GetTempPath(),
             });
 
-        _services.MockServerDatamanager.Setup(x => x.GetServers())
-            .Returns(new[]
-            {
-                new ServerHostDto
-                {
-                    Metadata = new ServerMetadataDto
-                    {
-                        DisplayName = "Test 1",
-                        Name = "HOST-1"
-                    }
-                },
-                new ServerHostDto
-                {
-                    Metadata = new ServerMetadataDto
-                    {
-                        DisplayName = "Test 2",
-                        Name = "HOST-2"
-                    }
-                },
-                new ServerHostDto
-                {
-                    Metadata = new ServerMetadataDto
-                    {
-                        DisplayName = "Test 3",
-                        Name = "HOST-3"
-                    }
-                }
-            });
+        var createdServers = _services.MockServerDataManager.SetupSimpleServers(3);
 
         var homePage = new HomeViewModel();
         var navigateTask = homePage.NavigateTo(new HomeNavigationRequest());
@@ -79,14 +53,14 @@ public class HomeViewModelTests
         await navigateTask.ConfigureAwait(true);
 
         Assert.That(homePage.CurrentDisplayMode, Is.EqualTo(HomeDisplayMode.HasServers));
-        Assert.That(homePage.Servers!, Has.Count.EqualTo(3));
+        Assert.That(homePage.Servers, Has.Count.EqualTo(createdServers.Count));
 
         homePage.Dispose();
     }
 
     private (
         Mock<ICoreConfigurationManager> MockCoreConfigManager, 
-        Mock<IServerDataManager> MockServerDatamanager, 
+        Mock<IServerDataManager> MockServerDataManager, 
         Mock<INavigationService> MockNavigationService
     ) _services;
 }
