@@ -23,6 +23,9 @@ public sealed record ServerHostDto : BaseServerDto
             if (_vms != value)
             {
                 _vms = value;
+                if (_vms is null)
+                    return;
+
                 foreach (var vm in _vms) 
                 {
                     vm.Host = this;
