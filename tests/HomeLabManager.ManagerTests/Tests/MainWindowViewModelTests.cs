@@ -1,8 +1,6 @@
-﻿using System.Reactive.Subjects;
-using HomeLabManager.Common.Data.CoreConfiguration;
+﻿using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager;
-using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Moq;

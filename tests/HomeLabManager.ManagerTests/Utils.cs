@@ -3,7 +3,6 @@ using Moq;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Services.Navigation;
-using HomeLabManager.ManagerTests.MockServiceExtensions;
 
 namespace HomeLabManager.ManagerTests;
 

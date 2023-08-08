@@ -3,7 +3,6 @@ using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.ManagerTests.MockServiceExtensions;
 using Moq;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
