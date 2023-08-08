@@ -1,18 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using Avalonia.Collections;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager;
-using HomeLabManager.Manager.Pages.CreateEditServer;
 using HomeLabManager.Manager.Pages.ServerListing;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using HomeLabManager.ManagerTests.MockServiceExtensions;
-using NUnit.Framework.Constraints;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
 

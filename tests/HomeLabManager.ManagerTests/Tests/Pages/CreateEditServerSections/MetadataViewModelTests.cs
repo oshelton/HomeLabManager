@@ -1,8 +1,5 @@
 ﻿using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Manager.Pages.CreateEditServer;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
-using HomeLabManager.Manager.Pages.ServerListing;
-using HomeLabManager.Manager.Services.Navigation.Requests;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages.CreateEditServerSections;
 
