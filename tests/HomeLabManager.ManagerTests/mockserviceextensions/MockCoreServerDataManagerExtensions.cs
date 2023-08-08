@@ -25,13 +25,14 @@ internal static class MockCoreServerDataManagerExtensions
     /// <param name="mockService">Mock service to set up.</param>
     /// <param name="numberServers">Number of servers to create.</param>
     /// <returns>Read only list of created servers.</returns>
-    public static IReadOnlyList<ServerHostDto> SetupSimpleServers(this Mock<IServerDataManager> mockService, int numberServers, Func<int, IReadOnlyList<ServerVmDto>> createVMs = null)
+    public static IReadOnlyList<ServerHostDto> SetupSimpleServers(this Mock<IServerDataManager> mockService, int numberServers, Func<int, IReadOnlyList<ServerVmDto>> createVMs = null, bool generateIds = false)
     {
         var servers = new List<ServerHostDto>();
         for (var i = 0; i < numberServers; i++)
         {
             servers.Add(new ServerHostDto
                 {
+                    UniqueId = generateIds ? Guid.NewGuid() : null,
                     Metadata = new ServerMetadataDto
                     {
                         DisplayName = $"Test {i + 1}",

@@ -1,4 +1,7 @@
-﻿using YamlDotNet.Serialization;
+﻿using System.Runtime.CompilerServices;
+using YamlDotNet.Serialization;
+
+[assembly: InternalsVisibleTo("HomeLabManager.ManagerTests")]
 
 namespace HomeLabManager.Common.Data.Git.Server;
 
