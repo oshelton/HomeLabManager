@@ -2,6 +2,8 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Avalonia.Collections;
+using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager;
 using HomeLabManager.Manager.Pages.CreateEditServer;
 using HomeLabManager.Manager.Pages.ServerListing;
@@ -9,6 +11,7 @@ using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using HomeLabManager.ManagerTests.MockServiceExtensions;
 using NUnit.Framework.Constraints;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
@@ -16,7 +19,7 @@ namespace HomeLabManager.ManagerTests.Tests.Pages;
 public sealed class ServerListingViewModelTests
 {
     [SetUp]
-    public void SetUp() => Utils.RegisterTestServices();
+    public void SetUp() => _services = Utils.RegisterTestServices();
 
     /// <summary>
     /// Test view model creation and initial state.
@@ -37,9 +40,10 @@ public sealed class ServerListingViewModelTests
     /// Test the logic executed when the page is navigated to.
     /// </summary>
     [Test]
-    [Ignore("Until we get a mocked server data manager.")]
     public async Task NavigatingTo_TestNavigatingToTheServerListingPage()
     {
+        var servers = _services.MockServerDataManager.SetupSimpleServers(3, generateIds: true);
+
         var serverListing = new ServerListingViewModel();
 
         var navigateTask = serverListing.NavigateTo(new ServerListingNavigationRequest());
@@ -49,7 +53,7 @@ public sealed class ServerListingViewModelTests
         await navigateTask.ConfigureAwait(true);
 
         Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.HasServers));
-        Assert.That(serverListing.SortedServers, Has.Count.EqualTo(3));
+        Assert.That(serverListing.SortedServers, Has.Count.EqualTo(servers.Count));
 
         serverListing.Dispose();
     }
@@ -64,10 +68,14 @@ public sealed class ServerListingViewModelTests
 
         var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 
-        Assert.That(navigationService.CurrentPage, Is.TypeOf<CreateEditServerViewModel>());
-
-        var createEditPage = navigationService.CurrentPage as CreateEditServerViewModel;
-
-        Assert.That(createEditPage.Title, Is.EqualTo("Create New Server Host"));
+        _services.MockNavigationService.Verify(expression: x => x.NavigateTo(
+            It.Is<CreateEditServerNavigationRequest>(x => x.Server is ServerHostDto && x.IsNew && x.AfterIndex == null), false
+        ), Times.Once);
     }
+
+    private (
+        Mock<ICoreConfigurationManager> MockCoreConfigManager,
+        Mock<IServerDataManager> MockServerDataManager,
+        Mock<INavigationService> MockNavigationService
+    ) _services;
 }
