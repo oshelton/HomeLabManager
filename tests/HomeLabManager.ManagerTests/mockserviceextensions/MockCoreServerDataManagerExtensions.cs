@@ -36,7 +36,8 @@ internal static class MockCoreServerDataManagerExtensions
                     Metadata = new ServerMetadataDto
                     {
                         DisplayName = $"Test {i + 1}",
-                        Name = $"HOST-{i + 1}"
+                        Name = $"HOST-{i + 1}",
+                        DisplayIndex = i,
                     },
                     DockerCompose = new DockerComposeDto(),
                     Configuration = new ServerConfigurationDto(),
