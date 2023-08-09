@@ -35,38 +35,97 @@ public sealed class ServerListingViewModelTests
     /// Test the logic executed when the page is navigated to.
     /// </summary>
     [Test]
-    [Ignore("Until we get a mocked server data manager.")]
     public async Task NavigatingTo_TestNavigatingToTheServerListingPage()
     {
         var servers = _services.MockServerDataManager.SetupSimpleServers(3, generateIds: true);
 
-        var serverListing = new ServerListingViewModel();
+        using (var serverListing = new ServerListingViewModel())
+        {
+            var navigateTask = serverListing.NavigateTo(new ServerListingNavigationRequest());
 
-        var navigateTask = serverListing.NavigateTo(new ServerListingNavigationRequest());
+            Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.IsLoading));
 
-        Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.IsLoading));
+            await navigateTask.ConfigureAwait(true);
 
-        await navigateTask.ConfigureAwait(true);
-
-        Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.HasServers));
-        Assert.That(serverListing.SortedServers, Has.Count.EqualTo(servers.Count));
-
-        serverListing.Dispose();
+            Assert.That(serverListing.CurrentDisplayMode, Is.EqualTo(ServerListingDisplayMode.HasServers));
+            Assert.That(serverListing.SortedServers, Has.Count.EqualTo(servers.Count));
+        }
     }
 
     [Test]
-    public async Task CreateNewServerHost_ConfirmCreateNewServerHostDefaultBehavior()
-    {    
-        var serverListing = new Mock<ServerListingViewModel>();
-        serverListing.SetupGet(x => x.SortedServers).Returns(new ReadOnlyObservableCollection<ServerViewModel>(new ObservableCollection<ServerViewModel>()));
+    public async Task CreateNewServerHostCommand_NoAfterIndexProvided_ConfirmCreateNewServerHostWithNoServersBehavior()
+    {
+        using (var serverListing = new ServerListingViewModel())
+        {
+            _services.MockServerDataManager.SetupSimpleServers(1);
 
-        await serverListing.Object.CreateNewServerHostCommand.Execute();
+            await serverListing.CreateNewServerHostCommand.Execute();
 
-        var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+            var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 
-        _services.MockNavigationService.Verify(expression: x => x.NavigateTo(
-            It.Is<CreateEditServerNavigationRequest>(x => x.Server is ServerHostDto && x.IsNew && x.AfterIndex == null), false
-        ), Times.Once);
+            _services.MockNavigationService.Verify(expression: x => x.NavigateTo(
+                It.Is<CreateEditServerNavigationRequest>(x => x.Server is ServerHostDto && x.IsNew && x.AfterIndex == null), false
+            ), Times.Once);
+        }
+    }
+
+    [Test]
+    public async Task CreateNewServerHostCommand_AfterIndexProvided_ConfirmCreateNewServerHostAfterAnotherServerBehavior()
+    {
+        using (var serverListing = new ServerListingViewModel())
+        {
+            _services.MockServerDataManager.SetupSimpleServers(1);
+
+            var afterIndex = 2;
+            await serverListing.CreateNewServerHostCommand.Execute(afterIndex);
+
+            var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+
+            _services.MockNavigationService.Verify(expression: x => x.NavigateTo(
+                It.Is<CreateEditServerNavigationRequest>(x => x.Server is ServerHostDto && x.IsNew && x.AfterIndex == afterIndex), false
+            ), Times.Once);
+        }
+    }
+
+    [Test]
+    public async Task EditServerCommand_ValidServerPassed_ConfirmEditServerHostBehavior()
+    {
+        using (var serverListing = new ServerListingViewModel())
+        {
+            _services.MockServerDataManager.SetupSimpleServers(1);
+            await serverListing.NavigateTo(new ServerListingNavigationRequest()).ConfigureAwait(true);
+
+            var toEdit = serverListing.SortedServers[0];
+            await serverListing.EditServerCommand.Execute(toEdit);
+
+            var navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+
+            _services.MockNavigationService.Verify(expression: x => x.NavigateTo(
+                It.Is<CreateEditServerNavigationRequest>(x => x.Server is ServerHostDto && x.Server.Metadata.DisplayName == toEdit.DisplayName && !x.IsNew && x.AfterIndex == null), false
+            ), Times.Once);
+        }
+    }
+
+    [Test]
+    public async Task MoveServerHostUpCommand_ValidServerPassed_ConfirmMoveServerHostUpBehavior()
+    {
+        using (var serverListing = new ServerListingViewModel())
+        {
+            _services.MockServerDataManager.SetupSimpleServers(5, generateIds: true);
+            await serverListing.NavigateTo(new ServerListingNavigationRequest()).ConfigureAwait(true);
+
+            var toMoveUp = serverListing.SortedServers[1];
+            await serverListing.MoveServerUpCommand.Execute(toMoveUp);
+
+            Assert.That(toMoveUp.DisplayIndex, Is.EqualTo(0));
+
+            // Need a delay here for sorted servers to update.
+            await Task.Delay(50).ConfigureAwait(true);
+
+            Assert.That(serverListing.SortedServers[1].DisplayIndex, Is.EqualTo(1));
+
+            _services.MockServerDataManager.Verify(x => x.AddUpdateServer(It.IsAny<ServerHostDto>()), Times.Exactly(2));
+        }
     }
 
     private (
