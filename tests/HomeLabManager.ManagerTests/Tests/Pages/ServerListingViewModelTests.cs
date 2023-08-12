@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager;
@@ -8,6 +9,7 @@ using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using ReactiveUI;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
 
@@ -125,6 +127,21 @@ public sealed class ServerListingViewModelTests
             Assert.That(serverListing.SortedServers[1].DisplayIndex, Is.EqualTo(1));
 
             _services.MockServerDataManager.Verify(x => x.AddUpdateServer(It.IsAny<ServerHostDto>()), Times.Exactly(2));
+        }
+    }
+
+    [Test]
+    public async Task MoveServerHostUpCommand_InvalidServerPassed_ConfirmMoveServerHostUpThrowsExceptionWhenInvalidPassed()
+    {
+        using (var serverListing = new ServerListingViewModel())
+        {
+            _services.MockServerDataManager.SetupSimpleServers(5, generateIds: true);
+            await serverListing.NavigateTo(new ServerListingNavigationRequest()).ConfigureAwait(true);
+
+            var toMoveUp = serverListing.SortedServers[0];
+            Assert.ThrowsAsync<UnhandledErrorException>(() => serverListing.MoveServerUpCommand.Execute(toMoveUp).ToTask());
+
+            _services.MockServerDataManager.Verify(x => x.AddUpdateServer(It.IsAny<ServerHostDto>()), Times.Never());
         }
     }
 
