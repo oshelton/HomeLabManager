@@ -185,7 +185,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             }
         }).ConfigureAwait(true);
 
-        dialog.GetWindow().Close();
+        dialog?.GetWindow().Close();
 
         await _navigationService.NavigateBack().ConfigureAwait(false);
     }
