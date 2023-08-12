@@ -246,7 +246,7 @@ public class ServerListingViewModel : PageBaseViewModel
 
         _serverCache.Remove(server);
 
-        dialog.GetWindow().Close();
+        dialog?.GetWindow().Close();
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;

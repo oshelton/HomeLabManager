@@ -15,6 +15,9 @@ public static class SharedDialogs
     /// <param name="content">Content to display in the dialog or nothing if none is provided.</param>
     public static async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
+        if (Program.IsInTestingMode)
+            return true;
+
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
         {
             Borderless = true,
@@ -35,6 +38,9 @@ public static class SharedDialogs
     /// <param name="textLabel">Text to display in the dialog, will show nothing if none provided.</param>
     public static (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
     {
+        if (Program.IsInTestingMode)
+            return (null, Task.CompletedTask);
+
         var layoutContainer = new StackPanel
         {
             MaxWidth = 350,
