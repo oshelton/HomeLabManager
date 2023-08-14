@@ -13,9 +13,11 @@ public sealed class CoreConfigurationManagerTests
     }
 
     [TearDown]
-    public void TearDown()
+    public async Task TearDown()
     {
         Directory.Delete(Utils.TestDirectory, true);
+
+        await Task.Delay(50).ConfigureAwait(false);
         Directory.Delete(Utils.TestGitDirectory, true);
     }
 
