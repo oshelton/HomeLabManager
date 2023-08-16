@@ -29,19 +29,16 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         // Set up an observable to check when content has actually changed and there are no errors.
         _canSave = this.WhenAnyValue(x => x.Metadata.HasChanges, x => x.Metadata.HasErrors,
             (hasMetadataChanges, hasMetadataErrors) => hasMetadataChanges && !hasMetadataErrors)
-            .Throttle(TimeSpan.FromSeconds(0.5))
             .ToProperty(this, nameof(CanSave))
             .DisposeWith(_disposables);
 
         // Set up observable to monitor for validation issues.
         _hasChanges = this.WhenAnyValue(x => x.Metadata.HasChanges)
-            .Throttle(TimeSpan.FromSeconds(0.5))
             .ToProperty(this, nameof(HasChanges))
             .DisposeWith(_disposables);
 
         // Set up observable to monitor for validation issues.
         _hasErrors = this.WhenAnyValue(x => x.Metadata.HasErrors)
-            .Throttle(TimeSpan.FromSeconds(0.5))
             .ToProperty(this, nameof(HasErrors))
             .DisposeWith(_disposables);
 
