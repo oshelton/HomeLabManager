@@ -42,7 +42,7 @@ internal static class MockCoreServerDataManagerExtensions
                     DockerCompose = new DockerComposeDto(),
                     Configuration = new ServerConfigurationDto(),
 
-                    VMs = createVMs?.Invoke(i)
+                    VMs = createVMs?.Invoke(i) ?? Array.Empty<ServerVmDto>(),
                 }
             );
         }
