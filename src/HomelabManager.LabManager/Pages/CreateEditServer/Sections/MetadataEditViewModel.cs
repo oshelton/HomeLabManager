@@ -100,16 +100,16 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
         public bool HasChanges => _hasChanges.Value;
 
         private static readonly Regex s_nameRequirementRegex = new Regex("^(([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])\\.)*([a-z0-9]|[a-z0-9][a-z0-9\\-]*[a-z0-9])$", 
-            RegexOptions.IgnoreCase | RegexOptions.Compiled); 
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private string _displayName;
-        private string _name;
+        private readonly TrackedPropertyState? _initialState;
+        private readonly IReadOnlyList<string> _allOtherDisplayNames;
+        private readonly IReadOnlyList<string> _allOtherNames;
 
         private readonly ObservableAsPropertyHelper<bool> _hasChanges;
 
-        private TrackedPropertyState? _initialState;
-        private IReadOnlyList<string> _allOtherDisplayNames;
-        private IReadOnlyList<string> _allOtherNames;
+        private string _displayName;
+        private string _name;
 
         private struct TrackedPropertyState
         {
