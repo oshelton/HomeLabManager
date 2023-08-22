@@ -1,4 +1,5 @@
-﻿using HomeLabManager.Common.Data.CoreConfiguration;
+﻿using System.Reactive.Linq;
+using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.CreateEditServer;
 using HomeLabManager.Manager.Services.Navigation;
@@ -265,6 +266,68 @@ public sealed class CreateEditServerViewModelTests
                 // ASSERT
                 Assert.That(newServer.CanSave, Is.False);
             }
+        }
+    }
+
+    [Test]
+    public async Task SaveCommand_ConfirmSaveNewServerBasic_ConfirmSavingNewServerInBasicScenarioWorks()
+    {
+        _services.MockServerDataManager.SetupSimpleServers(0);
+
+        var toCreate = new ServerHostDto
+        {
+            Metadata = new ServerMetadataDto
+            {
+                DisplayName = "display name",
+                Name = "SERVER"
+            }
+        };
+        var updatedDisplayName = "new display name";
+
+        using (var newServer = new CreateEditServerViewModel())
+        {
+            var request = new CreateEditServerNavigationRequest(true, toCreate);
+
+            await newServer.NavigateTo(request).ConfigureAwait(false);
+
+            newServer.Metadata.DisplayName = updatedDisplayName;
+
+            await Task.Delay(600).ConfigureAwait(false);
+
+            Assert.That(newServer.CanSave, Is.True);
+
+            await newServer.SaveCommand.Execute();
+
+            _services.MockServerDataManager.Verify(x => x.AddUpdateServer(It.Is<ServerHostDto>(wasSaved =>
+                wasSaved.Metadata.DisplayName == updatedDisplayName &&
+                wasSaved.Metadata.Name == toCreate.Metadata.Name &&
+                wasSaved.Metadata.DisplayIndex == 0
+            )), Times.Once);
+            _services.MockNavigationService.Verify(x => x.NavigateBack(), Times.Once);
+        }
+    }
+
+    [Test]
+    public async Task CancelCommand_ConfirmCancelCommandNavigatesBackNoChanges_ConfirmCancelingNavigatesNavigatesBackWithNoChanges()
+    {
+        _services.MockServerDataManager.SetupSimpleServers(0);
+
+        using (var newServer = new CreateEditServerViewModel())
+        {
+            var request = new CreateEditServerNavigationRequest(true, new ServerHostDto
+            {
+                Metadata = new ServerMetadataDto
+                {
+                    DisplayName = "display name",
+                    Name = "SERVER"
+                }
+            });
+
+            await newServer.NavigateTo(request).ConfigureAwait(false);
+
+            await newServer.CancelCommand.Execute();
+
+            _services.MockNavigationService.Verify(x => x.NavigateBack(), Times.Once);
         }
     }
 
