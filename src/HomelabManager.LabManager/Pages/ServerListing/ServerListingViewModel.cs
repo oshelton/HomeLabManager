@@ -3,14 +3,12 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Avalonia.Collections;
 using DynamicData;
-using DynamicData.Binding;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.Manager.Utils;
+using HomeLabManager.Manager.Services.SharedDialogs;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
@@ -33,6 +31,7 @@ public class ServerListingViewModel : PageBaseViewModel
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+        _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
 
         if (Avalonia.Controls.Design.IsDesignMode)
         {
@@ -226,12 +225,12 @@ public class ServerListingViewModel : PageBaseViewModel
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
-        var continueDeleting = await Utils.SharedDialogs.ShowSimpleYesNoDialog("Deleting cannot be readily undone outside of Git.\nAre you sure?").ConfigureAwait(true);
+        var continueDeleting = await _sharedDialogsService.ShowSimpleYesNoDialog("Deleting cannot be readily undone outside of Git.\nAre you sure?").ConfigureAwait(true);
 
         if (!continueDeleting)
             return;
 
-        var (dialog, dialogTask) = SharedDialogs.ShowSimpleSavingDataDialog("Deleting Server...");
+        var (dialog, dialogTask) = _sharedDialogsService.ShowSimpleSavingDataDialog("Deleting Server...");
 
         var toUpdateServers = SortedServers.Where(x => x.DisplayIndex > server.DisplayIndex).ToList();
         await Task.Run(() =>
@@ -252,6 +251,7 @@ public class ServerListingViewModel : PageBaseViewModel
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
+    private readonly ISharedDialogsService _sharedDialogsService;
 
     private readonly CompositeDisposable _disposables;
 

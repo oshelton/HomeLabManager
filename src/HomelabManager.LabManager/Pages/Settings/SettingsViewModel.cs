@@ -1,12 +1,10 @@
 ﻿using System.Reactive.Linq;
-using Avalonia;
 using Avalonia.Platform.Storage;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.Manager.Utils;
+using HomeLabManager.Manager.Services.SharedDialogs;
 using LibGit2Sharp;
-using Material.Dialog;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveValidation;
@@ -23,6 +21,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     {
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+        _sharedDialogService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
 
         var builder = new ValidationBuilder<SettingsViewModel>();
 
@@ -92,7 +91,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         if (!HasChanges)
             return Task.FromResult(true);
         else
-            return Utils.SharedDialogs.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
+            return _sharedDialogService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
     }
 
     public async Task OpenFolderPickerForRepoPath()
@@ -123,7 +122,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     {
         IsSaving = true;
 
-        var (dialog, dialogTask) = SharedDialogs.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
+        var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
         await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
         {
@@ -187,6 +186,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
+    private readonly ISharedDialogsService _sharedDialogService;
     
     private bool _hasChanges;
     private bool _isSaving;

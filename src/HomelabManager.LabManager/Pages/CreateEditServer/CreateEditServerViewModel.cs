@@ -5,7 +5,7 @@ using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.Manager.Utils;
+using HomeLabManager.Manager.Services.SharedDialogs;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
@@ -23,6 +23,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
     {
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+        _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
 
         _disposables = new CompositeDisposable();
 
@@ -97,7 +98,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         if (!HasChanges || IsSaving)
             return Task.FromResult(true);
         else
-            return Utils.SharedDialogs.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
+            return _sharedDialogsService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
     }
 
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
@@ -130,7 +131,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     private async Task Save()
     {
-        var (dialog, dialogTask) = SharedDialogs.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
+        var (dialog, dialogTask) = _sharedDialogsService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
         // Incorporate updated information into Dto.
         var updatedDto = _serverDto with
@@ -189,6 +190,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
+    private readonly ISharedDialogsService _sharedDialogsService;
     
     private readonly CompositeDisposable _disposables;
     private readonly ObservableAsPropertyHelper<bool> _canSave;

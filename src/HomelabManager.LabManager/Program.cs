@@ -5,6 +5,8 @@ using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
+using HomeLabManager.Manager.Services.SharedDialogs;
+using HomeLabManager.Manager.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Splat;
@@ -95,6 +97,7 @@ internal class Program
                         
                         // Add non-data services.
                         services.AddSingleton(provider => overrides.NavigationServiceBuilder?.Invoke() ?? new NavigationService());
+                        services.AddSingleton(provider => overrides.SharedDialogsServiceBuilder?.Invoke() ?? new SharedDialogsService());
                         break;
                     case ServiceMode.Design:
                         // Add Data Services.
@@ -103,6 +106,7 @@ internal class Program
 
                         // Add non-data services.
                         services.AddSingleton<INavigationService>(provider => new DesignNavigationService());
+                        services.AddSingleton(provider => new SharedDialogsService()); // No specific design time service.
                         break;
                 }
             })
