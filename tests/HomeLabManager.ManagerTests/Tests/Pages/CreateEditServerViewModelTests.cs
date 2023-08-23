@@ -1,8 +1,6 @@
 ﻿using System.Reactive.Linq;
-using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.CreateEditServer;
-using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Moq;
 
@@ -216,6 +214,7 @@ public sealed class CreateEditServerViewModelTests
     {
         // ARRANGE
         var servers = _services.MockServerDataManager.SetupSimpleServers(1, generateIds: true);
+
         var toEdit = servers[0];
         var initialDisplayName = toEdit.Metadata.DisplayName;
         var initialName = toEdit.Metadata.Name;
@@ -331,9 +330,5 @@ public sealed class CreateEditServerViewModelTests
         }
     }
 
-    private (
-        Mock<ICoreConfigurationManager> MockCoreConfigManager,
-        Mock<IServerDataManager> MockServerDataManager,
-        Mock<INavigationService> MockNavigationService
-    ) _services;
+    private Utils.MockServices _services;
 }

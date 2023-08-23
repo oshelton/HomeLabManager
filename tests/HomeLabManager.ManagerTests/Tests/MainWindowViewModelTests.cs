@@ -3,6 +3,7 @@ using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
+using HomeLabManager.Manager.Services.SharedDialogs;
 using Moq;
 
 namespace HomeLabManager.ManagerTests.Tests;
@@ -42,9 +43,5 @@ public class MainWindowViewModelTests
         _services.MockNavigationService.Verify(x => x.NavigateTo(It.IsAny<HomeNavigationRequest>(), false), Times.Once());
     }
 
-    private (
-        Mock<ICoreConfigurationManager> MockCoreConfigManager, 
-        Mock<IServerDataManager> MockServerDatamanager, 
-        Mock<INavigationService> MockNavigationService
-    ) _services;
+    private Utils.MockServices _services;
 }

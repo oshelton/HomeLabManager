@@ -1,9 +1,6 @@
 ﻿using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.Home;
-using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
-using Moq;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
 
@@ -36,7 +33,7 @@ public class HomeViewModelTests
     [Test]
     public async Task NavigateTo_HappyPathNavigateTo_ConfirmNavigatingToExpectationsWithFullConfiguration()
     {
-        _services.MockCoreConfigManager.Setup(x => x.GetCoreConfiguration())
+        _services.MockCoreConfigurationManager.Setup(x => x.GetCoreConfiguration())
             .Returns(new CoreConfigurationDto
             {
                 HomeLabRepoDataPath = Path.GetTempPath(),
@@ -57,9 +54,5 @@ public class HomeViewModelTests
         homePage.Dispose();
     }
 
-    private (
-        Mock<ICoreConfigurationManager> MockCoreConfigManager, 
-        Mock<IServerDataManager> MockServerDataManager, 
-        Mock<INavigationService> MockNavigationService
-    ) _services;
+    private Utils.MockServices _services;
 }

@@ -1,7 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager;
 using HomeLabManager.Manager.Pages.ServerListing;
@@ -218,6 +216,9 @@ public sealed class ServerListingViewModelTests
         using (var serverListing = new ServerListingViewModel())
         {
             _services.MockServerDataManager.SetupSimpleServers(5, generateIds: true);
+            _services.MockSharedDialogServices.Setup(x => x.ShowSimpleYesNoDialog(It.IsAny<string>()))
+                .Returns(Task.FromResult(true));
+
             await serverListing.NavigateTo(new ServerListingNavigationRequest()).ConfigureAwait(true);
 
             var toDelete = serverListing.SortedServers[2];
@@ -243,9 +244,5 @@ public sealed class ServerListingViewModelTests
         }
     }
 
-    private (
-        Mock<ICoreConfigurationManager> MockCoreConfigManager,
-        Mock<IServerDataManager> MockServerDataManager,
-        Mock<INavigationService> MockNavigationService
-    ) _services;
+    private Utils.MockServices _services;
 }

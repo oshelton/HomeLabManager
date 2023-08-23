@@ -2,22 +2,14 @@
 using Material.Dialog;
 using Material.Dialog.Interfaces;
 
-namespace HomeLabManager.Manager.Utils;
+namespace HomeLabManager.Manager.Services.SharedDialogs;
 
-/// <summary>
-/// Classs for some simple and reusable dialogs.
-/// </summary>
-public static class SharedDialogs
+/// <inheritdoc/>
+public class SharedDialogsService : ISharedDialogsService
 {
-    /// <summary>
-    /// Create and show a simple confirmation dialog.
-    /// </summary>
-    /// <param name="content">Content to display in the dialog or nothing if none is provided.</param>
-    public static async Task<bool> ShowSimpleYesNoDialog(string content = null)
+    /// <inheritdoc/>
+    public async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
-        if (Program.IsInTestingMode)
-            return true;
-
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
         {
             Borderless = true,
@@ -32,15 +24,9 @@ public static class SharedDialogs
         return result?.GetResult == "yes";
     }
 
-    /// <summary>
-    /// Show a simple saving in progress dialog.
-    /// </summary>
-    /// <param name="textLabel">Text to display in the dialog, will show nothing if none provided.</param>
-    public static (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
+    /// <inheritdoc/>
+    public (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
     {
-        if (Program.IsInTestingMode)
-            return (null, Task.CompletedTask);
-
         var layoutContainer = new StackPanel
         {
             MaxWidth = 350,
