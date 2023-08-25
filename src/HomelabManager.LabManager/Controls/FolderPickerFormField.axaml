@@ -1,0 +1,152 @@
+﻿<TemplatedControl
+	x:Class="HomeLabManager.Manager.Controls.FolderPickerFormField"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="clr-namespace:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	d:DesignHeight="70"
+	d:DesignWidth="520">
+	<TemplatedControl.Styles>
+		<Style Selector="controls|FolderPickerFormField">
+			<Setter Property="(i:Interaction.Behaviors)">
+				<i:BehaviorCollectionTemplate>
+					<i:BehaviorCollection>
+						<ir:AdaptiveBehavior SourceControl="{Binding $self}">
+							<ir:AdaptiveClassSetter
+								MinWidth="500"
+								MaxWidth="Infinity"
+								ClassName="Default" />
+							<ir:AdaptiveClassSetter
+								MinWidth="0"
+								MaxWidth="500"
+								ClassName="Small" />
+						</ir:AdaptiveBehavior>
+					</i:BehaviorCollection>
+				</i:BehaviorCollectionTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="controls|FolderPickerFormField materialIcons|MaterialIcon.InfoTip">
+			<Setter Property="Height" Value="14" />
+			<Setter Property="Width" Value="14" />
+			<Setter Property="Kind" Value="Information" />
+			<Setter Property="VerticalAlignment" Value="Top" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+			<Setter Property="IsVisible" Value="{Binding $parent[controls:FolderPickerFormField].InfoTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[controls:FolderPickerFormField].InfoTip}" />
+		</Style>
+
+		<Style Selector="controls|FolderPickerFormField materialIcons|MaterialIcon.FieldValidationError">
+			<Setter Property="IsVisible" Value="{Binding $parent[controls:FolderPickerFormField].(DataValidationErrors.Errors), Converter={x:Static ObjectConverters.IsNotNull}}" />
+			<Setter Property="(ToolTip.Tip)">
+				<Setter.Value>
+					<Template>
+						<ToolTip>
+							<DataValidationErrors MaxWidth="250" Errors="{Binding $parent[controls:FolderPickerFormField].(DataValidationErrors.Errors)}" />
+						</ToolTip>
+					</Template>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="controls|FolderPickerFormField materialControls|FloatingButton.BrowseButton">
+			<Setter Property="Margin" Value="8" />
+			<Setter Property="Content">
+				<Template>
+					<materialIcons:MaterialIcon Kind="Folder" />
+				</Template>
+			</Setter>
+			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[controls:FolderPickerFormField].OpenFolderPickerButtonToolTip}" />
+		</Style>
+
+		<Style Selector="controls|FolderPickerFormField.Default">
+			<Setter Property="Margin" Value="4" />
+			<Setter Property="Template">
+				<ControlTemplate TargetType="{x:Type controls:FolderPickerFormField}">
+					<Grid
+						Name="Container"
+						Margin="4"
+						VerticalAlignment="Top"
+						ColumnDefinitions="*,24,3*,Auto">
+
+						<TextBlock
+							Name="Label"
+							Margin="8,18,0,0"
+							VerticalAlignment="Top"
+							Classes="Body1"
+							TextTrimming="CharacterEllipsis">
+							<Run Text="{TemplateBinding Label}" />
+							<Run Text=":" />
+						</TextBlock>
+
+						<materialIcons:MaterialIcon Margin="0,8,0,0" Classes="InfoTip" />
+
+						<materialIcons:MaterialIcon
+							Grid.Column="1"
+							Margin="0,0,8,0"
+							Classes="ValidationError FieldValidationError" />
+
+						<TextBox
+							Name="FieldEntry"
+							Grid.Column="2"
+							Text="{Binding FolderPath, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+
+						<materialControls:FloatingButton
+							Name="PickFolderButton"
+							Grid.Column="3"
+							Classes="Mini BrowseButton"
+							Click="OnPickFolderButtonClicked" />
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="controls|FolderPickerFormField.Small">
+			<Setter Property="Margin" Value="4" />
+			<Setter Property="Template">
+				<ControlTemplate TargetType="{x:Type controls:FolderPickerFormField}">
+					<StackPanel
+						Name="Container"
+						Margin="4,8,4,4"
+						VerticalAlignment="Top">
+						<Grid>
+							<TextBlock
+								Name="Label"
+								Margin="8,0,0,0"
+								VerticalAlignment="Center"
+								Classes="Body1"
+								TextTrimming="CharacterEllipsis">
+								<Run Text="{TemplateBinding Label}" />
+								<Run Text=":" />
+							</TextBlock>
+
+							<materialIcons:MaterialIcon Margin="-2,-9,0,0" Classes="InfoTip" />
+						</Grid>
+
+						<Grid ColumnDefinitions="*,Auto">
+							<materialIcons:MaterialIcon
+								Margin="8,0,0,0"
+								HorizontalAlignment="Left"
+								Classes="ValidationError FieldValidationError" />
+
+							<TextBox
+								Name="FieldEntry"
+								Margin="40,0,0,0"
+								Text="{Binding FolderPath, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+
+							<materialControls:FloatingButton
+								Name="PickFolderButton"
+								Grid.Column="1"
+								Classes="Mini BrowseButton"
+								Click="OnPickFolderButtonClicked" />
+						</Grid>
+					</StackPanel>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+	</TemplatedControl.Styles>
+</TemplatedControl>
