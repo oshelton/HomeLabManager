@@ -17,6 +17,8 @@
 		<StyleInclude Source="/Styles/Icons.axaml" />
 		<StyleInclude Source="/Styles/Buttons.axaml" />
 		<StyleInclude Source="/Styles/BasicStringFormFields.axaml" />
+		<StyleInclude Source="/Styles/FilePickerFormFields.axaml" />
+		<StyleInclude Source="/Styles/FolderPickerFormFields.axaml" />
 		<StyleInclude Source="/Styles/AddItemInlineSeperator.axaml" />
 	</Application.Styles>
 </Application>

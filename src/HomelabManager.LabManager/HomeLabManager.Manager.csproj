@@ -39,6 +39,12 @@
     <Compile Update="Controls\AddItemInlineSeperator.axaml.cs">
       <DependentUpon>AddItemInlineSeperator.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Controls\FolderPickerFormField.axaml.cs">
+      <DependentUpon>FolderPickerFormField.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\FilePickerFormField.axaml.cs">
+      <DependentUpon>FilePickerFormField.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Update="Styles\Icons.xaml">

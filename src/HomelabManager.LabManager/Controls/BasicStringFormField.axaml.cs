@@ -37,9 +37,7 @@ public partial class BasicStringFormField : FormField
             Exception error)
     {
         if (property == StringValueProperty)
-        {
             DataValidationErrors.SetError(this, error);
-        }
     }
 
     private string _stringValue;

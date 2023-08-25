@@ -22,35 +22,6 @@
 
 	<DataTemplate x:Key="SettingsPageTemplate" DataType="{x:Type pages:SettingsViewModel}">
 		<DockPanel IsEnabled="{Binding !IsSaving}">
-			<DockPanel.Styles>
-				<Style Selector="materialIcons|MaterialIcon.TipIcon">
-					<Setter Property="Margin" Value="8,12,8,8" />
-					<Setter Property="Height" Value="24" />
-					<Setter Property="Width" Value="24" />
-				</Style>
-
-				<Style Selector="TextBlock.SettingLabel">
-					<Setter Property="Grid.Column" Value="1" />
-					<Setter Property="Margin" Value="0,6,0,0" />
-					<Setter Property="VerticalAlignment" Value="Center" />
-				</Style>
-
-				<Style Selector="TextBox.SettingField">
-					<Setter Property="Grid.Column" Value="3" />
-					<Setter Property="Margin" Value="8,0,8,0" />
-					<Setter Property="VerticalAlignment" Value="Center" />
-				</Style>
-
-				<Style Selector="materialControls|FloatingButton.BrowseButton">
-					<Setter Property="Grid.Column" Value="4" />
-					<Setter Property="Content">
-						<Template>
-							<materialIcons:MaterialIcon Kind="Folder" />
-						</Template>
-					</Setter>
-				</Style>
-			</DockPanel.Styles>
-
 			<UniformGrid
 				HorizontalAlignment="Right"
 				Columns="2"
@@ -68,98 +39,48 @@
 					Text="Cancel" />
 			</UniformGrid>
 
-			<Grid ColumnDefinitions="Auto,Auto,32,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
-				<materialIcons:MaterialIcon Classes="TipIcon" Kind="Information">
-					<ToolTip.Tip>
-						<TextBlock
-							MaxWidth="384"
-							Classes="Body1"
-							TextWrapping="Wrap">
+			<StackPanel>
+				<controls:FolderPickerFormField
+					FolderPath="{Binding HomeLabRepoDataPath}"
+					Label="Home Lab Repo Data Path"
+					OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
+					<controls:FolderPickerFormField.InfoTip>
+						<TextBlock MaxWidth="384" TextWrapping="Wrap">
 							<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
 							<LineBreak />
 							<LineBreak />
 							<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
 						</TextBlock>
-					</ToolTip.Tip>
-				</materialIcons:MaterialIcon>
-				<TextBlock Classes="SettingLabel Body1">Home Lab Repo Data Path:</TextBlock>
-				<TextBox
-					x:Name="homeLabText"
-					materialAssists:TextFieldAssist.Label="Repo Path"
-					Classes="SettingField"
-					Text="{Binding HomeLabRepoDataPath}" />
-				<materialControls:FloatingButton
-					Name="homeLabButton"
-					Margin="8"
-					Classes="Mini BrowseButton"
-					Click="{eventBinder:EventBinding OpenFolderPickerForRepoPath}"
-					ToolTip.Tip="Open a directory picker to set the repo directory." />
+					</controls:FolderPickerFormField.InfoTip>
+				</controls:FolderPickerFormField>
 
-				<materialIcons:MaterialIcon
-					Grid.Row="1"
-					Classes="TipIcon"
-					Kind="Information">
-					<ToolTip.Tip>
-						<TextBlock
-							MaxWidth="384"
-							Classes="Body1"
-							TextWrapping="Wrap">
+				<controls:FilePickerFormField
+					FilePath="{Binding GitConfigFilePath}"
+					Label="Git Config File Path"
+					OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
+					<controls:FilePickerFormField.InfoTip>
+						<TextBlock MaxWidth="384" TextWrapping="Wrap">
 							This is the path to the standard Git config file containing the Name and Email Address to use.
 						</TextBlock>
-					</ToolTip.Tip>
-				</materialIcons:MaterialIcon>
-				<TextBlock Grid.Row="1" Classes="SettingLabel Body1">Git Config File Path:</TextBlock>
-				<TextBox
-					x:Name="gitConfigText"
-					Grid.Row="1"
-					materialAssists:TextFieldAssist.Label="Git Config Path"
-					Classes="SettingField"
-					Text="{Binding GitConfigFilePath}" />
-				<materialControls:FloatingButton
-					Name="gitConfigButton"
-					Grid.Row="1"
-					Margin="8"
-					Classes="Mini BrowseButton"
-					Click="{eventBinder:EventBinding OpenFilePickerForGitConfig}"
-					ToolTip.Tip="Open a file picker to specify the path to the git config file." />
+					</controls:FilePickerFormField.InfoTip>
+				</controls:FilePickerFormField>
 
-				<materialIcons:MaterialIcon
-					Grid.Row="2"
-					Classes="TipIcon"
-					Kind="Information"
-					ToolTip.Tip="This is the User Name used when signing into Github." />
-				<TextBlock Grid.Row="2" Classes="SettingLabel Body1">Github User Name:</TextBlock>
-				<TextBox
-					x:Name="githubUsernameText"
-					Grid.Row="2"
-					materialAssists:TextFieldAssist.Label="Github User Name"
-					Classes="SettingField"
-					Text="{Binding GithubUserName}" />
+				<controls:BasicStringFormField
+					InfoTip="This is the User Name used when signing into Github."
+					Label="Github User Name"
+					StringValue="{Binding GithubUserName}" />
 
-				<materialIcons:MaterialIcon
-					Grid.Row="3"
-					Classes="TipIcon"
-					Kind="Information">
-					<ToolTip.Tip>
-						<TextBlock
-							MaxWidth="384"
-							Classes="Body1"
-							TextWrapping="Wrap">
+				<controls:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
+					<controls:BasicStringFormField.InfoTip>
+						<TextBlock MaxWidth="384" TextWrapping="Wrap">
 							<Run>This is the Github PAT used when pushing up to Github.</Run>
 							<LineBreak />
 							<LineBreak />
 							<Run>See Github PAT documentation for details.</Run>
 						</TextBlock>
-					</ToolTip.Tip>
-				</materialIcons:MaterialIcon>
-				<TextBlock Grid.Row="3" Classes="SettingLabel Body1">Github PAT:</TextBlock>
-				<TextBox
-					x:Name="githubPatText"
-					Grid.Row="3"
-					materialAssists:TextFieldAssist.Label="Github PAT"
-					Classes="SettingField"
-					Text="{Binding GithubPat}" />
-			</Grid>
+					</controls:BasicStringFormField.InfoTip>
+				</controls:BasicStringFormField>
+			</StackPanel>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>
