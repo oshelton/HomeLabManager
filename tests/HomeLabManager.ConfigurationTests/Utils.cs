@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services;
 
 namespace HomeLabManager.DataTests
 {
@@ -15,7 +16,7 @@ namespace HomeLabManager.DataTests
 
         public static (CoreConfigurationManager manager, CoreConfigurationDto coreConfig) CreateCoreConfigurationManager(bool disableCaching)
         {
-            var manager = new CoreConfigurationManager(TestDirectory);
+            var manager = new CoreConfigurationManager(TestDirectory, new LogManager(true));
             manager.DisableConfigurationCaching = disableCaching;
             var coreConfig = manager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
             {

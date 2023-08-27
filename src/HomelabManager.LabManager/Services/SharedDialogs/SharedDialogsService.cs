@@ -1,12 +1,20 @@
 ﻿using Avalonia.Controls;
+using HomeLabManager.Common.Services;
 using Material.Dialog;
 using Material.Dialog.Interfaces;
+using Serilog;
 
 namespace HomeLabManager.Manager.Services.SharedDialogs;
 
 /// <inheritdoc/>
 public class SharedDialogsService : ISharedDialogsService
 {
+    /// <summary>
+    /// Constructor, sets up a logger.
+    /// </summary>
+    public SharedDialogsService(ILogManager logManager) =>
+        _logger = logManager?.ApplicationLogger.ForContext<SharedDialogsService>() ?? throw new ArgumentNullException(nameof(logManager));
+
     /// <inheritdoc/>
     public async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
@@ -59,4 +67,6 @@ public class SharedDialogsService : ISharedDialogsService
 
         return (dialog, showTask);
     }
+
+    private readonly ILogger _logger;
 }

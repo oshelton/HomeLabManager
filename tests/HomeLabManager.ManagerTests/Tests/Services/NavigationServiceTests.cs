@@ -1,4 +1,5 @@
-﻿using HomeLabManager.Manager.Pages.Home;
+﻿using HomeLabManager.Common.Services;
+using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
@@ -16,7 +17,7 @@ public class NavigationServiceTests
     [Test]
     public void NavigationService_Creation_TestDefaultConstructor()
     {
-        var service = new NavigationService();
+        var service = new NavigationService(new LogManager(true));
 
         Assert.That(service.CanNavigateBack, Is.False);
         Assert.That(service.CurrentPage, Is.Null);
@@ -25,7 +26,7 @@ public class NavigationServiceTests
     [Test]
     public async Task NavigateTo_InitialNavigation_TestInitialNavigationToHomePage()
     {
-        var service = new NavigationService();
+        var service = new NavigationService(new LogManager(true));
 
         await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
 
@@ -36,7 +37,7 @@ public class NavigationServiceTests
     [Test]
     public async Task NavigateTo_SecondPageNavigation_TestNavigatingToASecondPage()
     {
-        var service = new NavigationService();
+        var service = new NavigationService(new LogManager(true));
 
         await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
         await service.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(true);
@@ -48,7 +49,7 @@ public class NavigationServiceTests
     [Test]
     public async Task NavigateBack_TestNavigateBackFunctionality_ConfirmNavigatingBackWorksAsExpected()
     {
-        var service = new NavigationService();
+        var service = new NavigationService(new LogManager(true));
 
         await service.NavigateTo(new HomeNavigationRequest()).ConfigureAwait(true);
         await service.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(true);

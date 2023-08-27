@@ -1,8 +1,10 @@
 ﻿using Avalonia.Threading;
+using HomeLabManager.Common.Services;
 using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
 using ReactiveUI;
+using Serilog;
 
 namespace HomeLabManager.Manager.Services.Navigation;
 
@@ -11,6 +13,12 @@ namespace HomeLabManager.Manager.Services.Navigation;
 /// </summary>
 public sealed class NavigationService: ReactiveObject, INavigationService
 {
+    /// <summary>
+    /// Constructor, sets up a logger.
+    /// </summary>
+    public NavigationService(ILogManager logManager) =>
+        _logger = logManager?.ApplicationLogger.ForContext<NavigationService>() ?? throw new ArgumentNullException(nameof(logManager));
+
     /// <summary>
     /// Navigate to a different page.
     /// </summary>
@@ -84,6 +92,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
     private readonly List<INavigationRequest> _navigationStack = new();
+    private ILogger _logger;
 
     private bool _canNavigateBack;
     private PageBaseViewModel _currentPage;

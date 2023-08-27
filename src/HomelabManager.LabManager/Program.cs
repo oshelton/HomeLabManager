@@ -3,19 +3,19 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services;
 using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.SharedDialogs;
-using HomeLabManager.Manager.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Splat;
+using Serilog;
 
 namespace HomeLabManager.Manager;
 
 internal class Program
 {
-    private sealed class RunMode: IModeDetector 
+    private sealed class RunMode: Splat.IModeDetector 
     {
         public bool? InUnitTestRunner() => false; 
     }
@@ -35,8 +35,16 @@ internal class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        try
+        {
+            BuildAvaloniaApp()
+                .StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception ex)
+        {
+            s_logger.Error(ex, "Unhandled exception received, application terminating.");
+            throw;
+        }
     }
 
     /// <summary>
@@ -88,16 +96,18 @@ internal class Program
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
+                services.AddSingleton<ILogManager>(provider => new LogManager(IsInTestingMode));
+
                 switch (mode)
                 {
                     case ServiceMode.Real:
                         // Add Data Services.
-                        services.AddSingleton(provider => overrides.CoreConfigurationManagerServiceBuilder?.Invoke() ?? new CoreConfigurationManager(s_coreConfigurationDirectory));
-                        services.AddSingleton(provider => overrides.ServerDataManagerServiceBuilder?.Invoke() ?? new ServerDataManager(provider.GetService<ICoreConfigurationManager>()));
+                        services.AddSingleton(provider => overrides.CoreConfigurationManagerServiceBuilder?.Invoke() ?? new CoreConfigurationManager(s_coreConfigurationDirectory, provider.GetService<ILogManager>()));
+                        services.AddSingleton(provider => overrides.ServerDataManagerServiceBuilder?.Invoke() ?? new ServerDataManager(provider.GetService<ICoreConfigurationManager>(), provider.GetService<ILogManager>()));
                         
                         // Add non-data services.
-                        services.AddSingleton(provider => overrides.NavigationServiceBuilder?.Invoke() ?? new NavigationService());
-                        services.AddSingleton(provider => overrides.SharedDialogsServiceBuilder?.Invoke() ?? new SharedDialogsService());
+                        services.AddSingleton(provider => overrides.NavigationServiceBuilder?.Invoke() ?? new NavigationService(provider.GetService<ILogManager>()));
+                        services.AddSingleton(provider => overrides.SharedDialogsServiceBuilder?.Invoke() ?? new SharedDialogsService(provider.GetService<ILogManager>()));
                         break;
                     case ServiceMode.Design:
                         // Add Data Services.
@@ -106,7 +116,7 @@ internal class Program
 
                         // Add non-data services.
                         services.AddSingleton<INavigationService>(provider => new DesignNavigationService());
-                        services.AddSingleton(provider => new SharedDialogsService()); // No specific design time service.
+                        services.AddSingleton(provider => new SharedDialogsService(new LogManager(true))); // No specific design time service.
                         break;
                 }
             })
@@ -115,9 +125,15 @@ internal class Program
         Debug.Assert(host.Services.GetService<ICoreConfigurationManager>() is not null);
         Debug.Assert(host.Services.GetService<IServerDataManager>() is not null);
         Debug.Assert(host.Services.GetService<INavigationService>() is not null);
+        Debug.Assert(host.Services.GetService<ILogManager>() is not null);
+
+        s_logger = host.Services.GetService<ILogManager>().ApplicationLogger.ForContext<Program>();
+
+        s_logger.ForCaller().Information("IHost built; services now available.");
 
         return host;
     }
 
+    private static ILogger s_logger;
     private static string s_coreConfigurationDirectory;
 }

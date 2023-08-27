@@ -1,4 +1,7 @@
 ﻿using System.Reactive.Subjects;
+using HomeLabManager.Common.Extensions;
+using HomeLabManager.Common.Services;
+using Serilog;
 
 namespace HomeLabManager.Common.Data.CoreConfiguration;
 
@@ -12,7 +15,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// Construct a new CoreConfigurationManager given the directory where the core configurationfile should live.
     /// </summary>
     /// <remarks>The class will append the expected file name to the passed in directory path.</remarks>
-    public CoreConfigurationManager(string coreConfigDirectory)
+    public CoreConfigurationManager(string coreConfigDirectory, ILogManager logManager)
     {
         if (string.IsNullOrEmpty(coreConfigDirectory))
             throw new ArgumentNullException(nameof(coreConfigDirectory));
@@ -21,6 +24,9 @@ public class CoreConfigurationManager : ICoreConfigurationManager
 
         CoreConfigPath = Path.Combine(coreConfigDirectory, "CoreConfig.yaml");
         CoreConfigurationUpdated = new Subject<CoreConfigurationDto>();
+
+        _logger = logManager?.ApplicationLogger.ForContext<CoreConfigurationManager>() ?? throw new ArgumentNullException(nameof(logManager));
+        _logger.ForCaller().Information("Created with config directory \"{ConfigDir}\"", coreConfigDirectory);
     }
 
     /// <summary>

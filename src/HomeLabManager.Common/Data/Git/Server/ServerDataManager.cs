@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services;
+using Serilog;
 
 [assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
@@ -9,12 +11,10 @@ namespace HomeLabManager.Common.Data.Git.Server;
 public sealed class ServerDataManager : IServerDataManager
 {
     /// <inheritdoc/>
-    public ServerDataManager(ICoreConfigurationManager coreConfigurationManager)
+    public ServerDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager)
     {
-        if (coreConfigurationManager is null)
-            throw new ArgumentNullException(nameof(coreConfigurationManager));
-
-        _coreConfigurationManager = coreConfigurationManager;
+        _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
+        _logger = logManager?.ApplicationLogger.ForContext<ServerDataManager>() ?? throw new ArgumentNullException(nameof(logManager));
     }
 
     /// <inheritdoc/>
@@ -186,4 +186,5 @@ public sealed class ServerDataManager : IServerDataManager
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
+    private readonly ILogger _logger;
 }
