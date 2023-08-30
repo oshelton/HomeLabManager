@@ -27,6 +27,10 @@ public sealed class NavigationService: ReactiveObject, INavigationService
         if (request is null)
             throw new ArgumentNullException(nameof(request));
 
+        var logger = _logger.ForCaller();
+        logger.Information("Exictuing NavigateTo for request of Type \"{Type}\" and is back navigation \"{IsBack}\"", request.GetType().Name, isBackNavigation);
+
+        logger.Verbose("Creating page for navigation request.");
         var destinationPage = request.CreatePage();
 
         if (destinationPage is null)
@@ -34,13 +38,20 @@ public sealed class NavigationService: ReactiveObject, INavigationService
 
         if (CurrentPage is not null)
         {
+            logger.Verbose("Attempting to navigate away from current page.");
             var result = await CurrentPage.TryNavigateAway().ConfigureAwait(false);
             if (!result)
+            {
+                logger.Information("Navigation aborted by current page of type \"{CurrentPageType}\".", CurrentPage.GetType().Name);
                 return false;
+            }
             else
+            {
                 CurrentPage.Dispose();
+            }
         }
 
+        logger.Verbose("Navigating to new page");
         await destinationPage.NavigateTo(request).ConfigureAwait(false);
 
         await DispatcherHelper.InvokeAsync(() =>
@@ -48,9 +59,15 @@ public sealed class NavigationService: ReactiveObject, INavigationService
             CurrentPage = destinationPage;
 
             if (!isBackNavigation)
+            {
+                logger.Verbose("Adding previous page's request to navigation stack");
                 _navigationStack.Add(request);
+            }
             else
+            {
+                logger.Verbose("Removing previous page's request from navigation stack");
                 _navigationStack.RemoveAt(_navigationStack.Count - 1);
+            }
             UpdateCanNavigateBack();
         }, DispatcherPriority.Input).ConfigureAwait(false);
 
@@ -63,7 +80,10 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     public Task NavigateBack()
     {
         if (!CanNavigateBack)
+        {
+            _logger.ForCaller().Warning("Cannot navigate back, request aborted");
             return Task.CompletedTask;
+        }
 
         return NavigateTo(_navigationStack[^2], true);
     }

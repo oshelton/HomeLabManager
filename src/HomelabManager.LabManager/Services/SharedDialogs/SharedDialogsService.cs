@@ -18,6 +18,9 @@ public class SharedDialogsService : ISharedDialogsService
     /// <inheritdoc/>
     public async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
+        var logger = _logger.ForCaller();
+
+        logger.Information("ShowSimpleYesNoDialog Opened with content \"{Content}\"", content);
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
         {
             Borderless = true,
@@ -29,12 +32,16 @@ public class SharedDialogsService : ISharedDialogsService
 
         var result = await dialog.ShowDialog(MainWindow.Instance).ConfigureAwait(true);
 
+        logger.Information("ShowSimpleYesNoDialog Closed with result \"{Result}\"", result?.GetResult);
         return result?.GetResult == "yes";
     }
 
     /// <inheritdoc/>
     public (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
     {
+        var logger = _logger.ForCaller();
+        logger.Information("Showing Simple saving dialog with label \"{Label}\"", textLabel);
+
         var layoutContainer = new StackPanel
         {
             MaxWidth = 350,

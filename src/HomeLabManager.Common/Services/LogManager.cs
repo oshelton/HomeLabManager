@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using Serilog;
+using Serilog.Events;
 
 namespace HomeLabManager.Common.Services;
 
@@ -19,7 +20,8 @@ public sealed class LogManager : ILogManager
             if (_applicationLogger is null)
             {
                 var loggerConfiguration = new LoggerConfiguration()
-                    .Enrich.FromLogContext();
+                    .Enrich.FromLogContext()
+                    .MinimumLevel.Verbose();
                 if (Debugger.IsAttached || _isInTestingMode)
                 {
                     loggerConfiguration = loggerConfiguration.WriteTo.Debug(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}.{MemberName}] {Message:lj}{NewLine}{Exception}");
@@ -27,9 +29,13 @@ public sealed class LogManager : ILogManager
                 else
                 {
                     var nowStamp = DateTime.Now.ToString("MM-dd-yyyy_HH-mm-ss", CultureInfo.InvariantCulture.DateTimeFormat);
-                    loggerConfiguration = loggerConfiguration.WriteTo.File($@".\logs\log_{nowStamp}.txt");
+                    loggerConfiguration = loggerConfiguration.WriteTo.File($@".\logs\log_{nowStamp}.txt",
+                        outputTemplate: "[{Timestamp:MM-dd-yyyy_HH:mm:ss} {Level:u3}] [{SourceContext:l}.{MemberName}] {Message:lj}{NewLine}{Exception}",
+                        restrictedToMinimumLevel: LogEventLevel.Information);
                 }
                 _applicationLogger = loggerConfiguration.CreateLogger();
+
+                _applicationLogger.ForContext<LogManager>().Information("Application Logger created.");
             }
 
             return _applicationLogger;

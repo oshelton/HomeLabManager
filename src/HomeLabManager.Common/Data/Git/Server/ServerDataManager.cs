@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Extensions;
 using HomeLabManager.Common.Services;
 using Serilog;
 
@@ -14,17 +15,25 @@ public sealed class ServerDataManager : IServerDataManager
     public ServerDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager)
     {
         _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
+
         _logger = logManager?.ApplicationLogger.ForContext<ServerDataManager>() ?? throw new ArgumentNullException(nameof(logManager));
+        _logger.ForCaller().Information("Created");
     }
 
     /// <inheritdoc/>
     public IReadOnlyList<ServerHostDto> GetServers()
     {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
-            return Array.Empty<ServerHostDto>();
-
-        static T readServerDto<T>(string basePath) where T : BaseServerDto, new()
+        var coreConfiguration = _coreConfigurationManager.GetCoreConfiguration();
+        if (!Directory.Exists(coreConfiguration.HomeLabRepoDataPath))
         {
+            _logger.ForCaller().Warning("Home lab repo path \"{RepoPath}\" does not exist", coreConfiguration.HomeLabRepoDataPath);
+            return Array.Empty<ServerHostDto>();
+        }
+
+        T readServerDto<T>(string basePath) where T : BaseServerDto, new()
+        {
+            _logger.ForCaller().Information("Reading server information from files in \"{BasePath}\"", basePath);
+
             var metadataPath = Path.Combine(basePath, ServerMetadataFileName);
             var dockerPath = Path.Combine(basePath, ServerDockerFileName);
             var configurationPath = Path.Combine(basePath, ServerConfigurationFileName);
@@ -42,6 +51,8 @@ public sealed class ServerDataManager : IServerDataManager
             var configuration = File.Exists(configurationPath)
                 ? deserializer.Deserialize<ServerConfigurationDto>(File.ReadAllText(configurationPath))
                 : null;
+
+            // TODO: Add VM support.
 
             var directoryName = Path.GetFileName(basePath);
             return new T
@@ -73,7 +84,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <inheritdoc/>
     public void AddUpdateServer(ServerHostDto server)
     {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
             throw new InvalidOperationException("Server cannot be added if the repo data path directory does not exist.");
 
         if (server is null)
@@ -82,13 +93,18 @@ public sealed class ServerDataManager : IServerDataManager
         if (server.Metadata is null)
             throw new InvalidDataException("Server must at least have metadata assigned to it.");
 
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
 
-        if (!Directory.Exists(serversDirectory))
-            Directory.CreateDirectory(serversDirectory);
+        _logger.ForCaller().Information("Updating server in directory \"{ServerDirectory}\" with unique Id \"{UniqueId}\"", serversDirectory, server.UniqueId);
 
-        WriteServerHostDto(server, serversDirectory);
+        if (!Directory.Exists(serversDirectory))
+        {
+            _logger.ForCaller().Information("Servers Directory does not exist, creating");
+            Directory.CreateDirectory(serversDirectory);
+        }
+
+        WriteServerHostDto(server, serversDirectory, _logger);
     }
 
     /// <inheritdoc/>
@@ -104,7 +120,9 @@ public sealed class ServerDataManager : IServerDataManager
             throw new InvalidDataException("This server doess not have an Id and should be added, not deleted.");
 
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
-        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName()!);
+        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName());
+
+        _logger.ForCaller().Information("Deleting server with Unique Id \"{UniqueId}\" and directory \"{serverDirectory}\"", server.UniqueId, serverDirectory);
 
         if (!Directory.Exists(serverDirectory))
             throw new InvalidOperationException("The directory for this server does not exist and cannot be deleted.");
@@ -137,7 +155,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <summary>
     /// Write the passed in server dto to the passed in directory.
     /// </summary>
-    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory)
+    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory, ILogger logger)
     {
         if (server is null)
             throw new ArgumentNullException(nameof(server));
@@ -171,6 +189,8 @@ public sealed class ServerDataManager : IServerDataManager
         if (!Directory.Exists(newServerDirectory))
             Directory.CreateDirectory(newServerDirectory);
 
+        logger.ForCaller().Information("Writing Server Host \"{UniqueId}\" to directory \"{VMDirectory}\"", server.UniqueId, newServerDirectory);
+
         writeDtoToFile(server, newServerDirectory);
 
         foreach (var vm in server.VMs)
@@ -180,6 +200,8 @@ public sealed class ServerDataManager : IServerDataManager
             var newVmDirectory = Path.Combine(newServerDirectory, vm.UniqueIdToDirectoryName()!);
             if (!Directory.Exists(newVmDirectory))
                 Directory.CreateDirectory(newVmDirectory);
+
+            logger.ForCaller().Information("Writing VM DTO \"{UniqueId}\" to directory \"{VMDirectory}\"", vm.UniqueId, newVmDirectory);
 
             writeDtoToFile(vm, newVmDirectory);
         }

@@ -42,6 +42,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (!File.Exists(CoreConfigPath))
         {
             var defaultConfiguration = defaultGenerator();
+            _logger.ForCaller().Information("Core configuration does not exist, creating a new one: {Initial}.", defaultConfiguration);
             if (!DisableConfigurationCaching)
                 _cachedCoreConfiguration = defaultConfiguration;
 
@@ -52,6 +53,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         }
         else
         {
+            _logger.ForCaller().Information("Getting core configuration from file.");
             var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
             var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
@@ -67,12 +69,18 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     public CoreConfigurationDto GetCoreConfiguration()
     {
         if (_cachedCoreConfiguration is not null && !DisableConfigurationCaching)
+        {
+            _logger.ForCaller().Verbose("Getting cached core configuration.");
             return _cachedCoreConfiguration;
+        }
 
+        _logger.ForCaller().Information("Getting core configuration from file.");
         var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
-        var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
-        _cachedCoreConfiguration = readConfiguration;
+        var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath));
+        if (!DisableConfigurationCaching)
+            _cachedCoreConfiguration = readConfiguration;
+
         return readConfiguration;
     }
 
@@ -81,6 +89,11 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// </summary>
     public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration)
     {
+        if (updatedConfiguration is null)
+            throw new ArgumentNullException(nameof(updatedConfiguration));
+
+        _logger.ForCaller().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
+
         if (!DisableConfigurationCaching)
             _cachedCoreConfiguration = updatedConfiguration;
 
@@ -106,6 +119,8 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// </summary>
     /// <remarks>Dtos should be considered transient and not held onto; including this one.</remarks>
     public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
+
+    private readonly ILogger _logger;
 
     private CoreConfigurationDto _cachedCoreConfiguration;
 }
