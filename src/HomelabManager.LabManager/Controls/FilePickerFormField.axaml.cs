@@ -3,6 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using HomeLabManager.Common.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace HomeLabManager.Manager.Controls;
 
@@ -49,7 +52,12 @@ public partial class FilePickerFormField : FormField
             o => o.DialogTitle,
             (o, v) => o.DialogTitle = v);
 
-    public FilePickerFormField() => InitializeComponent();
+    public FilePickerFormField()
+    {
+        InitializeComponent();
+
+        _logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<FilePickerFormField>();
+    }
 
     /// <summary>
     /// Gets or sets the path to the file the field is for.
@@ -104,6 +112,8 @@ public partial class FilePickerFormField : FormField
     /// </summary>
     private async void OnPickFileButtonClicked(object sender, RoutedEventArgs args)
     {
+        _logger.ForCaller().Verbose("File picker named \"{Name}\" with title \"{Title}\" opened with filters \"{Filters}\"", Name, DialogTitle ?? Label, FileTypeFilters?.SelectMany(x => x.Patterns).Distinct());
+
         var openedFile = await MainWindow.Instance!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             AllowMultiple = false,
@@ -112,8 +122,13 @@ public partial class FilePickerFormField : FormField
         }).ConfigureAwait(true);
 
         if (openedFile is not null && openedFile.Count == 1)
+        {
             FilePath = openedFile[0].Path.LocalPath;
+            _logger.ForCaller().Information("File \"{FilePath}\" chosen for field named \"{Name}\"", FilePath, Name);
+        }
     }
+
+    private readonly ILogger _logger;
 
     private string _filePath;
     private IReadOnlyList<FilePickerFileType> _fileTypeFilters;

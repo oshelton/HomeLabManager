@@ -3,6 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using HomeLabManager.Common.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace HomeLabManager.Manager.Controls;
 
@@ -40,7 +43,12 @@ public partial class FolderPickerFormField : FormField
             o => o.DialogTitle,
             (o, v) => o.DialogTitle = v);
 
-    public FolderPickerFormField() => InitializeComponent();
+    public FolderPickerFormField()
+    {
+        InitializeComponent();
+
+        _logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<FolderPickerFormField>();
+    }
 
     /// <summary>
     /// Gets or sets the path to the file the field is for.
@@ -86,6 +94,8 @@ public partial class FolderPickerFormField : FormField
     /// </summary>
     private async void OnPickFolderButtonClicked(object sender, RoutedEventArgs args)
     {
+        _logger.ForCaller().Verbose("Folder picker named \"{Name}\" with title \"{Title}\" opened", Name, DialogTitle ?? Label);
+
         var chosenFolder = await MainWindow.Instance!.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
         {
             AllowMultiple = false,
@@ -93,8 +103,13 @@ public partial class FolderPickerFormField : FormField
         }).ConfigureAwait(true);
 
         if (chosenFolder is not null && chosenFolder.Count == 1)
+        {
             FolderPath = chosenFolder[0].Path.LocalPath;
+            _logger.ForCaller().Information("Folder \"{FolderPath}\" chosen for field named \"{Name}\"", FolderPath, Name);
+        }
     }
+
+    private readonly ILogger _logger;
 
     private string _folderPath;
     private object _openFolderPickerButtonToolTip;
