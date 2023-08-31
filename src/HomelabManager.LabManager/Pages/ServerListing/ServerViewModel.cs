@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Reactive;
+﻿using System.Collections.Specialized;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia.Collections;
 using HomeLabManager.Common.Data.Git.Server;
 using ReactiveUI;
 
