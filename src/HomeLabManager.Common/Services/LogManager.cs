@@ -24,7 +24,7 @@ public sealed class LogManager : ILogManager
                     .MinimumLevel.Verbose();
                 if (Debugger.IsAttached || _isInTestingMode)
                 {
-                    loggerConfiguration = loggerConfiguration.WriteTo.Debug(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}.{MemberName}] {Message:lj}{NewLine}{Exception}");
+                    loggerConfiguration = loggerConfiguration.WriteTo.Debug(outputTemplate: "APP_LOG: [{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}.{MemberName}] {Message:lj}{NewLine}{Exception}");
                 }
                 else
                 {
