@@ -1,25 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 
 namespace HomeLabManager.Manager.Utils;
 
+/// <summary>
+/// Helper class for some Dispatcher operations.
+/// </summary>
 public static class DispatcherHelper
 {
-    public static void PostToUIThread(Action toPost, DispatcherPriority priority)
+    /// <summary>
+    /// Invoke the posted action on the UI Thread if exection is not currently on the UI thread.
+    /// </summary>
+    public static void PostToUIThreadIfNecessary(Action toPost, DispatcherPriority priority)
     {
         if (toPost is null)
             throw new ArgumentNullException(nameof(toPost));
 
-        if (!Program.IsInTestingMode)
+        if (!Program.IsInTestingMode && !Dispatcher.UIThread.CheckAccess())
             Dispatcher.UIThread.Post(toPost, priority);
         else
             toPost();
     }
 
+    /// <summary>
+    /// Invoke an operation asynchronously on the UI thread.
+    /// </summary>
     public static Task InvokeAsync(Action toInvoke, DispatcherPriority priority)
     {
         if (toInvoke is null)

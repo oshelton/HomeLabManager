@@ -90,7 +90,7 @@ public sealed class HomeViewModel : PageBaseViewModel
                 .ToArray();
         }).ConfigureAwait(false);
 
-        DispatcherHelper.PostToUIThread(() =>
+        DispatcherHelper.PostToUIThreadIfNecessary(() =>
         {
             Servers = servers;
             CurrentDisplayMode = (servers?.Count ?? 0) != 0 ? HomeDisplayMode.HasServers : HomeDisplayMode.NoServers;
