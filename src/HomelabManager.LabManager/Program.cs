@@ -127,9 +127,9 @@ internal class Program
         Debug.Assert(host.Services.GetService<INavigationService>() is not null);
         Debug.Assert(host.Services.GetService<ILogManager>() is not null);
 
-        s_logger = host.Services.GetService<ILogManager>().ApplicationLogger.ForContext<Program>();
+        s_logger = host.Services.GetService<ILogManager>().GetApplicationLoggerForContext<Program>();
 
-        s_logger.ForCaller().Information("IHost built; services now available.");
+        s_logger.Information("IHost built; services now available.");
 
         return host;
     }

@@ -47,7 +47,7 @@ public partial class FolderPickerFormField : FormField
     {
         InitializeComponent();
 
-        _logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<FolderPickerFormField>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
     }
 
     /// <summary>
@@ -94,7 +94,8 @@ public partial class FolderPickerFormField : FormField
     /// </summary>
     private async void OnPickFolderButtonClicked(object sender, RoutedEventArgs args)
     {
-        _logger.ForCaller().Verbose("Folder picker named \"{Name}\" with title \"{Title}\" opened", Name, DialogTitle ?? Label);
+        var logger = _logManager.GetApplicationLoggerForContext<FolderPickerFormField>();
+        logger.Verbose("Folder picker named \"{Name}\" with title \"{Title}\" opened", Name, DialogTitle ?? Label);
 
         var chosenFolder = await MainWindow.Instance!.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
         {
@@ -105,11 +106,11 @@ public partial class FolderPickerFormField : FormField
         if (chosenFolder is not null && chosenFolder.Count == 1)
         {
             FolderPath = chosenFolder[0].Path.LocalPath;
-            _logger.ForCaller().Information("Folder \"{FolderPath}\" chosen for field named \"{Name}\"", FolderPath, Name);
+            logger.Information("Folder \"{FolderPath}\" chosen for field named \"{Name}\"", FolderPath, Name);
         }
     }
 
-    private readonly ILogger _logger;
+    private readonly ILogManager _logManager;
 
     private string _folderPath;
     private object _openFolderPickerButtonToolTip;

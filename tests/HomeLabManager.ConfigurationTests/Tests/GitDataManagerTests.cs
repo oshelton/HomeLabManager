@@ -10,7 +10,6 @@ using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Common.Services;
 using LibGit2Sharp;
-using Serilog;
 
 namespace HomeLabManager.DataTests.Tests;
 
@@ -36,12 +35,12 @@ public sealed class GitDataManagerTests
         {
             var remote = repo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
             var logManager = new LogManager(true);
-            Commands.Fetch(repo, remote.Name, Array.Empty<string>(), CreateFetchOptions(config.GithubUserName, config.GithubPat, logManager.ApplicationLogger), "log");
+            Commands.Fetch(repo, remote.Name, Array.Empty<string>(), CreateFetchOptions(config.GithubUserName, config.GithubPat, logManager), "log");
 
             var branches = repo.Branches;
             foreach (var branch in branches)
             {
-                repo.Network.Push(remote, $"+:{branch.UpstreamBranchCanonicalName}", CreatePushOptions(config.GithubUserName, config.GithubPat, logManager.ApplicationLogger));
+                repo.Network.Push(remote, $"+:{branch.UpstreamBranchCanonicalName}", CreatePushOptions(config.GithubUserName, config.GithubPat, logManager));
             }
         }
 
@@ -61,7 +60,7 @@ public sealed class GitDataManagerTests
 
         using var repo = new Repository(repoPath);
         var logManager = new LogManager(true);
-        repo.Commit("Initial empty commit", GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager.ApplicationLogger), GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager.ApplicationLogger), new CommitOptions { AllowEmptyCommit = true });
+        repo.Commit("Initial empty commit", GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager), GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager), new CommitOptions { AllowEmptyCommit = true });
 
         var testRemote = repo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
         _testBranchName = $"test-branch_{DateTime.Now.ToString("MM-dd-yyyy_hh-mm-ss", CultureInfo.CurrentCulture)}";
@@ -71,7 +70,7 @@ public sealed class GitDataManagerTests
             b => b.Remote = testRemote.Name,
             b => b.UpstreamBranch = testBranch.CanonicalName
         );
-        repo.Network.Push(testBranch, CreatePushOptions(config.GithubUserName, config.GithubPat, logManager.ApplicationLogger));
+        repo.Network.Push(testBranch, CreatePushOptions(config.GithubUserName, config.GithubPat, logManager));
 
         Commands.Checkout(repo, testBranch);
     }
@@ -163,7 +162,7 @@ public sealed class GitDataManagerTests
         {
             var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
             var logManager = new LogManager(true);
-            Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager.ApplicationLogger), "log");
+            Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager), "log");
 
             var trackedBranch = tempRepo.Branches.First(branch => branch.FriendlyName.Contains(_testBranchName, StringComparison.InvariantCultureIgnoreCase));
             var localBranch = tempRepo.CreateBranch(_testBranchName, trackedBranch.Tip);
@@ -173,9 +172,9 @@ public sealed class GitDataManagerTests
 
             File.WriteAllText(tempFilePath, "Test Content");
             Commands.Stage(tempRepo, "*");
-            tempRepo.Commit("Test file commit", GitDataManager.CreateGitSignature(_coreConfigurationManager.GetCoreConfiguration().GitConfigFilePath, logManager.ApplicationLogger), GitDataManager.CreateGitSignature(_coreConfigurationManager.GetCoreConfiguration().GitConfigFilePath, logManager.ApplicationLogger));
+            tempRepo.Commit("Test file commit", GitDataManager.CreateGitSignature(_coreConfigurationManager.GetCoreConfiguration().GitConfigFilePath, logManager), GitDataManager.CreateGitSignature(_coreConfigurationManager.GetCoreConfiguration().GitConfigFilePath, logManager));
 
-            tempRepo.Network.Push(localBranch, CreatePushOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager.ApplicationLogger));
+            tempRepo.Network.Push(localBranch, CreatePushOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager));
         }
         Utils.DeleteReadOnlyDirectory(tempRepoDirectory);
 
@@ -209,7 +208,7 @@ public sealed class GitDataManagerTests
         {
             var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
             var logManager = new LogManager(true);
-            Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager.ApplicationLogger), "log");
+            Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager), "log");
 
             var trackedBranch = tempRepo.Branches.First(branch => branch.FriendlyName.Contains(_testBranchName, StringComparison.InvariantCultureIgnoreCase));
             var localBranch = tempRepo.CreateBranch(_testBranchName, trackedBranch.Tip);
@@ -217,7 +216,7 @@ public sealed class GitDataManagerTests
 
             Commands.Checkout(tempRepo, localBranch);
 
-            Commands.Pull(tempRepo, GitDataManager.CreateGitSignature(coreConfig.GitConfigFilePath, logManager.ApplicationLogger), CreatePullOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager.ApplicationLogger));
+            Commands.Pull(tempRepo, GitDataManager.CreateGitSignature(coreConfig.GitConfigFilePath, logManager), CreatePullOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager));
 
             Assert.That(tempRepo.Commits.Any(x => x.MessageShort == commitMessage), Is.True);
             Assert.That(File.Exists(Path.Combine(tempRepoDirectory, "testFile.txt")), Is.True);
@@ -236,27 +235,27 @@ public sealed class GitDataManagerTests
         Assert.That(result, Is.False);
     }
 
-    private static PushOptions CreatePushOptions(string githubUsername, string githubPat, ILogger logger)
+    private static PushOptions CreatePushOptions(string githubUsername, string githubPat, ILogManager logManager)
     {
         return new PushOptions
         {
-            CredentialsProvider = GitDataManager.CreateGithubCredentialsHandler(githubUsername, githubPat, logger)
+            CredentialsProvider = GitDataManager.CreateGithubCredentialsHandler(githubUsername, githubPat, logManager)
         };
     }
 
-    private static FetchOptions CreateFetchOptions(string githubUsername, string githubPat, ILogger logger)
+    private static FetchOptions CreateFetchOptions(string githubUsername, string githubPat, ILogManager logManager)
     {
         return new FetchOptions
         {
-            CredentialsProvider = GitDataManager.CreateGithubCredentialsHandler(githubUsername, githubPat, logger)
+            CredentialsProvider = GitDataManager.CreateGithubCredentialsHandler(githubUsername, githubPat, logManager)
         };
     }
 
-    private static PullOptions CreatePullOptions(string githubUsername, string githubPat, ILogger logger)
+    private static PullOptions CreatePullOptions(string githubUsername, string githubPat, ILogManager logManager)
     {
         return new PullOptions
         {
-            FetchOptions = CreateFetchOptions(githubUsername, githubPat, logger)
+            FetchOptions = CreateFetchOptions(githubUsername, githubPat, logManager)
         };
     }
 

@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Extensions;
 using HomeLabManager.Common.Services;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
@@ -22,9 +21,9 @@ namespace HomeLabManager.Common.Data.Git
         public GitDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager) 
         {
             _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
+            _logManager = logManager ?? throw new ArgumentNullException(nameof(logManager));
 
-            _logger = logManager?.ApplicationLogger.ForContext<GitDataManager>() ?? throw new ArgumentNullException(nameof(logManager));
-            _logger.ForCaller().Information("Created");
+            _logManager.GetApplicationLoggerForContext<GitDataManager>().Information("Created");
         }
 
         /// <summary>
@@ -33,15 +32,16 @@ namespace HomeLabManager.Common.Data.Git
         /// <returns>True if the Directory exists and is an actual Git Repo.</returns>
         public bool IsDataPathARepo()
         {
+            var logger = _logManager.GetApplicationLoggerForContext<GitDataManager>();
             var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
             if (string.IsNullOrWhiteSpace(repoPath) || !Directory.Exists(repoPath))
             {
-                _logger.ForCaller().Warning("Non-existent path available to IsDataPathARepo");
+                logger.Warning("Non-existent path available to IsDataPathARepo");
                 return false;
             }
 
             var isValid = Repository.IsValid(repoPath);
-            _logger.ForCaller().Information("Getting repo valid status of \"{RepoPath}\": {IsValid}", repoPath, isValid);
+            logger.Information("Getting repo valid status of \"{RepoPath}\": {IsValid}", repoPath, isValid);
 
             return isValid;
         }
@@ -56,7 +56,7 @@ namespace HomeLabManager.Common.Data.Git
 
             using var repo = new Repository(repoPath);
             var isDirty = repo.RetrieveStatus().IsDirty;
-            _logger.ForCaller().Information("Getting dirty status of \"{RepoPath}\": {IsDirty}", repoPath, isDirty);
+            _logManager.GetApplicationLoggerForContext<GitDataManager>().Information("Getting dirty status of \"{RepoPath}\": {IsDirty}", repoPath, isDirty);
 
             return isDirty;
         }
@@ -69,7 +69,7 @@ namespace HomeLabManager.Common.Data.Git
             var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
 
             using var repo = new Repository(repoPath);
-            _logger.ForCaller().Information("Getting status status of \"{RepoPath}\"", repoPath);
+            _logManager.GetApplicationLoggerForContext<GitDataManager>().Information("Getting status status of \"{RepoPath}\"", repoPath);
 
             return repo.RetrieveStatus();
         }
@@ -82,10 +82,11 @@ namespace HomeLabManager.Common.Data.Git
             var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
             var repoPath = coreConfig.HomeLabRepoDataPath!;
 
-            _logger.ForCaller().Information("Pulling latest changes for \"{RepoPath}\"", repoPath);
+            _logManager.GetApplicationLoggerForContext<GitDataManager>().Information("Pulling latest changes for \"{RepoPath}\"", repoPath);
 
+            using var _ = _logManager.StartTimedOperation<GitDataManager>("Pulling Latest Git Changes");
             using var repo = new Repository(repoPath);
-            Commands.Pull(repo, CreateGitSignature(coreConfig.GitConfigFilePath, _logger), new PullOptions
+            Commands.Pull(repo, CreateGitSignature(coreConfig.GitConfigFilePath, _logManager), new PullOptions
             {
                 FetchOptions = new FetchOptions
                 {
@@ -116,26 +117,29 @@ namespace HomeLabManager.Common.Data.Git
             var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
             var repoPath = coreConfig.HomeLabRepoDataPath;
 
+            var logger = _logManager.GetApplicationLoggerForContext<GitDataManager>();
+
+            using var _ = _logManager.StartTimedOperation<GitDataManager>("Committing and Pushing Changes");
             using var repo = new Repository(repoPath);
             if (repo.RetrieveStatus().IsDirty)
             {
-                _logger.ForCaller().Information("Committing and pushing changes for \"{RepoPath}\"", repoPath);
+                logger.Information("Committing and pushing changes for \"{RepoPath}\"", repoPath);
 
                 Commands.Stage(repo, "*");
-                var signature = CreateGitSignature(coreConfig.GitConfigFilePath, _logger);
+                var signature = CreateGitSignature(coreConfig.GitConfigFilePath, _logManager);
                 repo.Commit(commitMessage, signature, signature);
 
                 var currentBranch = repo.Head;
                 repo.Network.Push(currentBranch, new PushOptions
                 {
-                    CredentialsProvider = CreateGithubCredentialsHandler(coreConfig.GithubUserName, coreConfig.GithubPat, _logger)
+                    CredentialsProvider = CreateGithubCredentialsHandler(coreConfig.GithubUserName, coreConfig.GithubPat, _logManager)
                 });
 
                 return true;
             }
             else
             {
-                _logger.ForCaller().Information("No changes to push for \"{RepoPath}\"", repoPath);
+                logger.Information("No changes to push for \"{RepoPath}\"", repoPath);
                 return false;
             }
         }
@@ -143,35 +147,38 @@ namespace HomeLabManager.Common.Data.Git
         /// <summary>
         /// Create a Git signature based on the username and email in the git config file refferenced by the core config.
         /// </summary>
-        internal static Signature CreateGitSignature(string gitConfigFilePath, ILogger logger)
+        internal static Signature CreateGitSignature(string gitConfigFilePath, ILogManager logManager)
         {
             if (!File.Exists(gitConfigFilePath))
                 throw new InvalidDataException($"Cannot commit changes without a valid Git configuration file; Path: {gitConfigFilePath}.");
 
-            logger.ForCaller().Information("Creating git signature from information in file \"{GitConfigPath}\"", gitConfigFilePath);
+            logManager.GetApplicationLoggerForContext<GitDataManager>().Information("Creating git signature from information in file \"{GitConfigPath}\"", gitConfigFilePath);
 
-            var gitInfo = File.ReadAllText(gitConfigFilePath)
-                .Split("\\n", StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Replace("\\t", "", StringComparison.InvariantCultureIgnoreCase).Trim())
-                .Where(line => line.StartsWith("name", true, CultureInfo.InvariantCulture) || line.StartsWith("email", true, CultureInfo.InvariantCulture))
-                .Select(line => line.Split('=', StringSplitOptions.TrimEntries))
-                .ToDictionary(lineParts => lineParts[0], lineParts => lineParts[1]);
+            using (logManager.StartTimedOperation<GitDataManager>("Constructing Signature from Git Config File"))
+            {
+                var gitInfo = File.ReadAllText(gitConfigFilePath)
+                    .Split("\\n", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Replace("\\t", "", StringComparison.InvariantCultureIgnoreCase).Trim())
+                    .Where(line => line.StartsWith("name", true, CultureInfo.InvariantCulture) || line.StartsWith("email", true, CultureInfo.InvariantCulture))
+                    .Select(line => line.Split('=', StringSplitOptions.TrimEntries))
+                    .ToDictionary(lineParts => lineParts[0], lineParts => lineParts[1]);
 
-            if (gitInfo.Count != 2)
-                throw new InvalidDataException($"Contents of Git configuration file '{gitConfigFilePath}' does not contain the username and email information.");
+                if (gitInfo.Count != 2)
+                    throw new InvalidDataException($"Contents of Git configuration file '{gitConfigFilePath}' does not contain the username and email information.");
 
-            var userName = gitInfo["name"];
-            var email = gitInfo["email"];
+                var userName = gitInfo["name"];
+                var email = gitInfo["email"];
 
-            return new Signature(userName, email, DateTime.Now);
+                return new Signature(userName, email, DateTime.Now);
+            }
         }
 
         /// <summary>
         /// Create a Github Credentials Provider.
         /// </summary>
-        internal static CredentialsHandler CreateGithubCredentialsHandler(string githubUserName, string githubPat, ILogger logger)
+        internal static CredentialsHandler CreateGithubCredentialsHandler(string githubUserName, string githubPat, ILogManager logManager)
         {
-            logger.ForCaller().Information("Creating github credentials handler for \"{GithubUserName}\"", githubUserName);
+            logManager.GetApplicationLoggerForContext<GitDataManager>().Information("Creating github credentials handler for \"{GithubUserName}\"", githubUserName);
 
             return (string url, string usernameFromUrl, SupportedCredentialTypes types) =>
             {
@@ -184,6 +191,6 @@ namespace HomeLabManager.Common.Data.Git
         }
 
         private readonly ICoreConfigurationManager _coreConfigurationManager;
-        private readonly ILogger _logger;
+        private readonly ILogManager _logManager;
     }
 }

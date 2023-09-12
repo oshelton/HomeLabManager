@@ -56,7 +56,7 @@ public partial class FilePickerFormField : FormField
     {
         InitializeComponent();
 
-        _logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<FilePickerFormField>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
     }
 
     /// <summary>
@@ -112,7 +112,8 @@ public partial class FilePickerFormField : FormField
     /// </summary>
     private async void OnPickFileButtonClicked(object sender, RoutedEventArgs args)
     {
-        _logger.ForCaller().Verbose("File picker named \"{Name}\" with title \"{Title}\" opened with filters \"{Filters}\"", Name, DialogTitle ?? Label, FileTypeFilters?.SelectMany(x => x.Patterns).Distinct());
+        var logger = _logManager.GetApplicationLoggerForContext<FilePickerFormField>();
+        logger.Verbose("File picker named \"{Name}\" with title \"{Title}\" opened with filters \"{Filters}\"", Name, DialogTitle ?? Label, FileTypeFilters?.SelectMany(x => x.Patterns).Distinct());
 
         var openedFile = await MainWindow.Instance!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
@@ -124,11 +125,11 @@ public partial class FilePickerFormField : FormField
         if (openedFile is not null && openedFile.Count == 1)
         {
             FilePath = openedFile[0].Path.LocalPath;
-            _logger.ForCaller().Information("File \"{FilePath}\" chosen for field named \"{Name}\"", FilePath, Name);
+            logger.Information("File \"{FilePath}\" chosen for field named \"{Name}\"", FilePath, Name);
         }
     }
 
-    private readonly ILogger _logger;
+    private readonly ILogManager _logManager;
 
     private string _filePath;
     private IReadOnlyList<FilePickerFileType> _fileTypeFilters;

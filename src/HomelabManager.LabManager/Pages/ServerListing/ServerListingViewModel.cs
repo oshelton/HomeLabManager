@@ -2,15 +2,14 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using DynamicData;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 
 namespace HomeLabManager.Manager.Pages.ServerListing;
@@ -25,7 +24,7 @@ public enum ServerListingDisplayMode
 /// <summary>
 /// Server Listing Page View Model.
 /// </summary>
-public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
+public class ServerListingViewModel : PageBaseViewModel
 {
     public ServerListingViewModel() : base()
     {
@@ -33,6 +32,7 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         if (Avalonia.Controls.Design.IsDesignMode)
         {
@@ -88,7 +88,7 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
         if (request is not ServerListingNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
-        var logger = ApplicationClassLogger.ForCaller();
+        var logger = _logManager.GetApplicationLoggerForContext<ServerListingViewModel>();
 
         // Load Servers.
         CurrentDisplayMode = ServerListingDisplayMode.IsLoading;
@@ -191,7 +191,7 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
         previous.DisplayIndex++;
         server.DisplayIndex--;
 
-        ApplicationClassLogger.ForCaller().Information("Moving server \"{MoveUp}\" up and server \"{MoveDown}\" down", server.UniqueId, previous.UniqueId);
+        _logManager.GetApplicationLoggerForContext<ServerListingViewModel>().Information("Moving server \"{MoveUp}\" up and server \"{MoveDown}\" down", server.UniqueId, previous.UniqueId);
         return Task.Run(() =>
         {
             _serverDataManager.AddUpdateServer(previous.ToDto());
@@ -213,7 +213,7 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
         next.DisplayIndex--;
         server.DisplayIndex++;
 
-        ApplicationClassLogger.ForCaller().Information("Moving server \"{MoveDown}\" down and server \"{MoveUp}\" up", server.UniqueId, next.UniqueId);
+        _logManager.GetApplicationLoggerForContext<ServerListingViewModel>().Information("Moving server \"{MoveDown}\" down and server \"{MoveUp}\" up", server.UniqueId, next.UniqueId);
         return Task.Run(() =>
         {
             _serverDataManager.AddUpdateServer(server.ToDto());
@@ -229,7 +229,7 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
-        var logger = ApplicationClassLogger.ForCaller();
+        var logger = _logManager.GetApplicationLoggerForContext<ServerListingViewModel>();
 
         var continueDeleting = await _sharedDialogsService.ShowSimpleYesNoDialog("Deleting cannot be readily undone outside of Git.\nAre you sure?").ConfigureAwait(true);
 
@@ -264,6 +264,7 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogsService;
+    private readonly ILogManager _logManager;
 
     private readonly CompositeDisposable _disposables;
 

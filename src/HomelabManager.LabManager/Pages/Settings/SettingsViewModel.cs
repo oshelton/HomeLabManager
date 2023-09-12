@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Linq;
-using Avalonia.Platform.Storage;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
@@ -15,13 +15,14 @@ namespace HomeLabManager.Manager.Pages.Settings;
 /// <summary>
 /// Settings Page View Model.
 /// </summary>
-public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewModel>
+public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 {
     public SettingsViewModel() : base()
     {
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         var builder = new ValidationBuilder<SettingsViewModel>();
 
@@ -69,7 +70,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         HasChanges = false;
 
-        ApplicationClassLogger.ForCaller().Information("Loading configuration settings");
+        _logManager.GetApplicationLoggerForContext<SettingsViewModel>().Information("Loading configuration settings");
         var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
 
         HomeLabRepoDataPath = coreConfig.HomeLabRepoDataPath;
@@ -89,14 +90,15 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
     public override Task<bool> TryNavigateAway()
     {
+        var logger = _logManager.GetApplicationLoggerForContext<SettingsViewModel>();
         if (!HasChanges)
         {
-            ApplicationClassLogger.ForCaller().Information("Leaving page without having made any changes");
+            logger.Information("Leaving page without having made any changes");
             return Task.FromResult(true);
         }
         else
         {
-            ApplicationClassLogger.ForCaller().Information("Attempting to leave page with unsaved changes");
+            logger.Information("Attempting to leave page with unsaved changes");
             return _sharedDialogService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
         }
     }
@@ -107,7 +109,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
-        ApplicationClassLogger.ForCaller().Information("Saving updated core configuration settings");
+        _logManager.GetApplicationLoggerForContext<SettingsViewModel>().Information("Saving updated core configuration settings");
 
         await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
         {
@@ -172,6 +174,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogService;
+    private readonly ILogManager _logManager;
     
     private bool _hasChanges;
     private bool _isSaving;

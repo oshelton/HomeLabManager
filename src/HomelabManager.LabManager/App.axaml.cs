@@ -12,13 +12,13 @@ namespace HomeLabManager.Manager;
 /// </summary>
 public partial class App : Application
 {
-    public App() => _logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<App>();
+    public App() => _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
 
-        _logger.ForCaller().Information("Loaded application XAML");
+        _logManager.GetApplicationLoggerForContext<App>().Information("Loaded application XAML");
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -31,5 +31,5 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private readonly ILogger _logger;
+    private readonly ILogManager _logManager;
 }

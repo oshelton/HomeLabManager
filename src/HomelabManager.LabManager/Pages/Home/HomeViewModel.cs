@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
@@ -21,13 +22,14 @@ public enum HomeDisplayMode
 /// <summary>
 /// Home Page View Model.
 /// </summary>
-public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
+public sealed class HomeViewModel : PageBaseViewModel
 {
     public HomeViewModel(): base()
     {
-        _serverDataManager = Program.ServiceProvider!.Services.GetService<IServerDataManager>()!;
-        _coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
-        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
+        _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
+        _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
+        _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         if (Avalonia.Controls.Design.IsDesignMode)
         {
@@ -64,7 +66,7 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
         if (request is not HomeNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
-        var logger = ApplicationClassLogger.ForCaller();
+        var logger = _logManager.GetApplicationLoggerForContext<HomeViewModel>();
 
         // Confirm there is a repo data path and that it exists.
         var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
@@ -131,6 +133,7 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
     private readonly IServerDataManager _serverDataManager;
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
+    private readonly ILogManager _logManager;
 
     private HomeDisplayMode _currentDisplayMode;
     private IReadOnlyList<ServerViewModel> _servers;

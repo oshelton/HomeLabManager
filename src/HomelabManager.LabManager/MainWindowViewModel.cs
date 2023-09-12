@@ -29,7 +29,7 @@ public sealed class MainWindowViewModel: ReactiveObject
         UpdateConfigProperties(coreConfigurationManager.GetCoreConfiguration());
 
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
-        _logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<MainWindowViewModel>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public sealed class MainWindowViewModel: ReactiveObject
 
     public void OpenRepoDataPath()
     {
-        _logger.ForCaller().Information("Opening repo in file explorer");
+        _logManager.GetApplicationLoggerForContext<MainWindowViewModel>().Information("Opening repo in file explorer");
 
         ProcessStartInfo startInfo = new ProcessStartInfo
         {
@@ -82,7 +82,7 @@ public sealed class MainWindowViewModel: ReactiveObject
     }
 
     private readonly INavigationService _navigationService;
-    private readonly ILogger _logger;
+    private readonly ILogManager _logManager;
 
     private bool _hasRepoDataPath;
     private string _repoDataPath;

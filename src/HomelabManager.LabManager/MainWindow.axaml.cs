@@ -11,12 +11,12 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        var logger = Program.ServiceProvider.Services.GetService<ILogManager>().ApplicationLogger.ForContext<MainWindow>();
+        var logger = Program.ServiceProvider.Services.GetService<ILogManager>().GetApplicationLoggerForContext<MainWindow>();
 
         InitializeComponent();
 
         Instance = this;
 
-        logger.ForCaller().Information("Initialized main window");
+        logger.Information("Initialized main window");
     }
 }

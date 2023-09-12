@@ -1,7 +1,5 @@
 ﻿using System.Reactive.Subjects;
-using HomeLabManager.Common.Extensions;
 using HomeLabManager.Common.Services;
-using Serilog;
 
 namespace HomeLabManager.Common.Data.CoreConfiguration;
 
@@ -25,8 +23,8 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         CoreConfigPath = Path.Combine(coreConfigDirectory, "CoreConfig.yaml");
         CoreConfigurationUpdated = new Subject<CoreConfigurationDto>();
 
-        _logger = logManager?.ApplicationLogger.ForContext<CoreConfigurationManager>() ?? throw new ArgumentNullException(nameof(logManager));
-        _logger.ForCaller().Information("Created with config directory \"{ConfigDir}\"", coreConfigDirectory);
+        _logManager = logManager ?? throw new ArgumentNullException(nameof(logManager));
+        _logManager.GetApplicationLoggerForContext<CoreConfigurationManager>().Information("Created with config directory \"{ConfigDir}\"", coreConfigDirectory);
     }
 
     /// <summary>
@@ -39,26 +37,35 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (defaultGenerator is null)
             throw new ArgumentNullException(nameof(defaultGenerator));
 
+        var logger = _logManager.GetApplicationLoggerForContext<CoreConfigurationManager>();
+
         if (!File.Exists(CoreConfigPath))
         {
             var defaultConfiguration = defaultGenerator();
-            _logger.ForCaller().Information("Core configuration does not exist, creating a new one: {Initial}.", defaultConfiguration);
+            logger.Information("Core configuration does not exist, creating a new one: {Initial}.", defaultConfiguration);
             if (!DisableConfigurationCaching)
                 _cachedCoreConfiguration = defaultConfiguration;
 
-            var serializer = DataUtils.CreateBasicYamlSerializer();
+            using (_logManager.StartTimedOperation<CoreConfigurationManager>("Core Configuration Default Serialization"))
+            {
+                var serializer = DataUtils.CreateBasicYamlSerializer();
 
-            File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
+                File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
+            }
             return defaultConfiguration;
         }
         else
         {
-            _logger.ForCaller().Information("Getting core configuration from file.");
-            var deserializer = DataUtils.CreateBasicYamlDeserializer();
+            logger.Information("Getting core configuration from file.");
 
-            var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
-            _cachedCoreConfiguration = readConfiguration;
-            return readConfiguration;
+            using (_logManager.StartTimedOperation<CoreConfigurationManager>("Core Configuration Reading and Deserialization"))
+            {
+                var deserializer = DataUtils.CreateBasicYamlDeserializer();
+
+                var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
+                _cachedCoreConfiguration = readConfiguration;
+                return readConfiguration;
+            }
         }
     }
 
@@ -68,20 +75,25 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// <remarks>This should be called in most places that need access to the core configuration.</remarks>
     public CoreConfigurationDto GetCoreConfiguration()
     {
+        var logger = _logManager.GetApplicationLoggerForContext<CoreConfigurationManager>();
+
         if (_cachedCoreConfiguration is not null && !DisableConfigurationCaching)
         {
-            _logger.ForCaller().Verbose("Getting cached core configuration.");
+            logger.Verbose("Getting cached core configuration.");
             return _cachedCoreConfiguration;
         }
 
-        _logger.ForCaller().Information("Getting core configuration from file.");
-        var deserializer = DataUtils.CreateBasicYamlDeserializer();
+        logger.Information("Getting core configuration from file.");
+        using (_logManager.StartTimedOperation<CoreConfigurationManager>("Core Configuration Reading and Deserialization"))
+        {
+            var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
-        var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath));
-        if (!DisableConfigurationCaching)
-            _cachedCoreConfiguration = readConfiguration;
+            var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath));
+            if (!DisableConfigurationCaching)
+                _cachedCoreConfiguration = readConfiguration;
 
-        return readConfiguration;
+            return readConfiguration;
+        }
     }
 
     /// <summary>
@@ -92,13 +104,16 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (updatedConfiguration is null)
             throw new ArgumentNullException(nameof(updatedConfiguration));
 
-        _logger.ForCaller().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
+        _logManager.GetApplicationLoggerForContext<CoreConfigurationManager>().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
 
-        if (!DisableConfigurationCaching)
-            _cachedCoreConfiguration = updatedConfiguration;
+        using (_logManager.StartTimedOperation<CoreConfigurationManager>("Core Configuration Serialization and Writing"))
+        {
+            if (!DisableConfigurationCaching)
+                _cachedCoreConfiguration = updatedConfiguration;
 
-        var serializer = DataUtils.CreateBasicYamlSerializer();
-        File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
+            var serializer = DataUtils.CreateBasicYamlSerializer();
+            File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
+        }
 
         CoreConfigurationUpdated.OnNext(updatedConfiguration);
     }
@@ -120,7 +135,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
     /// <remarks>Dtos should be considered transient and not held onto; including this one.</remarks>
     public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
 
-    private readonly ILogger _logger;
+    private readonly ILogManager _logManager;
 
     private CoreConfigurationDto _cachedCoreConfiguration;
 }
