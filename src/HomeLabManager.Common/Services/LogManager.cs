@@ -52,16 +52,16 @@ public sealed class LogManager : ILogManager
                     .Enrich.FromLogContext();
             if (Debugger.IsAttached || _isInTestingMode)
             {
-                loggerConfiguration = loggerConfiguration.WriteTo.Debug(outputTemplate: "PERFORMANCE_LOG: [{Timestamp:HH:mm:ss} PERF] [{SourceContext:l}.{MemberName}] {Message:lj}");
+                loggerConfiguration = loggerConfiguration.WriteTo.Debug(outputTemplate: "PERFORMANCE_LOG: [{Timestamp:HH:mm:ss} PERF] [{SourceContext:l}.{MemberName}] {Message:lj}{NewLine}");
             }
             else
             {
                 loggerConfiguration = loggerConfiguration
                     .WriteTo.File(_applicationLogFileName,
-                        outputTemplate: "[{Timestamp:MM-dd-yyyy_HH:mm:ss} PERF] [{SourceContext:l}.{MemberName}] {Message:lj}",
+                        outputTemplate: "[{Timestamp:MM-dd-yyyy_HH:mm:ss} PERF] [{SourceContext:l}.{MemberName}] {Message:lj}{NewLine}",
                         shared: true)
                     .WriteTo.File(@".\logs\performance.csv",
-                        outputTemplate: "{Timestamp:MM-dd-yyyy_HH:mm:ss}, {SourceContext:l}.{MemberName}, {Message:lj}",
+                        outputTemplate: "{Timestamp:MM-dd-yyyy_HH:mm:ss}, {SourceContext:l}.{MemberName}, {Message:lj}{NewLine}",
                         rollingInterval: RollingInterval.Day);
             }
             _performanceLogger = loggerConfiguration.CreateLogger();
