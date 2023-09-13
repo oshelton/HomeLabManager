@@ -1,6 +1,5 @@
-﻿using System.Security.AccessControl;
-using Docker.DotNet.Models;
-using HomeLabManager.Common.Data.Git.Server;
+﻿using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services.Logging;
 
 namespace HomeLabManager.DataTests.Tests;
 
@@ -48,7 +47,7 @@ public sealed class ServerDataManagerTests
     [Test]
     public void GetServerMetadata()
     {
-        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
 
         var servers = serverManager.GetServers();
 
@@ -120,7 +119,7 @@ public sealed class ServerDataManagerTests
             Configuration = null, //TODO: FIll in when server configuration support is added.
         };
 
-        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
         serverManager.AddUpdateServer(testNewServer);
         Assert.That(testNewServer.UniqueId, Is.Not.Null);
 
@@ -150,7 +149,7 @@ public sealed class ServerDataManagerTests
     [Test]
     public void UpdateExistingServer()
     {
-        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
 
         var servers = serverManager.GetServers();
 
@@ -175,7 +174,7 @@ public sealed class ServerDataManagerTests
     [Test]
     public void DeleteServer()
     {
-        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager);
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
 
         var servers = serverManager.GetServers();
 

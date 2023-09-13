@@ -7,7 +7,7 @@ namespace HomeLabManager.Manager.Pages
     /// <summary>
     /// Base class for primary navigation pages that are validatable.
     /// </summary>
-    public abstract class ValidatedPageBaseViewModel: PageBaseViewModel, IValidatableObject
+    public abstract class ValidatedPageBaseViewModel<T> : PageBaseViewModel<T>, IValidatableObject where T : class
     {
         /// <inheritdoc />
         public IObjectValidator Validator

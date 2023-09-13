@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services.Logging;
+using Serilog;
 
 [assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
@@ -9,22 +11,30 @@ namespace HomeLabManager.Common.Data.Git.Server;
 public sealed class ServerDataManager : IServerDataManager
 {
     /// <inheritdoc/>
-    public ServerDataManager(ICoreConfigurationManager coreConfigurationManager)
+    public ServerDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager)
     {
-        if (coreConfigurationManager is null)
-            throw new ArgumentNullException(nameof(coreConfigurationManager));
+        _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
 
-        _coreConfigurationManager = coreConfigurationManager;
+        _logManager = logManager?.CreateContextualizedLogManager<ServerDataManager>() ?? throw new ArgumentNullException(nameof(logManager));
+        _logManager.GetApplicationLogger().Information("Created");
     }
 
     /// <inheritdoc/>
     public IReadOnlyList<ServerHostDto> GetServers()
     {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
-            return Array.Empty<ServerHostDto>();
+        var logger = _logManager.GetApplicationLogger();
 
-        static T readServerDto<T>(string basePath) where T : BaseServerDto, new()
+        var coreConfiguration = _coreConfigurationManager.GetCoreConfiguration();
+        if (!Directory.Exists(coreConfiguration.HomeLabRepoDataPath))
         {
+            logger.Warning("Home lab repo path \"{RepoPath}\" does not exist", coreConfiguration.HomeLabRepoDataPath);
+            return Array.Empty<ServerHostDto>();
+        }
+
+        T readServerDto<T>(string basePath) where T : BaseServerDto, new()
+        {
+            logger.Information("Reading server information from files in \"{BasePath}\"", basePath);
+
             var metadataPath = Path.Combine(basePath, ServerMetadataFileName);
             var dockerPath = Path.Combine(basePath, ServerDockerFileName);
             var configurationPath = Path.Combine(basePath, ServerConfigurationFileName);
@@ -43,6 +53,8 @@ public sealed class ServerDataManager : IServerDataManager
                 ? deserializer.Deserialize<ServerConfigurationDto>(File.ReadAllText(configurationPath))
                 : null;
 
+            // TODO: Add VM support.
+
             var directoryName = Path.GetFileName(basePath);
             return new T
             {
@@ -53,6 +65,8 @@ public sealed class ServerDataManager : IServerDataManager
                 Configuration = configuration
             };
         };
+
+        using var _ = _logManager.StartTimedOperation("Reading Servers From Repo Directory");
 
         var foundServerDtos = new List<ServerHostDto>();
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
@@ -73,7 +87,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <inheritdoc/>
     public void AddUpdateServer(ServerHostDto server)
     {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
             throw new InvalidOperationException("Server cannot be added if the repo data path directory does not exist.");
 
         if (server is null)
@@ -82,13 +96,21 @@ public sealed class ServerDataManager : IServerDataManager
         if (server.Metadata is null)
             throw new InvalidDataException("Server must at least have metadata assigned to it.");
 
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+        var logger = _logManager.GetApplicationLogger();
+
+        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
 
-        if (!Directory.Exists(serversDirectory))
-            Directory.CreateDirectory(serversDirectory);
+        logger.Information("Updating server in directory \"{ServerDirectory}\" with unique Id \"{UniqueId}\"", serversDirectory, server.UniqueId);
 
-        WriteServerHostDto(server, serversDirectory);
+        if (!Directory.Exists(serversDirectory))
+        {
+            logger.Information("Servers Directory does not exist, creating");
+            Directory.CreateDirectory(serversDirectory);
+        }
+
+        using var _ = _logManager.StartTimedOperation("Adding or Updating Server");
+        WriteServerHostDto(server, serversDirectory, _logManager);
     }
 
     /// <inheritdoc/>
@@ -104,11 +126,14 @@ public sealed class ServerDataManager : IServerDataManager
             throw new InvalidDataException("This server doess not have an Id and should be added, not deleted.");
 
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
-        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName()!);
+        var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName());
+
+        _logManager.GetApplicationLogger().Information("Deleting server with Unique Id \"{UniqueId}\" and directory \"{serverDirectory}\"", server.UniqueId, serverDirectory);
 
         if (!Directory.Exists(serverDirectory))
             throw new InvalidOperationException("The directory for this server does not exist and cannot be deleted.");
 
+        using var _ = _logManager.StartTimedOperation("Deleting Server");
         Directory.Delete(serverDirectory, true);
     }
 
@@ -137,12 +162,14 @@ public sealed class ServerDataManager : IServerDataManager
     /// <summary>
     /// Write the passed in server dto to the passed in directory.
     /// </summary>
-    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory)
+    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory, ContextAwareLogManager<ServerDataManager> logManager)
     {
         if (server is null)
             throw new ArgumentNullException(nameof(server));
         if (serversDirectory is null)
             throw new ArgumentNullException(nameof(serversDirectory));
+
+        var logger = logManager.GetApplicationLogger();
 
         static void writeDtoToFile(BaseServerDto dto, string basePath)
         {
@@ -171,6 +198,8 @@ public sealed class ServerDataManager : IServerDataManager
         if (!Directory.Exists(newServerDirectory))
             Directory.CreateDirectory(newServerDirectory);
 
+        logger.Information("Writing Server Host \"{UniqueId}\" to directory \"{VMDirectory}\"", server.UniqueId, newServerDirectory);
+
         writeDtoToFile(server, newServerDirectory);
 
         foreach (var vm in server.VMs)
@@ -181,9 +210,12 @@ public sealed class ServerDataManager : IServerDataManager
             if (!Directory.Exists(newVmDirectory))
                 Directory.CreateDirectory(newVmDirectory);
 
+            logger.Information("Writing VM DTO \"{UniqueId}\" to directory \"{VMDirectory}\"", vm.UniqueId, newVmDirectory);
+
             writeDtoToFile(vm, newVmDirectory);
         }
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
+    private readonly ContextAwareLogManager<ServerDataManager> _logManager;
 }

@@ -2,7 +2,6 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using DynamicData;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
@@ -24,9 +23,9 @@ public enum ServerListingDisplayMode
 /// <summary>
 /// Server Listing Page View Model.
 /// </summary>
-public class ServerListingViewModel : PageBaseViewModel
+public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
 {
-    public ServerListingViewModel()
+    public ServerListingViewModel() : base()
     {
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
@@ -69,15 +68,15 @@ public class ServerListingViewModel : PageBaseViewModel
         DeleteServerCommand = ReactiveCommand.CreateFromTask<ServerViewModel>(DeleteServerHost)
             .DisposeWith(_disposables);
 
-        ServerListObservable = _serverCache.Connect().Publish();
+        var serverListObservable = _serverCache.Connect().Publish();
 
-        ServerListObservable.AutoRefresh(server => server.DisplayIndex, propertyChangeThrottle: TimeSpan.FromMilliseconds(10))
+        serverListObservable.AutoRefresh(server => server.DisplayIndex, propertyChangeThrottle: TimeSpan.FromMilliseconds(10))
             .SortBy(x => x.DisplayIndex)
             .Bind(out _sortedServers)
             .Subscribe()
             .DisposeWith(_disposables);
 
-        _disposables.Add(ServerListObservable.Connect());
+        _disposables.Add(serverListObservable.Connect());
     }
 
     public override string Title => "Server Listing";
@@ -87,8 +86,12 @@ public class ServerListingViewModel : PageBaseViewModel
         if (request is not ServerListingNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
+        var logger = LogManager.GetApplicationLogger();
+
         // Load Servers.
         CurrentDisplayMode = ServerListingDisplayMode.IsLoading;
+
+        logger.Information("Loading servers");
 
         await Task.Run(async () =>
         {
@@ -101,6 +104,8 @@ public class ServerListingViewModel : PageBaseViewModel
             _serverCache.Clear();
             _serverCache.AddOrUpdate(serverViewModels);
         }).ConfigureAwait(true);
+
+        logger.Information("Loaded servers");
 
         CurrentDisplayMode = _serverCache.Count != 0 ? ServerListingDisplayMode.HasServers : ServerListingDisplayMode.NoServers;
     }
@@ -140,11 +145,6 @@ public class ServerListingViewModel : PageBaseViewModel
         get => _currentDisplayMode;
         private set => this.RaiseAndSetIfChanged(ref _currentDisplayMode, value);
     }
-
-    /// <summary>
-    /// An observable to hook into changes to the list of servers.
-    /// </summary>
-    public IConnectableObservable<IChangeSet<ServerViewModel, Guid>> ServerListObservable { get; }
 
     /// <summary>
     /// Collection of sorted servers.
@@ -189,6 +189,7 @@ public class ServerListingViewModel : PageBaseViewModel
         previous.DisplayIndex++;
         server.DisplayIndex--;
 
+        LogManager.GetApplicationLogger().Information("Moving server \"{MoveUp}\" up and server \"{MoveDown}\" down", server.UniqueId, previous.UniqueId);
         return Task.Run(() =>
         {
             _serverDataManager.AddUpdateServer(previous.ToDto());
@@ -210,6 +211,7 @@ public class ServerListingViewModel : PageBaseViewModel
         next.DisplayIndex--;
         server.DisplayIndex++;
 
+        LogManager.GetApplicationLogger().Information("Moving server \"{MoveDown}\" down and server \"{MoveUp}\" up", server.UniqueId, next.UniqueId);
         return Task.Run(() =>
         {
             _serverDataManager.AddUpdateServer(server.ToDto());
@@ -225,17 +227,25 @@ public class ServerListingViewModel : PageBaseViewModel
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
+        var logger = LogManager.GetApplicationLogger();
+
         var continueDeleting = await _sharedDialogsService.ShowSimpleYesNoDialog("Deleting cannot be readily undone outside of Git.\nAre you sure?").ConfigureAwait(true);
 
         if (!continueDeleting)
+        {
+            logger.Information("User chose to abort deleting server \"{UniqueID}\"", server.UniqueId);
             return;
+        }
 
         var (dialog, dialogTask) = _sharedDialogsService.ShowSimpleSavingDataDialog("Deleting Server...");
 
-        var toUpdateServers = SortedServers.Where(x => x.DisplayIndex > server.DisplayIndex).ToList();
+        var toUpdateServers = SortedServers.Where(x => x.DisplayIndex > server.DisplayIndex).ToArray();
         await Task.Run(() =>
         {
+            logger.Information("Deleting server \"{UniqueID}\"", server.UniqueId);
             _serverDataManager.DeleteServer(server.ToDto());
+
+            logger.Information("Updating display index of \"{UpdateCount}\" servers after the deleted one", toUpdateServers.Length);
             foreach (var toUpdate in toUpdateServers)
             {
                 toUpdate.DisplayIndex--;

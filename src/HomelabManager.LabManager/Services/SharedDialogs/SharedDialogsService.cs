@@ -1,15 +1,26 @@
 ﻿using Avalonia.Controls;
+using HomeLabManager.Common.Services.Logging;
 using Material.Dialog;
 using Material.Dialog.Interfaces;
+using Serilog;
 
 namespace HomeLabManager.Manager.Services.SharedDialogs;
 
 /// <inheritdoc/>
 public class SharedDialogsService : ISharedDialogsService
 {
+    /// <summary>
+    /// Constructor, sets up a logger.
+    /// </summary>
+    public SharedDialogsService(ILogManager logManager) =>
+        _logManager = logManager?.CreateContextualizedLogManager<SharedDialogsService>() ?? throw new ArgumentNullException(nameof(logManager));
+
     /// <inheritdoc/>
     public async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
+        var logger = _logManager.GetApplicationLogger();
+
+        logger.Information("ShowSimpleYesNoDialog Opened with content \"{Content}\"", content);
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
         {
             Borderless = true,
@@ -21,12 +32,16 @@ public class SharedDialogsService : ISharedDialogsService
 
         var result = await dialog.ShowDialog(MainWindow.Instance).ConfigureAwait(true);
 
+        logger.Information("ShowSimpleYesNoDialog Closed with result \"{Result}\"", result?.GetResult);
         return result?.GetResult == "yes";
     }
 
     /// <inheritdoc/>
     public (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
     {
+        var logger = _logManager.GetApplicationLogger();
+        logger.Information("Showing Simple saving dialog with label \"{Label}\"", textLabel);
+
         var layoutContainer = new StackPanel
         {
             MaxWidth = 350,
@@ -59,4 +74,6 @@ public class SharedDialogsService : ISharedDialogsService
 
         return (dialog, showTask);
     }
+
+    private readonly ContextAwareLogManager<SharedDialogsService> _logManager;
 }

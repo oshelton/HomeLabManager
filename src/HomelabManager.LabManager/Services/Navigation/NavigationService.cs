@@ -1,16 +1,24 @@
 ﻿using Avalonia.Threading;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
 using ReactiveUI;
+using Serilog;
 
 namespace HomeLabManager.Manager.Services.Navigation;
 
 /// <summary>
 /// Runtime class for handling Navigation between pages.
 /// </summary>
-public sealed class NavigationService: ReactiveObject, INavigationService
+public sealed class NavigationService : ReactiveObject, INavigationService
 {
+    /// <summary>
+    /// Constructor, sets up a logger.
+    /// </summary>
+    public NavigationService(ILogManager logManager) =>
+        _logManager = logManager?.CreateContextualizedLogManager<NavigationService>() ?? throw new ArgumentNullException(nameof(logManager));
+
     /// <summary>
     /// Navigate to a different page.
     /// </summary>
@@ -19,6 +27,10 @@ public sealed class NavigationService: ReactiveObject, INavigationService
         if (request is null)
             throw new ArgumentNullException(nameof(request));
 
+        var logger = _logManager.GetApplicationLogger();
+        logger.Information("Exictuing NavigateTo for request of Type \"{Type}\" and is back navigation \"{IsBack}\"", request.GetType().Name, isBackNavigation);
+
+        logger.Verbose("Creating page for navigation request.");
         var destinationPage = request.CreatePage();
 
         if (destinationPage is null)
@@ -26,13 +38,20 @@ public sealed class NavigationService: ReactiveObject, INavigationService
 
         if (CurrentPage is not null)
         {
+            logger.Verbose("Attempting to navigate away from current page.");
             var result = await CurrentPage.TryNavigateAway().ConfigureAwait(false);
             if (!result)
+            {
+                logger.Information("Navigation aborted by current page of type \"{CurrentPageType}\".", CurrentPage.GetType().Name);
                 return false;
+            }
             else
+            {
                 CurrentPage.Dispose();
+            }
         }
 
+        logger.Verbose("Navigating to new page");
         await destinationPage.NavigateTo(request).ConfigureAwait(false);
 
         await DispatcherHelper.InvokeAsync(() =>
@@ -40,9 +59,15 @@ public sealed class NavigationService: ReactiveObject, INavigationService
             CurrentPage = destinationPage;
 
             if (!isBackNavigation)
+            {
+                logger.Verbose("Adding previous page's request to navigation stack");
                 _navigationStack.Add(request);
+            }
             else
+            {
+                logger.Verbose("Removing previous page's request from navigation stack");
                 _navigationStack.RemoveAt(_navigationStack.Count - 1);
+            }
             UpdateCanNavigateBack();
         }, DispatcherPriority.Input).ConfigureAwait(false);
 
@@ -55,7 +80,10 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     public Task NavigateBack()
     {
         if (!CanNavigateBack)
+        {
+            _logManager.GetApplicationLogger().Warning("Cannot navigate back, request aborted");
             return Task.CompletedTask;
+        }
 
         return NavigateTo(_navigationStack[^2], true);
     }
@@ -84,6 +112,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
     private readonly List<INavigationRequest> _navigationStack = new();
+    private readonly ContextAwareLogManager<NavigationService> _logManager;
 
     private bool _canNavigateBack;
     private PageBaseViewModel _currentPage;

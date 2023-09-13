@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Linq;
-using Avalonia.Platform.Storage;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
@@ -15,9 +16,9 @@ namespace HomeLabManager.Manager.Pages.Settings;
 /// <summary>
 /// Settings Page View Model.
 /// </summary>
-public sealed class SettingsViewModel : ValidatedPageBaseViewModel
+public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewModel>
 {
-    public SettingsViewModel()
+    public SettingsViewModel() : base()
     {
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
@@ -69,6 +70,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 
         HasChanges = false;
 
+        LogManager.GetApplicationLogger().Information("Loading configuration settings");
         var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
 
         HomeLabRepoDataPath = coreConfig.HomeLabRepoDataPath;
@@ -88,34 +90,17 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 
     public override Task<bool> TryNavigateAway()
     {
+        var logger = LogManager.GetApplicationLogger();
         if (!HasChanges)
+        {
+            logger.Information("Leaving page without having made any changes");
             return Task.FromResult(true);
+        }
         else
+        {
+            logger.Information("Attempting to leave page with unsaved changes");
             return _sharedDialogService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
-    }
-
-    public async Task OpenFolderPickerForRepoPath()
-    {
-        var chosenFolder = await MainWindow.Instance!.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
-        {
-            AllowMultiple = false,
-            Title = "Pick a .gitconfig File"
-        }).ConfigureAwait(true);
-
-        if (chosenFolder is not null && chosenFolder.Count == 1)
-            HomeLabRepoDataPath = chosenFolder[0].Path.LocalPath;
-    }
-
-    public async Task OpenFilePickerForGitConfig()
-    {
-        var openedFile = await MainWindow.Instance!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
-        {
-            AllowMultiple = false,
-            Title = "Pick a .gitconfig File"
-        }).ConfigureAwait(true);
-
-        if (openedFile is not null && openedFile.Count == 1)
-            GitConfigFilePath = openedFile[0].Path.LocalPath;
+        }
     }
 
     public async Task SaveChangesAndNavigateBack()
@@ -123,6 +108,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
         IsSaving = true;
 
         var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
+
+        LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
 
         await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
         {

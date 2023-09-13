@@ -1,4 +1,5 @@
 ﻿using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services.Logging;
 
 namespace HomeLabManager.DataTests.Tests;
 
@@ -24,9 +25,9 @@ public sealed class CoreConfigurationManagerTests
     [Test]
     public void ManagerCreation()
     {
-        Assert.DoesNotThrow(() => new CoreConfigurationManager(Utils.TestDirectory));
-        Assert.Throws<ArgumentNullException>(() => new CoreConfigurationManager(string.Empty));
-        Assert.Throws<InvalidOperationException>(() => new CoreConfigurationManager("./NonExistentDir"));
+        Assert.DoesNotThrow(() => new CoreConfigurationManager(Utils.TestDirectory, new LogManager(true)));
+        Assert.Throws<ArgumentNullException>(() => new CoreConfigurationManager(string.Empty, new LogManager(true)));
+        Assert.Throws<InvalidOperationException>(() => new CoreConfigurationManager("./NonExistentDir", new LogManager(true)));
     }
 
     [Test]

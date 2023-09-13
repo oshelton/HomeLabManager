@@ -41,7 +41,7 @@ namespace HomeLabManager.Manager
         /// <inheritdoc />
         public IEnumerable GetErrors(string propertyName)
         {
-            if (Validator == null)
+            if (Validator is null)
                 return Array.Empty<ValidationMessage>();
 
             return string.IsNullOrEmpty(propertyName)

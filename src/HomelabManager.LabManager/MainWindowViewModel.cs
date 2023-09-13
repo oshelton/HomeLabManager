@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using Serilog;
 
 namespace HomeLabManager.Manager;
 
@@ -14,7 +16,7 @@ public sealed class MainWindowViewModel: ReactiveObject
 {
     public MainWindowViewModel()
     {
-        var coreConfigurationManager = Program.ServiceProvider!.Services.GetService<ICoreConfigurationManager>()!;
+        var coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         coreConfigurationManager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
         {
             GitConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gitconfig"),
@@ -26,7 +28,8 @@ public sealed class MainWindowViewModel: ReactiveObject
 
         UpdateConfigProperties(coreConfigurationManager.GetCoreConfiguration());
 
-        _navigationService = Program.ServiceProvider!.Services.GetService<INavigationService>()!;
+        _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
     }
 
     /// <summary>
@@ -62,12 +65,14 @@ public sealed class MainWindowViewModel: ReactiveObject
 
     public void OpenRepoDataPath()
     {
+        _logManager.GetApplicationLoggerForContext<MainWindowViewModel>().Information("Opening repo in file explorer");
+
         ProcessStartInfo startInfo = new ProcessStartInfo
         {
             Arguments = RepoDataPath,
             FileName = "explorer.exe"
         };
-        Process.Start(startInfo);
+        using var _ = Process.Start(startInfo);
     }
 
     private void UpdateConfigProperties(CoreConfigurationDto config)
@@ -77,6 +82,7 @@ public sealed class MainWindowViewModel: ReactiveObject
     }
 
     private readonly INavigationService _navigationService;
+    private readonly ILogManager _logManager;
 
     private bool _hasRepoDataPath;
     private string _repoDataPath;

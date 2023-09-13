@@ -73,6 +73,9 @@ public sealed record ServerConfigurationDto
 
 }
 
+/// <summary>
+/// Base record fr Servers and VMs.
+/// </summary>
 public abstract record BaseServerDto
 {
     /// <summary>

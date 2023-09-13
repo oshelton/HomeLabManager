@@ -2,6 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
@@ -14,12 +15,12 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer;
 /// <summary>
 /// Create/Edit Server Page View Model.
 /// </summary>
-public sealed class CreateEditServerViewModel : PageBaseViewModel
+public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServerViewModel>
 {
     /// <summary>
     /// Design time constructor.
     /// </summary>
-    public CreateEditServerViewModel()
+    public CreateEditServerViewModel() : base()
     {
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
@@ -61,6 +62,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         if (request is not CreateEditServerNavigationRequest realRequest)
             throw new InvalidOperationException("Expected navigation request type is CreateEditServerNavigationRequest.");
 
+        var logger = LogManager.GetApplicationLogger();
+
         _serverDto = realRequest.Server;
 
         _isNew = realRequest.IsNew;
@@ -68,15 +71,25 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         _initialServerTitle = !_isNew ? realRequest.Server.Metadata.DisplayName : null;
         _afterIndex = realRequest.AfterIndex;
 
-        var allServers = await Task.Run(() => _serverDataManager.GetServers()).ConfigureAwait(true);
+        logger.Information("Loading servers");
 
-        var flattenedServerList = allServers.Where(x => x.UniqueId != _serverDto.UniqueId)
-            .Cast<BaseServerDto>()
-            .Union(allServers.SelectMany(x => x.VMs).Where(x => x.UniqueId != _serverDto.UniqueId))
-            .ToList();
+        IReadOnlyList<ServerHostDto> allServers = null;
+        IReadOnlyList<string> allOtherDisplayNames = null;
+        IReadOnlyList<string> allOtherNames = null;
+        await Task.Run(() =>
+        {
+            allServers = _serverDataManager.GetServers();
+            var flattenedServerList = allServers
+                .Where(x => x.UniqueId != _serverDto.UniqueId)
+                .Cast<BaseServerDto>()
+                .Union(allServers.SelectMany(x => x.VMs).Where(x => x.UniqueId != _serverDto.UniqueId))
+                .ToArray();
 
-        var allOtherDisplayNames = flattenedServerList.Select(x => x.Metadata.DisplayName).ToList();
-        var allOtherNames = flattenedServerList.Select(x => x.Metadata.Name).ToList();
+            allOtherDisplayNames = flattenedServerList.Select(x => x.Metadata.DisplayName).ToArray();
+            allOtherNames = flattenedServerList.Select(x => x.Metadata.Name).ToArray();
+        }).ConfigureAwait(true);
+
+        logger.Information("Loaded servers");
 
         Metadata = new MetadataEditViewModel(realRequest.Server, allOtherDisplayNames, allOtherNames)
             .DisposeWith(_disposables);
@@ -95,10 +108,17 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     public override Task<bool> TryNavigateAway()
     {
+        var logger = LogManager.GetApplicationLogger();
         if (!HasChanges || IsSaving)
+        {
+            logger.Information("Leaving page without having made any changes");
             return Task.FromResult(true);
+        }
         else
+        {
+            logger.Information("Attempting to leave page with unsaved changes");
             return _sharedDialogsService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
+        }
     }
 
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
@@ -144,18 +164,24 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             }
         };
 
+        var logger = LogManager.GetApplicationLogger();
+
         // Do the actual saving work.
         await Task.Run(() => 
         {
             if (_isEditingServerHost)
             {
+                logger.Information("Saving server \"{UniqueID}\"", updatedDto.UniqueId);
                 _serverDataManager.AddUpdateServer(updatedDto as ServerHostDto);
 
                 if (_isNew)
                 {
                     var otherAffectedServers = _allExistingSiblingServers.Where(x => x.Metadata.DisplayIndex >= updatedDto.Metadata.DisplayIndex)
                         .Select(x => x with { Metadata = x.Metadata with { DisplayIndex = x.Metadata.DisplayIndex + 1 } })
-                        .Cast<ServerHostDto>();
+                        .Cast<ServerHostDto>()
+                        .ToArray();
+
+                    logger.Information("Updating display index of \"{ServerCount}\" servers", otherAffectedServers.Length);
 
                     foreach (var host in otherAffectedServers)
                     {
@@ -178,6 +204,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
                         } 
                     }).ToList();
                 }
+
+                logger.Information("Updating server \"{UniqueID}\" as its child vm \"{VMID}\" has been updated", host.UniqueId, vmDto.UniqueId);
                 
                 _serverDataManager.AddUpdateServer(host);
             }
