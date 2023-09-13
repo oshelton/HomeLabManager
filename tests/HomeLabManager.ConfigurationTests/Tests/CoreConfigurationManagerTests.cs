@@ -1,5 +1,5 @@
 ﻿using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 
 namespace HomeLabManager.DataTests.Tests;
 

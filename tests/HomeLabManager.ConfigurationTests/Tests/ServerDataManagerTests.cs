@@ -1,7 +1,5 @@
-﻿using System.Security.AccessControl;
-using Docker.DotNet.Models;
-using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Common.Services;
+﻿using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services.Logging;
 
 namespace HomeLabManager.DataTests.Tests;
 

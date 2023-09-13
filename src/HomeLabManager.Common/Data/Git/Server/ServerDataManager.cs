@@ -66,6 +66,8 @@ public sealed class ServerDataManager : IServerDataManager
             };
         };
 
+        using var _ = _logManager.StartTimedOperation("Reading Servers From Repo Directory");
+
         var foundServerDtos = new List<ServerHostDto>();
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
         var serversDir = Path.Combine(repoPath, ServersDirectoryName);
@@ -107,6 +109,7 @@ public sealed class ServerDataManager : IServerDataManager
             Directory.CreateDirectory(serversDirectory);
         }
 
+        using var _ = _logManager.StartTimedOperation("Adding or Updating Server");
         WriteServerHostDto(server, serversDirectory, _logManager);
     }
 
@@ -130,6 +133,7 @@ public sealed class ServerDataManager : IServerDataManager
         if (!Directory.Exists(serverDirectory))
             throw new InvalidOperationException("The directory for this server does not exist and cannot be deleted.");
 
+        using var _ = _logManager.StartTimedOperation("Deleting Server");
         Directory.Delete(serverDirectory, true);
     }
 

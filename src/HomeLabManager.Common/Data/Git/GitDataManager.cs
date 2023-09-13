@@ -84,6 +84,7 @@ namespace HomeLabManager.Common.Data.Git
 
             _logManager.GetApplicationLogger().Information("Pulling latest changes for \"{RepoPath}\"", repoPath);
 
+            using var _ = _logManager.StartTimedOperation("Pulling Latest Git Changes");
             using var repo = new Repository(repoPath);
             Commands.Pull(repo, CreateGitSignature(coreConfig.GitConfigFilePath, _logManager), new PullOptions
             {
@@ -118,6 +119,7 @@ namespace HomeLabManager.Common.Data.Git
             var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
             var repoPath = coreConfig.HomeLabRepoDataPath;
 
+            using var _ = _logManager.StartTimedOperation("Committing and Pushing Changes");
             using var repo = new Repository(repoPath);
             if (repo.RetrieveStatus().IsDirty)
             {
@@ -152,20 +154,23 @@ namespace HomeLabManager.Common.Data.Git
 
             logManager.GetApplicationLogger().Information("Creating git signature from information in file \"{GitConfigPath}\"", gitConfigFilePath);
 
-            var gitInfo = File.ReadAllText(gitConfigFilePath)
+            using (logManager.StartTimedOperation("Constructing Signature from Git Config File"))
+            {
+                var gitInfo = File.ReadAllText(gitConfigFilePath)
                 .Split("\\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Replace("\\t", "", StringComparison.InvariantCultureIgnoreCase).Trim())
                 .Where(line => line.StartsWith("name", true, CultureInfo.InvariantCulture) || line.StartsWith("email", true, CultureInfo.InvariantCulture))
                 .Select(line => line.Split('=', StringSplitOptions.TrimEntries))
                 .ToDictionary(lineParts => lineParts[0], lineParts => lineParts[1]);
 
-            if (gitInfo.Count != 2)
-                throw new InvalidDataException($"Contents of Git configuration file '{gitConfigFilePath}' does not contain the username and email information.");
+                if (gitInfo.Count != 2)
+                    throw new InvalidDataException($"Contents of Git configuration file '{gitConfigFilePath}' does not contain the username and email information.");
 
-            var userName = gitInfo["name"];
-            var email = gitInfo["email"];
+                var userName = gitInfo["name"];
+                var email = gitInfo["email"];
 
-            return new Signature(userName, email, DateTime.Now);
+                return new Signature(userName, email, DateTime.Now);
+            }
         }
 
         /// <summary>

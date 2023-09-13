@@ -47,19 +47,26 @@ public class CoreConfigurationManager : ICoreConfigurationManager
             if (!DisableConfigurationCaching)
                 _cachedCoreConfiguration = defaultConfiguration;
 
-            var serializer = DataUtils.CreateBasicYamlSerializer();
+            using (_logManager.StartTimedOperation("Core Configuration Default Serialization"))
+            {
+                var serializer = DataUtils.CreateBasicYamlSerializer();
 
-            File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
+                File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
+            }
             return defaultConfiguration;
         }
         else
         {
             logger.Information("Getting core configuration from file.");
-            var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
-            var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
-            _cachedCoreConfiguration = readConfiguration;
-            return readConfiguration;
+            using (_logManager.StartTimedOperation("Core Configuration Reading and Deserialization"))
+            {
+                var deserializer = DataUtils.CreateBasicYamlDeserializer();
+
+                var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
+                _cachedCoreConfiguration = readConfiguration;
+                return readConfiguration;
+            }
         }
     }
 
@@ -77,13 +84,17 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         }
 
         logger.Information("Getting core configuration from file.");
-        var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
-        var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath));
-        if (!DisableConfigurationCaching)
-            _cachedCoreConfiguration = readConfiguration;
+        using (_logManager.StartTimedOperation("Core Configuration Reading and Deserialization"))
+        {
+            var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
-        return readConfiguration;
+            var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath));
+            if (!DisableConfigurationCaching)
+                _cachedCoreConfiguration = readConfiguration;
+
+            return readConfiguration;
+        }
     }
 
     /// <summary>
@@ -96,11 +107,14 @@ public class CoreConfigurationManager : ICoreConfigurationManager
 
         _logManager.GetApplicationLogger().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
 
-        if (!DisableConfigurationCaching)
-            _cachedCoreConfiguration = updatedConfiguration;
+        using (_logManager.StartTimedOperation("Core Configuration Serialization and Writing"))
+        {
+            if (!DisableConfigurationCaching)
+                _cachedCoreConfiguration = updatedConfiguration;
 
-        var serializer = DataUtils.CreateBasicYamlSerializer();
-        File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
+            var serializer = DataUtils.CreateBasicYamlSerializer();
+            File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
+        }
 
         CoreConfigurationUpdated.OnNext(updatedConfiguration);
     }

@@ -2,7 +2,6 @@
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using Serilog;
 
 namespace HomeLabManager.Manager.Pages;
 
