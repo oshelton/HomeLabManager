@@ -1,4 +1,4 @@
-﻿using HomeLabManager.Common.Services;
+﻿using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation;

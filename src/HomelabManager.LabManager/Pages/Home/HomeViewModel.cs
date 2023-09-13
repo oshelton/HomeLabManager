@@ -2,6 +2,7 @@
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
@@ -22,14 +23,13 @@ public enum HomeDisplayMode
 /// <summary>
 /// Home Page View Model.
 /// </summary>
-public sealed class HomeViewModel : PageBaseViewModel
+public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
 {
     public HomeViewModel(): base()
     {
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         if (Avalonia.Controls.Design.IsDesignMode)
         {
@@ -66,7 +66,7 @@ public sealed class HomeViewModel : PageBaseViewModel
         if (request is not HomeNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
-        var logger = _logManager.GetApplicationLoggerForContext<HomeViewModel>();
+        var logger = LogManager.GetApplicationLogger();
 
         // Confirm there is a repo data path and that it exists.
         var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
@@ -133,7 +133,6 @@ public sealed class HomeViewModel : PageBaseViewModel
     private readonly IServerDataManager _serverDataManager;
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
-    private readonly ILogManager _logManager;
 
     private HomeDisplayMode _currentDisplayMode;
     private IReadOnlyList<ServerViewModel> _servers;

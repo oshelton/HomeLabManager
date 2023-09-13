@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -11,7 +11,7 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        var logger = Program.ServiceProvider.Services.GetService<ILogManager>().GetApplicationLoggerForContext<MainWindow>();
+        var logger = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<MainWindow>().GetApplicationLogger();
 
         InitializeComponent();
 

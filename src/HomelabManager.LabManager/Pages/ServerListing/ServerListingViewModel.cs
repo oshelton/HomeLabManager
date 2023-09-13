@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using DynamicData;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
@@ -24,7 +24,7 @@ public enum ServerListingDisplayMode
 /// <summary>
 /// Server Listing Page View Model.
 /// </summary>
-public class ServerListingViewModel : PageBaseViewModel
+public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
 {
     public ServerListingViewModel() : base()
     {
@@ -32,7 +32,6 @@ public class ServerListingViewModel : PageBaseViewModel
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         if (Avalonia.Controls.Design.IsDesignMode)
         {
@@ -88,7 +87,7 @@ public class ServerListingViewModel : PageBaseViewModel
         if (request is not ServerListingNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
-        var logger = _logManager.GetApplicationLoggerForContext<ServerListingViewModel>();
+        var logger = LogManager.GetApplicationLogger();
 
         // Load Servers.
         CurrentDisplayMode = ServerListingDisplayMode.IsLoading;
@@ -191,7 +190,7 @@ public class ServerListingViewModel : PageBaseViewModel
         previous.DisplayIndex++;
         server.DisplayIndex--;
 
-        _logManager.GetApplicationLoggerForContext<ServerListingViewModel>().Information("Moving server \"{MoveUp}\" up and server \"{MoveDown}\" down", server.UniqueId, previous.UniqueId);
+        LogManager.GetApplicationLogger().Information("Moving server \"{MoveUp}\" up and server \"{MoveDown}\" down", server.UniqueId, previous.UniqueId);
         return Task.Run(() =>
         {
             _serverDataManager.AddUpdateServer(previous.ToDto());
@@ -213,7 +212,7 @@ public class ServerListingViewModel : PageBaseViewModel
         next.DisplayIndex--;
         server.DisplayIndex++;
 
-        _logManager.GetApplicationLoggerForContext<ServerListingViewModel>().Information("Moving server \"{MoveDown}\" down and server \"{MoveUp}\" up", server.UniqueId, next.UniqueId);
+        LogManager.GetApplicationLogger().Information("Moving server \"{MoveDown}\" down and server \"{MoveUp}\" up", server.UniqueId, next.UniqueId);
         return Task.Run(() =>
         {
             _serverDataManager.AddUpdateServer(server.ToDto());
@@ -229,7 +228,7 @@ public class ServerListingViewModel : PageBaseViewModel
         if (server is null)
             throw new ArgumentNullException(nameof(server));
 
-        var logger = _logManager.GetApplicationLoggerForContext<ServerListingViewModel>();
+        var logger = LogManager.GetApplicationLogger();
 
         var continueDeleting = await _sharedDialogsService.ShowSimpleYesNoDialog("Deleting cannot be readily undone outside of Git.\nAre you sure?").ConfigureAwait(true);
 
@@ -264,7 +263,6 @@ public class ServerListingViewModel : PageBaseViewModel
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogsService;
-    private readonly ILogManager _logManager;
 
     private readonly CompositeDisposable _disposables;
 

@@ -1,22 +1,23 @@
 ﻿using Avalonia.Threading;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Pages;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Utils;
 using ReactiveUI;
+using Serilog;
 
 namespace HomeLabManager.Manager.Services.Navigation;
 
 /// <summary>
 /// Runtime class for handling Navigation between pages.
 /// </summary>
-public sealed class NavigationService: ReactiveObject, INavigationService
+public sealed class NavigationService : ReactiveObject, INavigationService
 {
     /// <summary>
     /// Constructor, sets up a logger.
     /// </summary>
     public NavigationService(ILogManager logManager) =>
-        _logManager = logManager ?? throw new ArgumentNullException(nameof(logManager));
+        _logManager = logManager?.CreateContextualizedLogManager<NavigationService>() ?? throw new ArgumentNullException(nameof(logManager));
 
     /// <summary>
     /// Navigate to a different page.
@@ -26,11 +27,14 @@ public sealed class NavigationService: ReactiveObject, INavigationService
         if (request is null)
             throw new ArgumentNullException(nameof(request));
 
-        var logger = _logManager.GetApplicationLoggerForContext<NavigationService>();
+        var logger = _logManager.GetApplicationLogger();
         logger.Information("Exictuing NavigateTo for request of Type \"{Type}\" and is back navigation \"{IsBack}\"", request.GetType().Name, isBackNavigation);
 
         logger.Verbose("Creating page for navigation request.");
-        var destinationPage = request.CreatePage() ?? throw new InvalidOperationException("INavigationRequest must have a destination page.");
+        var destinationPage = request.CreatePage();
+
+        if (destinationPage is null)
+            throw new InvalidOperationException("INavigationRequest must have a destination page.");
 
         if (CurrentPage is not null)
         {
@@ -77,7 +81,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     {
         if (!CanNavigateBack)
         {
-            _logManager.GetApplicationLoggerForContext<NavigationService>().Warning("Cannot navigate back, request aborted");
+            _logManager.GetApplicationLogger().Warning("Cannot navigate back, request aborted");
             return Task.CompletedTask;
         }
 
@@ -108,7 +112,7 @@ public sealed class NavigationService: ReactiveObject, INavigationService
     private void UpdateCanNavigateBack() => CanNavigateBack = _navigationStack.Count > 1;
 
     private readonly List<INavigationRequest> _navigationStack = new();
-    private readonly ILogManager _logManager;
+    private readonly ContextAwareLogManager<NavigationService> _logManager;
 
     private bool _canNavigateBack;
     private PageBaseViewModel _currentPage;

@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Linq;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
@@ -15,14 +16,13 @@ namespace HomeLabManager.Manager.Pages.Settings;
 /// <summary>
 /// Settings Page View Model.
 /// </summary>
-public sealed class SettingsViewModel : ValidatedPageBaseViewModel
+public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewModel>
 {
     public SettingsViewModel() : base()
     {
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         var builder = new ValidationBuilder<SettingsViewModel>();
 
@@ -70,7 +70,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 
         HasChanges = false;
 
-        _logManager.GetApplicationLoggerForContext<SettingsViewModel>().Information("Loading configuration settings");
+        LogManager.GetApplicationLogger().Information("Loading configuration settings");
         var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
 
         HomeLabRepoDataPath = coreConfig.HomeLabRepoDataPath;
@@ -90,7 +90,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 
     public override Task<bool> TryNavigateAway()
     {
-        var logger = _logManager.GetApplicationLoggerForContext<SettingsViewModel>();
+        var logger = LogManager.GetApplicationLogger();
         if (!HasChanges)
         {
             logger.Information("Leaving page without having made any changes");
@@ -109,7 +109,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
 
         var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
 
-        _logManager.GetApplicationLoggerForContext<SettingsViewModel>().Information("Saving updated core configuration settings");
+        LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
 
         await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
         {
@@ -174,7 +174,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogService;
-    private readonly ILogManager _logManager;
     
     private bool _hasChanges;
     private bool _isSaving;

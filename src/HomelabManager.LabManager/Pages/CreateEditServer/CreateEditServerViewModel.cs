@@ -2,7 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
@@ -15,7 +15,7 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer;
 /// <summary>
 /// Create/Edit Server Page View Model.
 /// </summary>
-public sealed class CreateEditServerViewModel : PageBaseViewModel
+public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServerViewModel>
 {
     /// <summary>
     /// Design time constructor.
@@ -25,7 +25,6 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
 
         _disposables = new CompositeDisposable();
 
@@ -63,7 +62,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
         if (request is not CreateEditServerNavigationRequest realRequest)
             throw new InvalidOperationException("Expected navigation request type is CreateEditServerNavigationRequest.");
 
-        var logger = _logManager.GetApplicationLoggerForContext<CreateEditServerViewModel>();
+        var logger = LogManager.GetApplicationLogger();
 
         _serverDto = realRequest.Server;
 
@@ -109,7 +108,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
 
     public override Task<bool> TryNavigateAway()
     {
-        var logger = _logManager.GetApplicationLoggerForContext<CreateEditServerViewModel>();
+        var logger = LogManager.GetApplicationLogger();
         if (!HasChanges || IsSaving)
         {
             logger.Information("Leaving page without having made any changes");
@@ -165,7 +164,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
             }
         };
 
-        var logger = _logManager.GetApplicationLoggerForContext<CreateEditServerViewModel>();
+        var logger = LogManager.GetApplicationLogger();
 
         // Do the actual saving work.
         await Task.Run(() => 
@@ -220,7 +219,6 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel
     private readonly IServerDataManager _serverDataManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogsService;
-    private readonly ILogManager _logManager;
     
     private readonly CompositeDisposable _disposables;
     private readonly ObservableAsPropertyHelper<bool> _canSave;

@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -56,7 +56,7 @@ public partial class FilePickerFormField : FormField
     {
         InitializeComponent();
 
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<FilePickerFormField>();
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public partial class FilePickerFormField : FormField
     /// </summary>
     private async void OnPickFileButtonClicked(object sender, RoutedEventArgs args)
     {
-        var logger = _logManager.GetApplicationLoggerForContext<FilePickerFormField>();
+        var logger = _logManager.GetApplicationLogger();
         logger.Verbose("File picker named \"{Name}\" with title \"{Title}\" opened with filters \"{Filters}\"", Name, DialogTitle ?? Label, FileTypeFilters?.SelectMany(x => x.Patterns).Distinct());
 
         var openedFile = await MainWindow.Instance!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
@@ -129,7 +129,7 @@ public partial class FilePickerFormField : FormField
         }
     }
 
-    private readonly ILogManager _logManager;
+    private readonly ContextAwareLogManager<FilePickerFormField> _logManager;
 
     private string _filePath;
     private IReadOnlyList<FilePickerFileType> _fileTypeFilters;

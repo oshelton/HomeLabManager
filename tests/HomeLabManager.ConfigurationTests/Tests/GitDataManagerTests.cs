@@ -9,6 +9,7 @@ using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using LibGit2Sharp;
 
 namespace HomeLabManager.DataTests.Tests;
@@ -34,7 +35,7 @@ public sealed class GitDataManagerTests
         using (var repo = new Repository(repoPath))
         {
             var remote = repo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
-            var logManager = new LogManager(true);
+            var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
             Commands.Fetch(repo, remote.Name, Array.Empty<string>(), CreateFetchOptions(config.GithubUserName, config.GithubPat, logManager), "log");
 
             var branches = repo.Branches;
@@ -59,7 +60,7 @@ public sealed class GitDataManagerTests
         Assert.That(repoPath, Is.Not.Null);
 
         using var repo = new Repository(repoPath);
-        var logManager = new LogManager(true);
+        var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
         repo.Commit("Initial empty commit", GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager), GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager), new CommitOptions { AllowEmptyCommit = true });
 
         var testRemote = repo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
@@ -161,7 +162,7 @@ public sealed class GitDataManagerTests
         using (var tempRepo = new Repository(tempRepoDirectory))
         {
             var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
-            var logManager = new LogManager(true);
+            var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
             Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager), "log");
 
             var trackedBranch = tempRepo.Branches.First(branch => branch.FriendlyName.Contains(_testBranchName, StringComparison.InvariantCultureIgnoreCase));
@@ -207,7 +208,7 @@ public sealed class GitDataManagerTests
         using (var tempRepo = new Repository(tempRepoDirectory))
         {
             var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
-            var logManager = new LogManager(true);
+            var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
             Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager), "log");
 
             var trackedBranch = tempRepo.Branches.First(branch => branch.FriendlyName.Contains(_testBranchName, StringComparison.InvariantCultureIgnoreCase));
@@ -235,7 +236,7 @@ public sealed class GitDataManagerTests
         Assert.That(result, Is.False);
     }
 
-    private static PushOptions CreatePushOptions(string githubUsername, string githubPat, ILogManager logManager)
+    private static PushOptions CreatePushOptions(string githubUsername, string githubPat, ContextAwareLogManager<GitDataManager> logManager)
     {
         return new PushOptions
         {
@@ -243,7 +244,7 @@ public sealed class GitDataManagerTests
         };
     }
 
-    private static FetchOptions CreateFetchOptions(string githubUsername, string githubPat, ILogManager logManager)
+    private static FetchOptions CreateFetchOptions(string githubUsername, string githubPat, ContextAwareLogManager<GitDataManager> logManager)
     {
         return new FetchOptions
         {
@@ -251,7 +252,7 @@ public sealed class GitDataManagerTests
         };
     }
 
-    private static PullOptions CreatePullOptions(string githubUsername, string githubPat, ILogManager logManager)
+    private static PullOptions CreatePullOptions(string githubUsername, string githubPat, ContextAwareLogManager<GitDataManager> logManager)
     {
         return new PullOptions
         {

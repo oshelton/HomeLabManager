@@ -1,5 +1,8 @@
-﻿using HomeLabManager.Manager.Services.Navigation.Requests;
+﻿using HomeLabManager.Common.Services.Logging;
+using HomeLabManager.Manager.Services.Navigation.Requests;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using Serilog;
 
 namespace HomeLabManager.Manager.Pages;
 
@@ -33,4 +36,20 @@ public abstract class PageBaseViewModel : ReactiveObject, IDisposable
     /// </summary>
     /// <param name="isDisposing"></param>
     protected abstract void Dispose(bool isDisposing);
+}
+
+/// <summary>
+/// Base class for primary navigation pages with logging support.
+/// </summary>
+public abstract class PageBaseViewModel<T> : PageBaseViewModel where T : class
+{
+    /// <summary>
+    /// Constructor, set up the logger.
+    /// </summary>
+    protected PageBaseViewModel() => LogManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<T>();
+
+    /// <summary>
+    /// Reference to a Longer for pages to use.
+    /// </summary>
+    protected ContextAwareLogManager<T> LogManager { get; }
 }

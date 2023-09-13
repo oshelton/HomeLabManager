@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using Serilog;
 
 [assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
@@ -14,15 +14,16 @@ public sealed class ServerDataManager : IServerDataManager
     public ServerDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager)
     {
         _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
-        _logManager = logManager ?? throw new ArgumentNullException(nameof(logManager));
 
-        _logManager.GetApplicationLoggerForContext<ServerDataManager>().Information("Created");
+        _logManager = logManager?.CreateContextualizedLogManager<ServerDataManager>() ?? throw new ArgumentNullException(nameof(logManager));
+        _logManager.GetApplicationLogger().Information("Created");
     }
 
     /// <inheritdoc/>
     public IReadOnlyList<ServerHostDto> GetServers()
     {
-        var logger = _logManager.GetApplicationLoggerForContext<ServerDataManager>();
+        var logger = _logManager.GetApplicationLogger();
+
         var coreConfiguration = _coreConfigurationManager.GetCoreConfiguration();
         if (!Directory.Exists(coreConfiguration.HomeLabRepoDataPath))
         {
@@ -32,7 +33,7 @@ public sealed class ServerDataManager : IServerDataManager
 
         T readServerDto<T>(string basePath) where T : BaseServerDto, new()
         {
-            _logManager.GetApplicationLoggerForContext<ServerDataManager>().Information("Reading server information from files in \"{BasePath}\"", basePath);
+            logger.Information("Reading server information from files in \"{BasePath}\"", basePath);
 
             var metadataPath = Path.Combine(basePath, ServerMetadataFileName);
             var dockerPath = Path.Combine(basePath, ServerDockerFileName);
@@ -65,8 +66,6 @@ public sealed class ServerDataManager : IServerDataManager
             };
         };
 
-        using var _ = _logManager.StartTimedOperation<ServerDataManager>("Reading Servers From Repo Directory");
-
         var foundServerDtos = new List<ServerHostDto>();
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
         var serversDir = Path.Combine(repoPath, ServersDirectoryName);
@@ -95,7 +94,7 @@ public sealed class ServerDataManager : IServerDataManager
         if (server.Metadata is null)
             throw new InvalidDataException("Server must at least have metadata assigned to it.");
 
-        var logger = _logManager.GetApplicationLoggerForContext<ServerDataManager>();
+        var logger = _logManager.GetApplicationLogger();
 
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
@@ -108,8 +107,7 @@ public sealed class ServerDataManager : IServerDataManager
             Directory.CreateDirectory(serversDirectory);
         }
 
-        using var _ = _logManager.StartTimedOperation<ServerDataManager>("Adding or Updating Server");
-        WriteServerHostDto(server, serversDirectory, logger);
+        WriteServerHostDto(server, serversDirectory, _logManager);
     }
 
     /// <inheritdoc/>
@@ -127,12 +125,11 @@ public sealed class ServerDataManager : IServerDataManager
         var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
         var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName());
 
-        _logManager.GetApplicationLoggerForContext<ServerDataManager>().Information("Deleting server with Unique Id \"{UniqueId}\" and directory \"{serverDirectory}\"", server.UniqueId, serverDirectory);
+        _logManager.GetApplicationLogger().Information("Deleting server with Unique Id \"{UniqueId}\" and directory \"{serverDirectory}\"", server.UniqueId, serverDirectory);
 
         if (!Directory.Exists(serverDirectory))
             throw new InvalidOperationException("The directory for this server does not exist and cannot be deleted.");
 
-        using var _ = _logManager.StartTimedOperation<ServerDataManager>("Deleting Server");
         Directory.Delete(serverDirectory, true);
     }
 
@@ -161,12 +158,14 @@ public sealed class ServerDataManager : IServerDataManager
     /// <summary>
     /// Write the passed in server dto to the passed in directory.
     /// </summary>
-    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory, ILogger logger)
+    private static void WriteServerHostDto(ServerHostDto server, string serversDirectory, ContextAwareLogManager<ServerDataManager> logManager)
     {
         if (server is null)
             throw new ArgumentNullException(nameof(server));
         if (serversDirectory is null)
             throw new ArgumentNullException(nameof(serversDirectory));
+
+        var logger = logManager.GetApplicationLogger();
 
         static void writeDtoToFile(BaseServerDto dto, string basePath)
         {
@@ -214,5 +213,5 @@ public sealed class ServerDataManager : IServerDataManager
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
-    private readonly ILogManager _logManager;
+    private readonly ContextAwareLogManager<ServerDataManager> _logManager;
 }

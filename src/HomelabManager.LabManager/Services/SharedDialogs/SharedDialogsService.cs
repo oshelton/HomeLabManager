@@ -1,5 +1,5 @@
 ﻿using Avalonia.Controls;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using Material.Dialog;
 using Material.Dialog.Interfaces;
 using Serilog;
@@ -13,12 +13,12 @@ public class SharedDialogsService : ISharedDialogsService
     /// Constructor, sets up a logger.
     /// </summary>
     public SharedDialogsService(ILogManager logManager) =>
-        _logManager = logManager ?? throw new ArgumentNullException(nameof(logManager));
+        _logManager = logManager?.CreateContextualizedLogManager<SharedDialogsService>() ?? throw new ArgumentNullException(nameof(logManager));
 
     /// <inheritdoc/>
     public async Task<bool> ShowSimpleYesNoDialog(string content = null)
     {
-        var logger = _logManager.GetApplicationLoggerForContext<SharedDialogsService>();
+        var logger = _logManager.GetApplicationLogger();
 
         logger.Information("ShowSimpleYesNoDialog Opened with content \"{Content}\"", content);
         var dialog = DialogHelper.CreateAlertDialog(new AlertDialogBuilderParams
@@ -39,7 +39,7 @@ public class SharedDialogsService : ISharedDialogsService
     /// <inheritdoc/>
     public (IDialogWindow<DialogResult> Dialog, Task DialogTask) ShowSimpleSavingDataDialog(string textLabel = null)
     {
-        var logger = _logManager.GetApplicationLoggerForContext<SharedDialogsService>();
+        var logger = _logManager.GetApplicationLogger();
         logger.Information("Showing Simple saving dialog with label \"{Label}\"", textLabel);
 
         var layoutContainer = new StackPanel
@@ -75,5 +75,5 @@ public class SharedDialogsService : ISharedDialogsService
         return (dialog, showTask);
     }
 
-    private readonly ILogManager _logManager;
+    private readonly ContextAwareLogManager<SharedDialogsService> _logManager;
 }

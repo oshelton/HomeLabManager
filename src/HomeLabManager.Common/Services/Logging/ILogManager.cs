@@ -2,13 +2,18 @@
 using HomeLabManager.Common.Utils;
 using Serilog;
 
-namespace HomeLabManager.Common.Services;
+namespace HomeLabManager.Common.Services.Logging;
 
 /// <summary>
 /// Interface for retrieving application logging objects.
 /// </summary>
 public interface ILogManager
 {
+    /// <summary>
+    /// Build a context aware log manager for the passed in type.
+    /// </summary>
+    ContextAwareLogManager<T> CreateContextualizedLogManager<T>() where T : class;
+
     /// <summary>
     /// Get the primary application logger.
     /// </summary>

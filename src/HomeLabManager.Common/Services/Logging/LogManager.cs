@@ -5,7 +5,7 @@ using HomeLabManager.Common.Utils;
 using Serilog;
 using Serilog.Events;
 
-namespace HomeLabManager.Common.Services;
+namespace HomeLabManager.Common.Services.Logging;
 
 /// <summary>
 /// Main LogManager implementation.
@@ -13,6 +13,9 @@ namespace HomeLabManager.Common.Services;
 public sealed class LogManager : ILogManager
 {
     public LogManager(bool isInTestingMode) => _isInTestingMode = isInTestingMode;
+
+    /// <inheritdoc/>
+    public ContextAwareLogManager<T> CreateContextualizedLogManager<T>() where T : class => new(this);
 
     /// <inheritdoc/>
     public ILogger GetApplicationLoggerForContext<T>([CallerMemberName] string callerName = null)

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;

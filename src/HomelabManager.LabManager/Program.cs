@@ -4,6 +4,7 @@ using Avalonia.ReactiveUI;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Common.Services;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.SharedDialogs;
@@ -42,7 +43,7 @@ internal class Program
         }
         catch (Exception ex)
         {
-            s_logger.Error(ex, "Unhandled exception received, application terminating.");
+            s_logManager.GetApplicationLogger().Error(ex, "Unhandled exception received, application terminating.");
             throw;
         }
     }
@@ -127,13 +128,13 @@ internal class Program
         Debug.Assert(host.Services.GetService<INavigationService>() is not null);
         Debug.Assert(host.Services.GetService<ILogManager>() is not null);
 
-        s_logger = host.Services.GetService<ILogManager>().GetApplicationLoggerForContext<Program>();
+        s_logManager = host.Services.GetService<ILogManager>().CreateContextualizedLogManager<Program>();
 
-        s_logger.Information("IHost built; services now available.");
+        s_logManager.GetApplicationLogger().Information("IHost built; services now available.");
 
         return host;
     }
 
-    private static ILogger s_logger;
+    private static ContextAwareLogManager<Program> s_logManager;
     private static string s_coreConfigurationDirectory;
 }
