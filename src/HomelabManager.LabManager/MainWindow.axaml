@@ -33,9 +33,17 @@
 		<local:MainWindowViewModel />
 	</Window.DataContext>
 
-	<Grid>
-		<DockPanel Margin="24">
-			<DockPanel DockPanel.Dock="Top">
+	<DockPanel>
+		<Border
+			VerticalAlignment="Top"
+			BorderBrush="Black"
+			BorderThickness="0,0,0,1"
+			DockPanel.Dock="Top">
+			<Border.Background>
+				<SolidColorBrush Opacity="0.2" Color="Black" />
+			</Border.Background>
+
+			<DockPanel Margin="24,12,24,12" VerticalAlignment="Top">
 				<materialControls:FloatingButton
 					Name="backButton"
 					Margin="0,0,8,0"
@@ -86,24 +94,24 @@
 
 				<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
 			</DockPanel>
+		</Border>
 
-			<TransitioningContentControl
-				Name="ContentHost"
-				Margin="0,24,0,0"
-				Content="{Binding NavigationService.CurrentPage}"
-				DockPanel.Dock="Bottom">
-				<TransitioningContentControl.PageTransition>
-					<CrossFade Duration="0:00:00.250" />
-				</TransitioningContentControl.PageTransition>
+		<TransitioningContentControl
+			Name="ContentHost"
+			Padding="24,24,24,24"
+			Content="{Binding NavigationService.CurrentPage}"
+			DockPanel.Dock="Bottom">
+			<TransitioningContentControl.PageTransition>
+				<CrossFade Duration="0:00:00.250" />
+			</TransitioningContentControl.PageTransition>
 
-				<TransitioningContentControl.DataTemplates>
-					<!--  Pages  -->
-					<StaticResource ResourceKey="HomePageTemplate" />
-					<StaticResource ResourceKey="ServerListingPageTemplate" />
-					<StaticResource ResourceKey="CreateEditServerPageTemplate" />
-					<StaticResource ResourceKey="SettingsPageTemplate" />
-				</TransitioningContentControl.DataTemplates>
-			</TransitioningContentControl>
-		</DockPanel>
-	</Grid>
+			<TransitioningContentControl.DataTemplates>
+				<!--  Pages  -->
+				<StaticResource ResourceKey="HomePageTemplate" />
+				<StaticResource ResourceKey="ServerListingPageTemplate" />
+				<StaticResource ResourceKey="CreateEditServerPageTemplate" />
+				<StaticResource ResourceKey="SettingsPageTemplate" />
+			</TransitioningContentControl.DataTemplates>
+		</TransitioningContentControl>
+	</DockPanel>
 </Window>
