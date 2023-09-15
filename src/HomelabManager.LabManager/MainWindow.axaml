@@ -74,22 +74,27 @@
 					PlacementGravity="BottomLeft"
 					PlacementTarget="{Binding #repoDataPathButton}"
 					VerticalOffset="4">
-					<materialControls:Card>
-						<StackPanel Orientation="Vertical">
-							<TextBlock Margin="8,8,8,4">
-								<Run Classes="Body1" FontWeight="Bold">Repo Data Path:</Run>
-								<Run Classes="Body1" Text="{Binding RepoDataPath}" />
-							</TextBlock>
+					<Border
+						BorderBrush="Black"
+						BorderThickness="1"
+						CornerRadius="3">
+						<materialControls:Card>
+							<StackPanel Orientation="Vertical">
+								<TextBlock Margin="8,8,8,4">
+									<Run Classes="Body1" FontWeight="Bold">Repo Data Path:</Run>
+									<Run Classes="Body1" Text="{Binding RepoDataPath}" />
+								</TextBlock>
 
-							<Button
-								Margin="8,4,8,8"
-								HorizontalAlignment="Right"
-								Classes="Flat"
-								Click="{eventBinder:EventBinding OpenRepoDataPath}">
-								Open Folder
-							</Button>
-						</StackPanel>
-					</materialControls:Card>
+								<Button
+									Margin="8,4,8,8"
+									HorizontalAlignment="Right"
+									Classes="Flat"
+									Click="{eventBinder:EventBinding OpenRepoDataPath}">
+									Open Folder
+								</Button>
+							</StackPanel>
+						</materialControls:Card>
+					</Border>
 				</Popup>
 
 				<TextBlock Classes="Headline4" Text="{Binding NavigationService.CurrentPage.Title}" />
@@ -98,7 +103,7 @@
 
 		<TransitioningContentControl
 			Name="ContentHost"
-			Padding="24,24,24,24"
+			Padding="24,0,24,0"
 			Content="{Binding NavigationService.CurrentPage}"
 			DockPanel.Dock="Bottom">
 			<TransitioningContentControl.PageTransition>
