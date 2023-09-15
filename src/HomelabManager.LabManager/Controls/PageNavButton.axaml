@@ -14,15 +14,20 @@
 			<Button
 				x:Name="{x:Static controls:PageNavButton.PartButtonName}"
 				Padding="0"
+				HorizontalContentAlignment="Stretch"
 				VerticalContentAlignment="Center"
 				Classes.Outline="{Binding IsOutline}"
 				Click="OnButtonClick"
 				DataContext="{Binding $parent}"
 				ToolTip.Tip="{Binding (ToolTip.Tip)}">
-				<StackPanel>
+				<DockPanel Margin="8">
 					<materialIcons:MaterialIcon Kind="{Binding Icon}" />
-					<TextBlock Margin="4,0,0,0" Text="{Binding Text}" />
-				</StackPanel>
+					<TextBlock
+						Margin="4,0,0,0"
+						DockPanel.Dock="Right"
+						Text="{Binding Text}"
+						TextAlignment="Left" />
+				</DockPanel>
 			</Button>
 		</ControlTemplate>
 	</TemplatedControl.Template>
