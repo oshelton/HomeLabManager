@@ -106,10 +106,6 @@
 			Padding="24,0,24,0"
 			Content="{Binding NavigationService.CurrentPage}"
 			DockPanel.Dock="Bottom">
-			<TransitioningContentControl.PageTransition>
-				<CrossFade Duration="0:00:00.250" />
-			</TransitioningContentControl.PageTransition>
-
 			<TransitioningContentControl.DataTemplates>
 				<!--  Pages  -->
 				<StaticResource ResourceKey="HomePageTemplate" />
