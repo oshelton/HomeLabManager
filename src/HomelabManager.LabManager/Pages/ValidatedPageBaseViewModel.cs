@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel;
+using ReactiveUI;
 using ReactiveValidation;
 
 namespace HomeLabManager.Manager.Pages
@@ -25,13 +26,17 @@ namespace HomeLabManager.Manager.Pages
         }
 
         /// <inheritdoc />
-        public virtual void OnPropertyMessagesChanged(string propertyName) => ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        public virtual void OnPropertyMessagesChanged(string propertyName)
+        {
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            this.RaisePropertyChanged(nameof(HasErrors));
+        }
 
 
         #region INotifyDataErrorInfo
 
         /// <inheritdoc />
-        public bool HasErrors => Validator?.IsValid == false || Validator?.HasWarnings == true;
+        public bool HasErrors => Validator?.IsValid == false;
 
         /// <inheritdoc />
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
