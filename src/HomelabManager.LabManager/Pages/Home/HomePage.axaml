@@ -22,41 +22,31 @@
 
 	<DataTemplate x:Key="HomePageTemplate" DataType="{x:Type page:HomeViewModel}">
 		<DockPanel>
-			<UniformGrid
-				HorizontalAlignment="Right"
-				Columns="4"
-				DockPanel.Dock="Bottom">
+			<StackPanel Classes="PageSidebar" DockPanel.Dock="Right">
 				<controls:PageNavButton
 					x:Name="serversButton"
 					Click="{eventBinder:EventBinding NavigateToServerListing}"
 					Icon="Web"
 					Text="Servers"
 					ToolTip.Tip="Navigate to the Server Listing page." />
-				<controls:PageNavButton
-					Margin="6,0,0,0"
-					Icon="Console"
-					Text="Commands" />
-				<controls:PageNavButton
-					Margin="6,0,0,0"
-					Icon="Toolbox"
-					Text="Tools" />
+				<controls:PageNavButton Icon="Console" Text="Commands" />
+				<controls:PageNavButton Icon="Toolbox" Text="Tools" />
 				<controls:PageNavButton
 					x:Name="settingsButton"
-					Margin="6,0,0,0"
 					Click="{eventBinder:EventBinding NavigateToSettings}"
 					Icon="CogOutline"
 					Text="Settings" />
-			</UniformGrid>
+			</StackPanel>
 
-			<Border
+			<ScrollViewer
 				Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.IsLoading}}"
 				Classes.NoRepoPath="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.NoRepoPath}}"
 				Classes.NoServers="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.NoServers}}"
 				Classes.RepoPathDoesNotExist="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.RepoPathDoesNotExist}}"
 				Classes.ServerDisplay="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:HomeDisplayMode.HasServers}}">
-				<Border.Styles>
-					<Style Selector="Border.NoRepoPath">
-						<Setter Property="Child">
+				<ScrollViewer.Styles>
+					<Style Selector="ScrollViewer.NoRepoPath">
+						<Setter Property="Content">
 							<Template>
 								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 									<TextBlock
@@ -72,8 +62,8 @@
 						</Setter>
 					</Style>
 
-					<Style Selector="Border.RepoPathDoesNotExist">
-						<Setter Property="Child">
+					<Style Selector="ScrollViewer.RepoPathDoesNotExist">
+						<Setter Property="Content">
 							<Template>
 								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 									<TextBlock
@@ -89,8 +79,8 @@
 						</Setter>
 					</Style>
 
-					<Style Selector="Border.IsLoading">
-						<Setter Property="Child">
+					<Style Selector="ScrollViewer.IsLoading">
+						<Setter Property="Content">
 							<Template>
 								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 									<StackPanel Margin="8">
@@ -102,8 +92,8 @@
 						</Setter>
 					</Style>
 
-					<Style Selector="Border.NoServers">
-						<Setter Property="Child">
+					<Style Selector="ScrollViewer.NoServers">
+						<Setter Property="Content">
 							<Template>
 								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 									<TextBlock
@@ -119,10 +109,10 @@
 						</Setter>
 					</Style>
 
-					<Style Selector="Border.ServerDisplay">
-						<Setter Property="Child">
+					<Style Selector="ScrollViewer.ServerDisplay">
+						<Setter Property="Content">
 							<Template>
-								<ItemsRepeater Margin="12" ItemsSource="{Binding Servers}">
+								<ItemsRepeater Margin="12,24,12,24" ItemsSource="{Binding Servers}">
 									<ItemsRepeater.Layout>
 										<WrapLayout
 											HorizontalSpacing="8"
@@ -146,8 +136,8 @@
 							</Template>
 						</Setter>
 					</Style>
-				</Border.Styles>
-			</Border>
+				</ScrollViewer.Styles>
+			</ScrollViewer>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>
