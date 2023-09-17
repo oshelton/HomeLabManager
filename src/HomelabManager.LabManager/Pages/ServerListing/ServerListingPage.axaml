@@ -21,14 +21,14 @@
 	</Design.PreviewWith>
 
 	<DataTemplate x:Key="ServerListingPageTemplate" DataType="{x:Type page:ServerListingViewModel}">
-		<Border
+		<ScrollViewer
 			Name="root"
 			Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.IsLoading}}"
 			Classes.NoServers="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.NoServers}}"
 			Classes.ServerDisplay="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:ServerListingDisplayMode.HasServers}}">
-			<Border.Styles>
-				<Style Selector="Border.IsLoading">
-					<Setter Property="Child">
+			<ScrollViewer.Styles>
+				<Style Selector="ScrollViewer.IsLoading">
+					<Setter Property="Content">
 						<Template>
 							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 								<StackPanel Margin="8">
@@ -40,8 +40,8 @@
 					</Setter>
 				</Style>
 
-				<Style Selector="Border.NoServers">
-					<Setter Property="Child">
+				<Style Selector="ScrollViewer.NoServers">
+					<Setter Property="Content">
 						<Template>
 							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
 								<StackPanel>
@@ -66,8 +66,8 @@
 					</Setter>
 				</Style>
 
-				<Style Selector="Border.ServerDisplay">
-					<Setter Property="Child">
+				<Style Selector="ScrollViewer.ServerDisplay">
+					<Setter Property="Content">
 						<Template>
 							<StackPanel Margin="12">
 								<controls:AddItemInlineSeperator
@@ -107,7 +107,7 @@
 						</Template>
 					</Setter>
 				</Style>
-			</Border.Styles>
-		</Border>
+			</ScrollViewer.Styles>
+		</ScrollViewer>
 	</DataTemplate>
 </ResourceDictionary>
