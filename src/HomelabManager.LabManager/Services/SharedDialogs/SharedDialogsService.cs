@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using HomeLabManager.Common.Services.Logging;
+using HomeLabManager.Manager.Windows;
 using Material.Dialog;
 using Material.Dialog.Interfaces;
 using Serilog;

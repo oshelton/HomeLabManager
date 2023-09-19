@@ -1,9 +1,5 @@
-﻿using HomeLabManager.Common.Data.CoreConfiguration;
-using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Manager;
-using HomeLabManager.Manager.Services.Navigation;
-using HomeLabManager.Manager.Services.Navigation.Requests;
-using HomeLabManager.Manager.Services.SharedDialogs;
+﻿using HomeLabManager.Manager.Services.Navigation.Requests;
+using HomeLabManager.Manager.Windows;
 using Moq;
 
 namespace HomeLabManager.ManagerTests.Tests;

@@ -1,10 +1,10 @@
 <Window
-	x:Class="HomeLabManager.Manager.MainWindow"
+	x:Class="HomeLabManager.Manager.Windows.MainWindow"
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:eventBinder="using:EventBinder"
-	xmlns:local="using:HomeLabManager.Manager"
+	xmlns:local="using:HomeLabManager.Manager.Windows"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"

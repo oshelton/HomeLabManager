@@ -1,9 +1,8 @@
 using Avalonia.Controls;
 using HomeLabManager.Common.Services.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
-namespace HomeLabManager.Manager;
+namespace HomeLabManager.Manager.Windows;
 
 public sealed partial class MainWindow : Window
 {

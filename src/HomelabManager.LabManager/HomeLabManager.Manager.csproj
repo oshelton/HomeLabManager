@@ -46,6 +46,9 @@
     <Compile Update="Controls\FilePickerFormField.axaml.cs">
       <DependentUpon>FilePickerFormField.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Windows\MainWindow.axaml.cs">
+      <DependentUpon>MainWindow.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Update="Styles\Icons.xaml">

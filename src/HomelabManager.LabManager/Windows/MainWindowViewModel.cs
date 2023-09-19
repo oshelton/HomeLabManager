@@ -5,14 +5,13 @@ using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using Serilog;
 
-namespace HomeLabManager.Manager;
+namespace HomeLabManager.Manager.Windows;
 
 /// <summary>
 /// View Model for the Main Window.
 /// </summary>
-public sealed class MainWindowViewModel: ReactiveObject
+public sealed class MainWindowViewModel : ReactiveObject
 {
     public MainWindowViewModel()
     {
@@ -67,7 +66,7 @@ public sealed class MainWindowViewModel: ReactiveObject
     {
         _logManager.GetApplicationLoggerForContext<MainWindowViewModel>().Information("Opening repo in file explorer");
 
-        ProcessStartInfo startInfo = new ProcessStartInfo
+        var startInfo = new ProcessStartInfo
         {
             Arguments = RepoDataPath,
             FileName = "explorer.exe"
