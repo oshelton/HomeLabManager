@@ -1,4 +1,6 @@
-﻿using System.Reactive.Linq;
+﻿using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Services;
 using HomeLabManager.Common.Services.Logging;
@@ -24,18 +26,20 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
 
+        _disposables = new CompositeDisposable();
+
         var builder = new ValidationBuilder<SettingsViewModel>();
 
         builder.RuleFor(vm => vm.HomeLabRepoDataPath)
             .WithPropertyCascadeMode(CascadeMode.Stop)
             .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application cannot work as expected.")
-            .Must(value => Directory.Exists(value), ValidationMessageType.Warning).WithMessage("This should point to a directory.").Throttle(1000)
-            .Must(value => Repository.IsValid(value), ValidationMessageType.Warning).WithMessage("This is not a Git Working Copy; some features will not work properly.").Throttle(1000);
+            .Must(value => Directory.Exists(value), ValidationMessageType.Error).WithMessage("This should point to a directory.").Throttle(200)
+            .Must(value => Repository.IsValid(value), ValidationMessageType.Error).WithMessage("This is not a Git Working Copy; some features will not work properly.").Throttle(1000);
 
         builder.RuleFor(vm => vm.GitConfigFilePath)
             .WithPropertyCascadeMode(CascadeMode.Stop)
             .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty change tracking will not be able to work as expected.")
-            .Must(value => File.Exists(value), ValidationMessageType.Warning).WithMessage("This must point to a file that exists.").Throttle(1000);
+            .Must(value => File.Exists(value), ValidationMessageType.Error).WithMessage("This must point to a file that exists.").Throttle(200);
 
         builder.RuleFor(vm => vm.GithubUserName)
             .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
@@ -45,8 +49,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         Validator = builder.Build(this);
 
-        // Set up an observable to check when content has actually changed.
-        _stateChangeSubscription = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
+        // Set up observable to monitor for validation issues.
+        _hasChanges = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
             (repoPath, gitPath, userName, pat) =>
             {
                 return new TrackedPropertyState()
@@ -58,7 +62,22 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
                 };
             })
             .Throttle(TimeSpan.FromSeconds(0.5))
-            .Subscribe(state => HasChanges = !state.Equals(_initialState));
+            .Select(state => !state.Equals(this._initialState))
+            .ToProperty(this, nameof(HasChanges))
+            .DisposeWith(_disposables);
+
+        // Set up an observable to check when content has actually changed and there are no errors.
+        _canSave = this.WhenAnyValue(x => x.HasErrors, x => x.HasChanges,
+            (hasErrors, hasChanges) => !hasErrors && hasChanges)
+            .ToProperty(this, nameof(CanSave))
+            .DisposeWith(_disposables);
+
+        SaveCommand = ReactiveCommand.CreateFromTask(Save, this.WhenAnyValue(x => x.CanSave).ObserveOn(RxApp.MainThreadScheduler))
+            .DisposeWith(_disposables);
+        SaveCommand.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
+
+        CancelCommand = ReactiveCommand.CreateFromTask(_navigationService.NavigateBack)
+            .DisposeWith(_disposables);
     }
 
     public override string Title => "Settings";
@@ -67,8 +86,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     {
         if (request is not SettingsNavigationRequest)
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
-
-        HasChanges = false;
 
         LogManager.GetApplicationLogger().Information("Loading configuration settings");
         var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
@@ -103,43 +120,18 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         }
     }
 
-    public async Task SaveChangesAndNavigateBack()
-    {
-        IsSaving = true;
+    public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
-        var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
+    public ReactiveCommand<Unit, Unit> CancelCommand { get; }
 
-        LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
+    /// Whether or not this page has changes and is in a valid state to be saved.
+    public bool CanSave => _canSave.Value;
 
-        await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
-        {
-            HomeLabRepoDataPath = HomeLabRepoDataPath,
-            GitConfigFilePath = GitConfigFilePath,
-            GithubUserName = GithubUserName,
-            GithubPat = GithubPat
-        })).ConfigureAwait(true);
+    /// Whether or not this page has changes, regardless of whether or not they are valid.
+    public bool HasChanges => _hasChanges?.Value ?? false;
 
-        dialog?.GetWindow().Close();
-
-        IsSaving = false;
-        HasChanges = false;
-
-        await _navigationService!.NavigateBack().ConfigureAwait(false);
-    }
-
-    public INavigationService NavigationService => _navigationService;
-
-    public bool HasChanges
-    {
-        get => _hasChanges;
-        private set => this.RaiseAndSetIfChanged(ref _hasChanges, value);
-    }
-
-    public bool IsSaving
-    {
-        get => _isSaving;
-        private set => this.RaiseAndSetIfChanged(ref _isSaving, value);
-    }
+    /// Whether or not this page is currently saving data.
+    public bool IsSaving => _isSaving.Value;
 
     public string HomeLabRepoDataPath
     {
@@ -168,22 +160,41 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     protected override void Dispose(bool isDisposing)
     {
         if (isDisposing)
-            _stateChangeSubscription.Dispose();
+            _disposables.Dispose();
+    }
+
+    private async Task Save()
+    {
+        var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
+
+        LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
+
+        await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
+        {
+            HomeLabRepoDataPath = HomeLabRepoDataPath,
+            GitConfigFilePath = GitConfigFilePath,
+            GithubUserName = GithubUserName,
+            GithubPat = GithubPat
+        })).ConfigureAwait(true);
+
+        dialog?.GetWindow().Close();
+
+        await _navigationService!.NavigateBack().ConfigureAwait(false);
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogService;
-    
-    private bool _hasChanges;
-    private bool _isSaving;
+
+    private readonly CompositeDisposable _disposables;
+    private readonly ObservableAsPropertyHelper<bool> _canSave;
+    private readonly ObservableAsPropertyHelper<bool> _hasChanges;
+    private readonly ObservableAsPropertyHelper<bool> _isSaving;
 
     private string _homeLabRepoDataPath;
     private string _gitConfigFilePath;
     private string _githubUserName;
     private string _githubPat;
-
-    private IDisposable _stateChangeSubscription;
 
     private TrackedPropertyState? _initialState;
 

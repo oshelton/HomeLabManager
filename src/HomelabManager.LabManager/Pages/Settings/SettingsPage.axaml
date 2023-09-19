@@ -22,65 +22,77 @@
 
 	<DataTemplate x:Key="SettingsPageTemplate" DataType="{x:Type pages:SettingsViewModel}">
 		<DockPanel IsEnabled="{Binding !IsSaving}">
-			<UniformGrid
-				HorizontalAlignment="Right"
-				Columns="2"
-				DockPanel.Dock="Bottom">
+			<StackPanel Classes="PageSidebar" DockPanel.Dock="Right">
+				<Grid>
+					<controls:PageNavButton
+						Command="{Binding SaveCommand}"
+						Icon="FloppyDisc"
+						IsEnabled="{Binding HasChanges}"
+						Text="Save" />
+
+					<Border>
+						<materialIcons:MaterialIcon
+							Width="16"
+							Height="16"
+							Margin="-8,-8,0,0"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Top"
+							Classes="ValidationError"
+							IsVisible="{Binding HasErrors}"
+							ToolTip.Tip="Validation errors must be addressed before data can be saved." />
+					</Border>
+				</Grid>
 				<controls:PageNavButton
-					Margin="0,0,6,0"
-					Click="{eventBinder:EventBinding SaveChangesAndNavigateBack}"
-					Icon="FloppyDisc"
-					IsEnabled="{Binding HasChanges}"
-					Text="Save" />
-				<controls:PageNavButton
-					Click="{eventBinder:EventBinding NavigationService.NavigateBack}"
+					Command="{Binding CancelCommand}"
 					Icon="Cancel"
 					IsOutline="True"
 					Text="Cancel" />
-			</UniformGrid>
-
-			<StackPanel>
-				<controls:FolderPickerFormField
-					FolderPath="{Binding HomeLabRepoDataPath}"
-					Label="Home Lab Repo Data Path"
-					OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
-					<controls:FolderPickerFormField.InfoTip>
-						<TextBlock MaxWidth="384" TextWrapping="Wrap">
-							<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
-							<LineBreak />
-							<LineBreak />
-							<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
-						</TextBlock>
-					</controls:FolderPickerFormField.InfoTip>
-				</controls:FolderPickerFormField>
-
-				<controls:FilePickerFormField
-					FilePath="{Binding GitConfigFilePath}"
-					Label="Git Config File Path"
-					OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
-					<controls:FilePickerFormField.InfoTip>
-						<TextBlock MaxWidth="384" TextWrapping="Wrap">
-							This is the path to the standard Git config file containing the Name and Email Address to use.
-						</TextBlock>
-					</controls:FilePickerFormField.InfoTip>
-				</controls:FilePickerFormField>
-
-				<controls:BasicStringFormField
-					InfoTip="This is the User Name used when signing into Github."
-					Label="Github User Name"
-					StringValue="{Binding GithubUserName}" />
-
-				<controls:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
-					<controls:BasicStringFormField.InfoTip>
-						<TextBlock MaxWidth="384" TextWrapping="Wrap">
-							<Run>This is the Github PAT used when pushing up to Github.</Run>
-							<LineBreak />
-							<LineBreak />
-							<Run>See Github PAT documentation for details.</Run>
-						</TextBlock>
-					</controls:BasicStringFormField.InfoTip>
-				</controls:BasicStringFormField>
 			</StackPanel>
+
+			<ScrollViewer>
+				<StackPanel>
+					<controls:FolderPickerFormField
+						FolderPath="{Binding HomeLabRepoDataPath}"
+						Label="Home Lab Repo Data Path"
+						OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
+						<controls:FolderPickerFormField.InfoTip>
+							<TextBlock MaxWidth="384" TextWrapping="Wrap">
+								<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
+								<LineBreak />
+								<LineBreak />
+								<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
+							</TextBlock>
+						</controls:FolderPickerFormField.InfoTip>
+					</controls:FolderPickerFormField>
+
+					<controls:FilePickerFormField
+						FilePath="{Binding GitConfigFilePath}"
+						Label="Git Config File Path"
+						OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
+						<controls:FilePickerFormField.InfoTip>
+							<TextBlock MaxWidth="384" TextWrapping="Wrap">
+								This is the path to the standard Git config file containing the Name and Email Address to use.
+							</TextBlock>
+						</controls:FilePickerFormField.InfoTip>
+					</controls:FilePickerFormField>
+
+					<controls:BasicStringFormField
+						InfoTip="This is the User Name used when signing into Github."
+						Label="Github User Name"
+						StringValue="{Binding GithubUserName}" />
+
+					<controls:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
+						<controls:BasicStringFormField.InfoTip>
+							<TextBlock MaxWidth="384" TextWrapping="Wrap">
+								<Run>This is the Github PAT used when pushing up to Github.</Run>
+								<LineBreak />
+								<LineBreak />
+								<Run>See Github PAT documentation for details.</Run>
+							</TextBlock>
+						</controls:BasicStringFormField.InfoTip>
+					</controls:BasicStringFormField>
+				</StackPanel>
+			</ScrollViewer>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>
