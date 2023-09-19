@@ -1,0 +1,23 @@
+<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+	xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
+	xmlns:materialIcons="using:Material.Icons.Avalonia">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<WrapPanel MaxWidth="800" Orientation="Horizontal" />
+		</Border>
+	</Design.PreviewWith>
+
+	<!--  PageNavButton default styles.  -->
+	<Style Selector="StackPanel.PageSidebar">
+		<Setter Property="MaxWidth" Value="400" />
+		<Setter Property="Margin" Value="24,24,0,24" />
+		<Setter Property="HorizontalAlignment" Value="Right" />
+		<Setter Property="VerticalAlignment" Value="Top" />
+		<Setter Property="Spacing" Value="8" />
+	</Style>
+</Styles>

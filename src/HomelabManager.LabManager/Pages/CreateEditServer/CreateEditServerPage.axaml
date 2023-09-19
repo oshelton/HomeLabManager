@@ -25,38 +25,36 @@
 
 	<DataTemplate x:Key="CreateEditServerPageTemplate" DataType="{x:Type page:CreateEditServerViewModel}">
 		<DockPanel IsEnabled="{Binding !IsSaving}">
-			<UniformGrid
-				HorizontalAlignment="Right"
-				Columns="3"
-				DockPanel.Dock="Bottom">
+			<StackPanel Classes="PageSidebar" DockPanel.Dock="Right">
+				<Grid>
+					<controls:PageNavButton
+						Command="{Binding SaveCommand}"
+						Icon="FloppyDisc"
+						Text="Save" />
 
-				<Border>
-					<materialIcons:MaterialIcon
-						Margin="0,0,8,0"
-						HorizontalAlignment="Right"
-						Classes="ValidationError"
-						IsVisible="{Binding HasErrors}"
-						ToolTip.Tip="Validation errors must be addressed before data can be saved." />
-				</Border>
-
-				<controls:PageNavButton
-					Margin="0,0,6,0"
-					Command="{Binding SaveCommand}"
-					Icon="FloppyDisc"
-					Text="Save" />
+					<Border>
+						<materialIcons:MaterialIcon
+							Width="16"
+							Height="16"
+							Margin="-8,-8,0,0"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Top"
+							Classes="ValidationError"
+							IsVisible="{Binding HasErrors}"
+							ToolTip.Tip="Validation errors must be addressed before data can be saved." />
+					</Border>
+				</Grid>
 
 				<controls:PageNavButton
 					Command="{Binding CancelCommand}"
 					Icon="Cancel"
 					IsOutline="True"
 					Text="Cancel" />
-			</UniformGrid>
+			</StackPanel>
 
 			<ScrollViewer DockPanel.Dock="Top">
 				<StackPanel>
-					<StackPanel>
-						<ContentControl Content="{Binding Metadata}" ContentTemplate="{StaticResource MetadataEditorTemplate}" />
-					</StackPanel>
+					<ContentControl Content="{Binding Metadata}" ContentTemplate="{StaticResource MetadataEditorTemplate}" />
 				</StackPanel>
 			</ScrollViewer>
 		</DockPanel>
