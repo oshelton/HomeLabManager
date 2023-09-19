@@ -34,7 +34,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
             .ToProperty(this, nameof(CanSave))
             .DisposeWith(_disposables);
 
-        // Set up observable to monitor for validation issues.
+        // Set up observable to monitor for changes in general.
         _hasChanges = this.WhenAnyValue(x => x.Metadata.HasChanges)
             .ToProperty(this, nameof(HasChanges))
             .DisposeWith(_disposables);
