@@ -1,4 +1,5 @@
 ﻿using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.SharedDialogs;
@@ -12,6 +13,7 @@ namespace HomeLabManager.Manager
     {
         public Func<ICoreConfigurationManager> CoreConfigurationManagerServiceBuilder { get; init; }
         public Func<IServerDataManager> ServerDataManagerServiceBuilder { get; init; }
+        public Func<IGitDataManager> GitDataManagerServiceBuilder { get; init; }
         public Func<INavigationService> NavigationServiceBuilder { get; init; }
         public Func<ISharedDialogsService> SharedDialogsServiceBuilder { get; init; }
     }

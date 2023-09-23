@@ -2,8 +2,8 @@ using System.Diagnostics;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using HomeLabManager.Common.Data.CoreConfiguration;
+using HomeLabManager.Common.Data.Git;
 using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Common.Services;
 using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.DesignModeServices;
 using HomeLabManager.Manager.Services.Navigation;
@@ -105,7 +105,8 @@ internal class Program
                         // Add Data Services.
                         services.AddSingleton(provider => overrides.CoreConfigurationManagerServiceBuilder?.Invoke() ?? new CoreConfigurationManager(s_coreConfigurationDirectory, provider.GetService<ILogManager>()));
                         services.AddSingleton(provider => overrides.ServerDataManagerServiceBuilder?.Invoke() ?? new ServerDataManager(provider.GetService<ICoreConfigurationManager>(), provider.GetService<ILogManager>()));
-                        
+                        services.AddSingleton(provider => overrides.GitDataManagerServiceBuilder?.Invoke() ?? new GitDataManager(provider.GetService<ICoreConfigurationManager>(), provider.GetService<ILogManager>()));
+
                         // Add non-data services.
                         services.AddSingleton(provider => overrides.NavigationServiceBuilder?.Invoke() ?? new NavigationService(provider.GetService<ILogManager>()));
                         services.AddSingleton(provider => overrides.SharedDialogsServiceBuilder?.Invoke() ?? new SharedDialogsService(provider.GetService<ILogManager>()));
@@ -114,6 +115,7 @@ internal class Program
                         // Add Data Services.
                         services.AddSingleton<ICoreConfigurationManager>(provider => new DesignCoreConfigurationManager());
                         services.AddSingleton<IServerDataManager>(provider => new DesignServerDataManager());
+                        services.AddSingleton<IGitDataManager>(provider => new DesignGitDataManager());
 
                         // Add non-data services.
                         services.AddSingleton<INavigationService>(provider => new DesignNavigationService());
@@ -125,6 +127,7 @@ internal class Program
 
         Debug.Assert(host.Services.GetService<ICoreConfigurationManager>() is not null);
         Debug.Assert(host.Services.GetService<IServerDataManager>() is not null);
+        Debug.Assert(host.Services.GetService<IGitDataManager>() is not null);
         Debug.Assert(host.Services.GetService<INavigationService>() is not null);
         Debug.Assert(host.Services.GetService<ILogManager>() is not null);
 
