@@ -8,20 +8,43 @@
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
 	<Design.PreviewWith>
 		<Border Padding="20">
-			<WrapPanel MaxWidth="800" Orientation="Horizontal">
-				<controls:PageNavButton
-					Margin="4"
-					Icon="Toolbox"
-					Text="Tools" />
+			<StackPanel
+				MaxWidth="800"
+				Orientation="Vertical"
+				Spacing="8">
 
-				<Button Margin="4" Classes="CardCommandIconButton BasicAction">
-					<materialIcons:MaterialIcon Kind="Square" />
-				</Button>
+				<StackPanel Orientation="Horizontal" Spacing="4">
+					<TextBlock VerticalAlignment="Center">Page Nav Buttons:</TextBlock>
 
-				<Button Margin="4" Classes="CardCommandIconButton">
-					<materialIcons:MaterialIcon Kind="About" />
-				</Button>
-			</WrapPanel>
+					<controls:PageNavButton
+						Margin="4"
+						Icon="Toolbox"
+						Text="Tools" />
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" Spacing="4">
+					<TextBlock VerticalAlignment="Center">ToolbarIconButton:</TextBlock>
+
+					<Button Classes="ToolbarIconButton">
+						<materialIcons:MaterialIcon Kind="About" />
+					</Button>
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" Spacing="4">
+					<TextBlock VerticalAlignment="Center">CardCommandIconButton BasicAction:</TextBlock>
+
+					<Button Margin="4" Classes="CardCommandIconButton BasicAction">
+						<materialIcons:MaterialIcon Kind="Square" />
+					</Button>
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" Spacing="4">
+					<TextBlock VerticalAlignment="Center">CardCommandIconButton:</TextBlock>
+					<Button Margin="4" Classes="CardCommandIconButton">
+						<materialIcons:MaterialIcon Kind="About" />
+					</Button>
+				</StackPanel>
+			</StackPanel>
 		</Border>
 	</Design.PreviewWith>
 
@@ -31,16 +54,27 @@
 		<Setter Property="Orientation" Value="Horizontal" />
 	</Style>
 
-	<Style Selector=":is(controls|PageNavButton) materialIcons|MaterialIcon">
-		<Setter Property="Width" Value="24" />
-		<Setter Property="Height" Value="24" />
-	</Style>
-
 	<Style Selector=":is(controls|PageNavButton) TextBlock">
 		<Setter Property="VerticalAlignment" Value="Bottom" />
 		<Setter Property="FontWeight" Value="Medium" />
 		<Setter Property="Padding" Value="0,0,0,1" />
 		<Setter Property="FontSize" Value="16" />
+	</Style>
+
+	<!--  Toolbar Buttons  -->
+	<Style Selector=":is(Button).ToolbarIconButton">
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="Padding" Value="4" />
+		<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+		<Setter Property="(i:Interaction.Behaviors)">
+			<i:BehaviorCollectionTemplate>
+				<i:BehaviorCollection>
+					<iac:RoutedEventTriggerBehavior RoutedEvent="{x:Static Control.LoadedEvent}" RoutingStrategies="Direct">
+						<iac:AddClassAction ClassName="Flat" />
+					</iac:RoutedEventTriggerBehavior>
+				</i:BehaviorCollection>
+			</i:BehaviorCollectionTemplate>
+		</Setter>
 	</Style>
 
 	<!--  Card Command Button Styles  -->

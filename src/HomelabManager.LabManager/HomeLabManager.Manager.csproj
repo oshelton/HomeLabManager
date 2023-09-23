@@ -49,6 +49,9 @@
     <Compile Update="Windows\MainWindow.axaml.cs">
       <DependentUpon>MainWindow.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Windows\MainWindowComponents\GitStatusIndicator\GitStatusIndicatorControl.axaml.cs">
+      <DependentUpon>GitStatusIndicatorControl.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Update="Styles\Icons.xaml">
