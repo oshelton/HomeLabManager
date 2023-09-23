@@ -32,12 +32,7 @@
 
 					<Border>
 						<materialIcons:MaterialIcon
-							Width="16"
-							Height="16"
-							Margin="-8,-8,0,0"
-							HorizontalAlignment="Left"
-							VerticalAlignment="Top"
-							Classes="ValidationError"
+							Classes="ValidationError SmallBadge"
 							IsVisible="{Binding HasErrors}"
 							ToolTip.Tip="Validation errors must be addressed before data can be saved." />
 					</Border>
