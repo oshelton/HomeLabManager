@@ -21,18 +21,10 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _gitDataManager = Program.ServiceProvider.Services.GetService<IGitDataManager>();
 
-        if (!Avalonia.Controls.Design.IsDesignMode)
-        {
-            // Set up the timer for regularly polling the status of the git data. 
-            _pollingObserver = Observable.Timer(TimeSpan.FromSeconds(2))
-                .Subscribe(async _ => await UpdateGitStatus().ConfigureAwait(true));
-        }
+        // Set up the timer for regularly polling the status of the git data. 
+        _pollingObserver = Observable.Timer(TimeSpan.FromSeconds(2))
+            .Subscribe(async _ => await UpdateGitStatus().ConfigureAwait(true));
     }
-
-    /// <summary>
-    /// Stop the polling timer.
-    /// </summary>
-    public void StopPolling() => _pollingObserver.Dispose();
 
     /// <inheritdoc />
     public GitStatusIndicatorDisplayMode CurrentDisplayMode
