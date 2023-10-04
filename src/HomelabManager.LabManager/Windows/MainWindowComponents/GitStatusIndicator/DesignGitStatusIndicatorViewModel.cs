@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Avalonia.Controls.Documents;
+using ReactiveUI;
 
 namespace HomeLabManager.Manager.Windows.MainWindowComponents.GitStatusIndicator;
 
@@ -9,4 +10,18 @@ internal sealed class DesignGitStatusIndicatorViewModel : ReactiveObject, IGitSt
 {
     /// <inheritdoc />
     public GitStatusIndicatorDisplayMode CurrentDisplayMode { get; set; }
+
+    /// <inheritdoc />
+    public IReadOnlyList<string> UncommittedChanges { get; } = new[]
+    {
+        "Change 1",
+        "Change 2",
+        "Change 3"
+    };
+
+    /// <inheritdoc />
+    public bool CanCommitChanges { get; set; }
+
+    /// <inheritdoc />
+    public bool IsCommittingChanges { get; set; }
 }

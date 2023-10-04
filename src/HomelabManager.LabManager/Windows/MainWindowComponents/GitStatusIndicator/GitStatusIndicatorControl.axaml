@@ -79,7 +79,39 @@
 								BorderThickness="1"
 								CornerRadius="3">
 								<materialControls:Card>
-									<TextBlock>Change List</TextBlock>
+									<StackPanel>
+										<ScrollViewer MaxWidth="400" MaxHeight="400">
+											<ItemsRepeater Margin="4" ItemsSource="{Binding UncommittedChanges}">
+												<ItemsRepeater.ItemTemplate>
+													<DataTemplate>
+														<TextBlock Text="{Binding Mode=OneTime}" TextTrimming="CharacterEllipsis" />
+													</DataTemplate>
+												</ItemsRepeater.ItemTemplate>
+											</ItemsRepeater>
+										</ScrollViewer>
+
+										<Separator Margin="4" />
+
+										<Button
+											Margin="4"
+											HorizontalAlignment="Right"
+											IsEnabled="{Binding CanCommitChanges}"
+											IsVisible="{Binding !IsCommittingChanges}">
+											Commit and Push Changes
+										</Button>
+
+										<StackPanel IsVisible="{Binding IsCommittingChanges}" Orientation="Horizontal">
+											<TextBlock Margin="4,4,8,4">
+												Committing...
+											</TextBlock>
+
+											<ProgressBar
+												Width="16"
+												Height="16"
+												Classes="circular"
+												IsIndeterminate="True" />
+										</StackPanel>
+									</StackPanel>
 								</materialControls:Card>
 							</Border>
 						</Popup>

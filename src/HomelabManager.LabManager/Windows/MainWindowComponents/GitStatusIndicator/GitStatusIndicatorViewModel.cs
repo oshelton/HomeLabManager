@@ -1,7 +1,10 @@
 ﻿using System.Reactive.Linq;
+using Avalonia.Controls.Documents;
 using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git;
+using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
@@ -20,10 +23,20 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
     {
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _gitDataManager = Program.ServiceProvider.Services.GetService<IGitDataManager>();
+        _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
+        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<GitStatusIndicatorViewModel>();
 
         // Set up the timer for regularly polling the status of the git data. 
-        _pollingObserver = Observable.Timer(TimeSpan.FromSeconds(2))
+        Observable.Timer(TimeSpan.FromSeconds(2))
             .Subscribe(async _ => await UpdateGitStatus().ConfigureAwait(true));
+    }
+
+    public async Task CommitChanges()
+    {
+        if (!CanCommitChanges)
+            throw new InvalidOperationException("Attempting to commit changes when we can't.");
+
+
     }
 
     /// <inheritdoc />
@@ -33,30 +46,75 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         private set => this.RaiseAndSetIfChanged(ref _currentDisplayMode, value);
     }
 
+    /// <inheritdoc />
+    public IReadOnlyList<string> UncommittedChanges
+    {
+        get => _uncommittedChanges;
+        private set => this.RaiseAndSetIfChanged(ref _uncommittedChanges, value);
+    }
+
+    /// <inheritdoc />
+    public bool CanCommitChanges
+    {
+        get => _canCommitChanges;
+        set => this.RaiseAndSetIfChanged(ref _canCommitChanges, value);
+    }
+
+    /// <inheritdoc />
+    public bool IsCommittingChanges
+    {
+        get => _isCommittingChanges;
+        set => this.RaiseAndSetIfChanged(ref _isCommittingChanges, value);
+    }
+
     /// <summary>
     /// Update the git data status.
     /// </summary>
     private async Task UpdateGitStatus()
     {
         var displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
-        await Task.Run(() =>
-        {
-            if (string.IsNullOrEmpty(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
-                displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
-            else if (!_gitDataManager.IsDataPathARepo())
-                displayMode = GitStatusIndicatorDisplayMode.NoValidGitRepo;
-            else if (!_gitDataManager.RepoHasUncommitedChanges())
-                displayMode = GitStatusIndicatorDisplayMode.NoChanges;
-            else
-                displayMode = GitStatusIndicatorDisplayMode.UncommittedChanges;
-        }).ConfigureAwait(false);
+        IReadOnlyList<string> statusMessages = Array.Empty<string>();
+        var canCommit = false;
 
-        DispatcherHelper.PostToUIThreadIfNecessary(() => CurrentDisplayMode = displayMode, DispatcherPriority.Normal);
+        using (_logManager.StartTimedOperation("Updating Git Status Indicator Status"))
+        {
+            await Task.Run(() =>
+            {
+                if (string.IsNullOrEmpty(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
+                    displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
+                else if (!_gitDataManager.IsDataPathARepo())
+                    displayMode = GitStatusIndicatorDisplayMode.NoValidGitRepo;
+                else if (!_gitDataManager.RepoHasUncommitedChanges())
+                    displayMode = GitStatusIndicatorDisplayMode.NoChanges;
+                else
+                {
+                    displayMode = GitStatusIndicatorDisplayMode.UncommittedChanges;
+                    var changes = _gitDataManager.GetRepoStatus();
+
+                    statusMessages = _serverDataManager.MapChangesToHumanReadableInfo(changes);
+
+                    var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
+                    if (!string.IsNullOrEmpty(coreConfig.GithubPat) && !string.IsNullOrEmpty(coreConfig.GithubUserName) && File.Exists(coreConfig.GitConfigFilePath))
+                        canCommit = true;
+                }
+            }).ConfigureAwait(false);
+        }
+
+        DispatcherHelper.PostToUIThreadIfNecessary(() =>
+        {
+            CurrentDisplayMode = displayMode;
+            UncommittedChanges = statusMessages;
+            CanCommitChanges = canCommit;
+        }, DispatcherPriority.Normal);
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly IGitDataManager _gitDataManager;
-    private readonly IDisposable _pollingObserver;
+    private readonly IServerDataManager _serverDataManager;
+    private readonly ContextAwareLogManager<GitStatusIndicatorViewModel> _logManager;
 
     private GitStatusIndicatorDisplayMode _currentDisplayMode;
+    private IReadOnlyList<string> _uncommittedChanges;
+    private bool _canCommitChanges;
+    private bool _isCommittingChanges;
 }

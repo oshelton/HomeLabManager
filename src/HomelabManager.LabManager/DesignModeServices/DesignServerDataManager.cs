@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
+using Avalonia.Controls.Documents;
 using HomeLabManager.Common.Data.Git.Server;
+using LibGit2Sharp;
 
 [assembly: InternalsVisibleTo("HomeLabManager.ManagerTests")]
 
@@ -14,10 +16,9 @@ internal sealed class DesignServerDataManager: IServerDataManager
 
     public void DeleteServer(ServerHostDto server) => m_servers.Remove(server);
 
-    public IReadOnlyList<ServerHostDto> GetServers()
-    {
-        return m_servers;
-    }
+    public IReadOnlyList<ServerHostDto> GetServers() => m_servers;
+
+    public IReadOnlyList<string> MapChangesToHumanReadableInfo(RepositoryStatus status) => Array.Empty<string>();
 
     public void UpdateServer(ServerHostDto server) { }
 

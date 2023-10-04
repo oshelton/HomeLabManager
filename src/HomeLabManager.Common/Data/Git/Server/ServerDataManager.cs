@@ -1,16 +1,16 @@
 ﻿using System.Runtime.CompilerServices;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Services.Logging;
-using Serilog;
+using LibGit2Sharp;
 
 [assembly: InternalsVisibleTo("HomeLabManager.DataTests")]
 
 namespace HomeLabManager.Common.Data.Git.Server;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public sealed class ServerDataManager : IServerDataManager
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public ServerDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager)
     {
         _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
@@ -19,7 +19,7 @@ public sealed class ServerDataManager : IServerDataManager
         _logManager.GetApplicationLogger().Information("Created");
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IReadOnlyList<ServerHostDto> GetServers()
     {
         var logger = _logManager.GetApplicationLogger();
@@ -84,7 +84,7 @@ public sealed class ServerDataManager : IServerDataManager
         return foundServerDtos;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void AddUpdateServer(ServerHostDto server)
     {
         if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
@@ -113,7 +113,7 @@ public sealed class ServerDataManager : IServerDataManager
         WriteServerHostDto(server, serversDirectory, _logManager);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void DeleteServer(ServerHostDto server)
     {
         if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
@@ -135,6 +135,79 @@ public sealed class ServerDataManager : IServerDataManager
 
         using var _ = _logManager.StartTimedOperation("Deleting Server");
         Directory.Delete(serverDirectory, true);
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyList<string> MapChangesToHumanReadableInfo(RepositoryStatus status)
+    {
+        if (status is null)
+            throw new ArgumentNullException(nameof(status));
+
+        var results = new List<string>();
+        var servers = GetServers();
+
+        foreach (var statusChanges in status.Untracked.GroupBy(x => x.State))
+        {
+            var remapped = MapEntries(statusChanges);
+            if (remapped is null)
+            {
+                _logManager.GetApplicationLogger().Warning("Unhandled change type encountered {ChangeType} for one or more files.", statusChanges.Key);
+            }
+            else
+            {
+                var serverChanges = remapped?.Entries.Where(x => x.FilePath.StartsWith(ServersDirectoryName, StringComparison.OrdinalIgnoreCase))
+                    .GroupBy(x => Path.GetDirectoryName(x.FilePath.Substring(ServersDirectoryName.Length + 1)))
+                    .ToArray();
+
+                foreach (var serverGroup in serverChanges)
+                {
+                    var matchingServer = servers.FirstOrDefault(x => x.UniqueId?.ToString() == serverGroup.Key);
+                    if (matchingServer is null)
+                    {
+                        results.Add($"Deleted Server host with Unique Id: {serverGroup.Key}");
+                    }
+                    else
+                    {
+                        switch (remapped?.Change)
+                        {
+                            case ChangeKind.Added:
+                                var existingFiles = Directory.GetFiles(matchingServer.Directory, "*.*", SearchOption.AllDirectories);
+                                if (existingFiles.Length == serverGroup.Count())
+                                    results.Add($"Created new server host: {matchingServer.Metadata.DisplayName}");
+                                else
+                                    results.Add($"Updating server host with new features: {matchingServer.Metadata.DisplayName}");
+                                break;
+                            case ChangeKind.Modified:
+                                results.Add($"Modified server host: {matchingServer.Metadata.DisplayName}");
+                                break;
+                            case ChangeKind.Removed:
+                                results.Add($"Removing features from server host: {matchingServer.Metadata.DisplayName}");
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private static (ChangeKind Change, IReadOnlyList<StatusEntry> Entries)? MapEntries(IGrouping<FileStatus, StatusEntry> entries)
+    {
+        return entries switch
+        {
+            IGrouping<FileStatus, StatusEntry> grouping when grouping.Key == FileStatus.NewInWorkdir || entries.Key == FileStatus.NewInIndex => (ChangeKind.Added, grouping.ToArray()),
+            IGrouping<FileStatus, StatusEntry> grouping when grouping.Key == FileStatus.ModifiedInWorkdir || entries.Key == FileStatus.ModifiedInIndex => (ChangeKind.Modified, grouping.ToArray()),
+            IGrouping<FileStatus, StatusEntry> grouping when grouping.Key == FileStatus.DeletedFromWorkdir || entries.Key == FileStatus.DeletedFromIndex => (ChangeKind.Removed, grouping.ToArray()),
+            _ => null,
+        };
+    }
+
+    private enum ChangeKind
+    {
+        Added,
+        Modified,
+        Removed
     }
 
     /// <summary>
