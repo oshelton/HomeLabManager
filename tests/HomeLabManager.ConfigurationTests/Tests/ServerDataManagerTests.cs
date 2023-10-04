@@ -1,5 +1,6 @@
 ﻿using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Common.Services.Logging;
+using LibGit2Sharp;
 
 namespace HomeLabManager.DataTests.Tests;
 
@@ -45,7 +46,7 @@ public sealed class ServerDataManagerTests
     /// Test retrieving server metadata.
     /// </summary>
     [Test]
-    public void GetServerMetadata()
+    public void GetServers_CompareReadWithTruth_ConfirmServersReadFromFilesMatchExpected()
     {
         var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
 
@@ -89,7 +90,7 @@ public sealed class ServerDataManagerTests
     /// Test adding a new server.
     /// </summary>
     [Test]
-    public void AddNewServer()
+    public void AddUpdateServer_AddNewServer_ConfirmAddingNewServerWorks()
     {
         var testNewServer = new ServerHostDto()
         {
@@ -147,7 +148,7 @@ public sealed class ServerDataManagerTests
     }
 
     [Test]
-    public void UpdateExistingServer()
+    public void AddUpdateServer_UpdateExistingServer_ConfirmUpdatingExistingServerWorks()
     {
         var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
 
@@ -172,7 +173,7 @@ public sealed class ServerDataManagerTests
     }
 
     [Test]
-    public void DeleteServer()
+    public void DeleteServer_DeleteExistingServer_ConfirmDeletingServerWorks()
     {
         var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
 
@@ -188,6 +189,16 @@ public sealed class ServerDataManagerTests
 
         Assert.That(servers.Count, Is.EqualTo(_servers.Length - 1));
         Assert.That(servers.All(x => x.UniqueId != toDelete.UniqueId), Is.True);
+    }
+
+    [Test]
+    public void DeleteServer_DeleteUnsavedServer_ConfirmDeletingUnsavedServerThrows()
+    {
+        var serverManager = new ServerDataManager(Utils.CreateCoreConfigurationManager(false).manager, new LogManager(true));
+
+        var newServer = new ServerHostDto();
+
+        Assert.Throws<InvalidDataException>(() => serverManager.DeleteServer(newServer));
     }
 
     /// <summary>
