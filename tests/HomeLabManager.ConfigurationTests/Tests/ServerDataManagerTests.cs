@@ -32,7 +32,7 @@ public sealed class ServerDataManagerTests
             }
         }
 
-        File.WriteAllText(Utils.TestGitConfigFilePath, @"[user]\n\tname = Owen Shelton\n\temail = jowenshelton@gmail.com");
+        Utils.WriteTestGitConfig();
     }
 
     [TearDown]

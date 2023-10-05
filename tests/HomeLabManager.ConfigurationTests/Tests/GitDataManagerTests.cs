@@ -255,10 +255,8 @@ public sealed class GitDataManagerTests
     private static void CreateTestData()
     {
         Directory.CreateDirectory(Utils.TestDirectory);
-
         Directory.CreateDirectory(Utils.TestGitDirectory);
-
-        File.WriteAllText(Utils.TestGitConfigFilePath, @"[user]\n\tname = Owen Shelton\n\temail = jowenshelton@gmail.com");
+        Utils.WriteTestGitConfig();
     }
 
     private CoreConfigurationManager _coreConfigurationManager;

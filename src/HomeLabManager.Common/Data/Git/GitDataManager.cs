@@ -156,9 +156,8 @@ namespace HomeLabManager.Common.Data.Git
 
             using (logManager.StartTimedOperation("Constructing Signature from Git Config File"))
             {
-                var gitInfo = File.ReadAllText(gitConfigFilePath)
-                .Split("\\n", StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Replace("\\t", "", StringComparison.InvariantCultureIgnoreCase).Trim())
+                var gitInfo = File.ReadAllLines(gitConfigFilePath)
+                    .Select(line => line.Trim())
                 .Where(line => line.StartsWith("name", true, CultureInfo.InvariantCulture) || line.StartsWith("email", true, CultureInfo.InvariantCulture))
                 .Select(line => line.Split('=', StringSplitOptions.TrimEntries))
                 .ToDictionary(lineParts => lineParts[0], lineParts => lineParts[1]);

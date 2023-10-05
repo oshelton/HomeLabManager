@@ -10,7 +10,7 @@ public sealed class CoreConfigurationManagerTests
     {
         Directory.CreateDirectory(Utils.TestDirectory);
         Directory.CreateDirectory(Utils.TestGitDirectory);
-        File.WriteAllText(Utils.TestGitConfigFilePath, @"[user]\n\tname = Owen Shelton\n\temail = jowenshelton@gmail.com");
+        Utils.WriteTestGitConfig();
     }
 
     [TearDown]
