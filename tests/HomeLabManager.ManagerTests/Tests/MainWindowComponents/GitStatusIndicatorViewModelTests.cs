@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace HomeLabManager.ManagerTests.Tests.MainWindowComponents;
 
-internal class GitStatusIndicatorViewModelTests
+/*internal class GitStatusIndicatorViewModelTests
 {
-}
+}*/

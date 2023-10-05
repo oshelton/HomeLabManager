@@ -36,7 +36,17 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         if (!CanCommitChanges)
             throw new InvalidOperationException("Attempting to commit changes when we can't.");
 
+        IReadOnlyList<string> changes = null;
+        await DispatcherHelper.PostToUIThreadIfNecessary(() =>
+        {
+            IsCommittingChanges = true;
+            changes = UncommittedChanges.ToArray();
+        }, DispatcherPriority.Normal).ConfigureAwait(false);
 
+        await Task.Run(() => _gitDataManager.CommitAndPushChanges($"Home Lab Manager Changes Committed:\n\n{string.Join("\n", changes)}")).ConfigureAwait(false);
+
+        await Task.Delay(5000).ConfigureAwait(false);
+        await DispatcherHelper.PostToUIThreadIfNecessary(() => IsCommittingChanges = false, DispatcherPriority.Normal).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -72,6 +82,9 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
     /// </summary>
     private async Task UpdateGitStatus()
     {
+        if (IsCommittingChanges)
+            return;
+
         var displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
         IReadOnlyList<string> statusMessages = Array.Empty<string>();
         var canCommit = false;
@@ -100,12 +113,12 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
             }).ConfigureAwait(false);
         }
 
-        DispatcherHelper.PostToUIThreadIfNecessary(() =>
+        await DispatcherHelper.PostToUIThreadIfNecessary(() =>
         {
             CurrentDisplayMode = displayMode;
             UncommittedChanges = statusMessages;
             CanCommitChanges = canCommit;
-        }, DispatcherPriority.Normal);
+        }, DispatcherPriority.Normal).ConfigureAwait(false);
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;

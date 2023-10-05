@@ -95,11 +95,11 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
 
         logger.Information("Loaded \"{ServerCount}\" servers", servers.Length);
 
-        DispatcherHelper.PostToUIThreadIfNecessary(() =>
+        await DispatcherHelper.PostToUIThreadIfNecessary(() =>
         {
             Servers = servers;
             CurrentDisplayMode = (servers?.Length ?? 0) != 0 ? HomeDisplayMode.HasServers : HomeDisplayMode.NoServers;
-        }, DispatcherPriority.Input);
+        }, DispatcherPriority.Input).ConfigureAwait(false);
     }
 
     public override Task<bool> TryNavigateAway() => Task.FromResult(true);

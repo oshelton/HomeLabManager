@@ -146,7 +146,13 @@ public sealed class ServerDataManager : IServerDataManager
         var results = new List<string>();
         var servers = GetServers();
 
-        foreach (var statusChanges in status.Untracked.GroupBy(x => x.State))
+        var allChanges = status.Untracked
+            .Concat(status.Added)
+            .Concat(status.Modified)
+            .Concat(status.Removed)
+            .GroupBy(x => x.State);
+
+        foreach (var statusChanges in allChanges)
         {
             var remapped = MapEntries(statusChanges);
             if (remapped is null)

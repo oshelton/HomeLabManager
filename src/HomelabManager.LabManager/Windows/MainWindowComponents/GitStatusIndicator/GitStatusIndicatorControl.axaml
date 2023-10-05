@@ -4,6 +4,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:eventBinder="using:EventBinder"
 	xmlns:local="using:HomeLabManager.Manager.Windows.MainWindowComponents.GitStatusIndicator"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -95,6 +96,7 @@
 										<Button
 											Margin="4"
 											HorizontalAlignment="Right"
+											Click="{eventBinder:EventBinding CommitChanges}"
 											IsEnabled="{Binding CanCommitChanges}"
 											IsVisible="{Binding !IsCommittingChanges}">
 											Commit and Push Changes

@@ -8,9 +8,13 @@ namespace HomeLabManager.Manager.DesignModeServices;
 /// </summary>
 internal sealed class DesignGitDataManager : IGitDataManager
 {
+    public bool CommitAndPushChanges(string commitMessage) => false;
+
     public RepositoryStatus GetRepoStatus() => null;
 
     public bool IsDataPathARepo() => false;
+
+    public void PullLatestChanges() { }
 
     public bool RepoHasUncommitedChanges() => false;
 }

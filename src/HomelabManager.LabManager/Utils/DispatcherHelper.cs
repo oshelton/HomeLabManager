@@ -10,33 +10,28 @@ public static class DispatcherHelper
     /// <summary>
     /// Invoke the posted action on the UI Thread if exection is not currently on the UI thread.
     /// </summary>
-    public static void PostToUIThreadIfNecessary(Action toPost, DispatcherPriority priority)
+    public static async Task PostToUIThreadIfNecessary(Action toInvoke, DispatcherPriority priority)
     {
-        if (toPost is null)
-            throw new ArgumentNullException(nameof(toPost));
+        if (toInvoke is null)
+            throw new ArgumentNullException(nameof(toInvoke));
 
         if (!Program.IsInTestingMode && !Dispatcher.UIThread.CheckAccess())
-            Dispatcher.UIThread.Post(toPost, priority);
+            await Dispatcher.UIThread.InvokeAsync(toInvoke, priority);
         else
-            toPost();
+            toInvoke();
     }
 
     /// <summary>
     /// Invoke an operation asynchronously on the UI thread.
     /// </summary>
-    public static Task InvokeAsync(Action toInvoke, DispatcherPriority priority)
+    public static async Task InvokeAsync(Action toInvoke, DispatcherPriority priority)
     {
         if (toInvoke is null)
             throw new ArgumentNullException(nameof(toInvoke));
 
         if (!Program.IsInTestingMode)
-        {
-            return Task.Run(async () => await Dispatcher.UIThread.InvokeAsync(toInvoke, priority));
-        }
+            await Dispatcher.UIThread.InvokeAsync(toInvoke, priority);
         else
-        {
             toInvoke();
-            return Task.CompletedTask;
-        }
     }
 }
