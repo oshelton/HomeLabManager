@@ -37,7 +37,7 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
             throw new InvalidOperationException("Attempting to commit changes when we can't.");
 
         IReadOnlyList<string> changes = null;
-        var title = string.IsNullOrWhiteSpace(CustomCommitMessageTitle) ? CustomCommitMessageTitle : DefaultCommitMessageTitle;
+        var title = !string.IsNullOrWhiteSpace(CustomCommitMessageTitle) ? CustomCommitMessageTitle : DefaultCommitMessageTitle;
         await DispatcherHelper.PostToUIThreadIfNecessary(() =>
         {
             IsCommittingChanges = true;
