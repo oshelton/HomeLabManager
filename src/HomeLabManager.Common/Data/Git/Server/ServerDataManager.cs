@@ -150,6 +150,9 @@ public sealed class ServerDataManager : IServerDataManager
             .Concat(status.Added)
             .Concat(status.Modified)
             .Concat(status.Removed)
+            .Concat(status.Missing)
+            .Concat(status.Staged)
+            .Concat(status.Untracked)
             .GroupBy(x => x.State);
 
         foreach (var statusChanges in allChanges)
