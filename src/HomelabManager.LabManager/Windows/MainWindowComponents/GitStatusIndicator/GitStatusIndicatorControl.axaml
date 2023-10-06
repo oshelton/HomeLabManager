@@ -80,8 +80,8 @@
 								BorderThickness="1"
 								CornerRadius="3">
 								<materialControls:Card>
-									<StackPanel>
-										<ScrollViewer MaxWidth="400" MaxHeight="400">
+									<StackPanel MaxWidth="400">
+										<ScrollViewer MaxHeight="400">
 											<ItemsRepeater Margin="4" ItemsSource="{Binding UncommittedChanges}">
 												<ItemsRepeater.ItemTemplate>
 													<DataTemplate>
@@ -93,14 +93,25 @@
 
 										<Separator Margin="4" />
 
-										<Button
-											Margin="4"
-											HorizontalAlignment="Right"
-											Click="{eventBinder:EventBinding CommitChanges}"
-											IsEnabled="{Binding CanCommitChanges}"
-											IsVisible="{Binding !IsCommittingChanges}">
-											Commit and Push Changes
-										</Button>
+										<DockPanel IsVisible="{Binding !IsCommittingChanges}">
+											<Button
+												Height="40"
+												Margin="4"
+												Click="{eventBinder:EventBinding CommitChanges}"
+												DockPanel.Dock="Right"
+												IsEnabled="{Binding CanCommitChanges}">
+												Commit Changes
+											</Button>
+
+											<TextBox
+												Margin="4,4,4,10"
+												Classes="outline dense"
+												FontSize="12"
+												Text="{Binding CustomCommitMessageTitle}"
+												Theme="{StaticResource OutlineTextBox}"
+												ToolTip.Tip="Title of the commit message."
+												Watermark="{Binding DefaultCommitMessageTitle}" />
+										</DockPanel>
 
 										<StackPanel IsVisible="{Binding IsCommittingChanges}" Orientation="Horizontal">
 											<TextBlock Margin="4,4,8,4">

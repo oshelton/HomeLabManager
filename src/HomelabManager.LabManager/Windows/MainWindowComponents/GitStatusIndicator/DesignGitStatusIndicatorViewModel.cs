@@ -20,6 +20,12 @@ internal sealed class DesignGitStatusIndicatorViewModel : ReactiveObject, IGitSt
     };
 
     /// <inheritdoc />
+    public string DefaultCommitMessageTitle { get; } = "Home Lab Manager Changes Committed";
+
+    /// <inheritdoc />
+    public string CustomCommitMessageTitle { get; set; }
+
+    /// <inheritdoc />
     public bool CanCommitChanges { get; set; }
 
     /// <inheritdoc />

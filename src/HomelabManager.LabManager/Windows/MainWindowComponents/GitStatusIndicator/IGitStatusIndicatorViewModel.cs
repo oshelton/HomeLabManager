@@ -29,6 +29,16 @@ internal interface IGitStatusIndicatorViewModel
     IReadOnlyList<string> UncommittedChanges { get; }
 
     /// <summary>
+    /// The default commit message title to use.
+    /// </summary>
+    string DefaultCommitMessageTitle { get; }
+
+    /// <summary>
+    /// Custom title to use for the commit message.
+    /// </summary>
+    string CustomCommitMessageTitle { get; }
+
+    /// <summary>
     /// Get whether or not changes can be committed.
     /// </summary>
     bool CanCommitChanges { get; }

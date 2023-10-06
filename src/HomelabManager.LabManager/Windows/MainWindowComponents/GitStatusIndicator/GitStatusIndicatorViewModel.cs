@@ -27,7 +27,7 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<GitStatusIndicatorViewModel>();
 
         // Set up the timer for regularly polling the status of the git data. 
-        Observable.Timer(TimeSpan.FromSeconds(2))
+        Observable.Timer(TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2), RxApp.MainThreadScheduler)
             .Subscribe(async _ => await UpdateGitStatus().ConfigureAwait(true));
     }
 
@@ -37,16 +37,20 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
             throw new InvalidOperationException("Attempting to commit changes when we can't.");
 
         IReadOnlyList<string> changes = null;
+        var title = string.IsNullOrWhiteSpace(CustomCommitMessageTitle) ? CustomCommitMessageTitle : DefaultCommitMessageTitle;
         await DispatcherHelper.PostToUIThreadIfNecessary(() =>
         {
             IsCommittingChanges = true;
             changes = UncommittedChanges.ToArray();
         }, DispatcherPriority.Normal).ConfigureAwait(false);
 
-        await Task.Run(() => _gitDataManager.CommitAndPushChanges($"Home Lab Manager Changes Committed:\n\n{string.Join("\n", changes)}")).ConfigureAwait(false);
+        await Task.Run(() => _gitDataManager.CommitAndPushChanges($"{title}\n\n{string.Join("\n", changes)}")).ConfigureAwait(false);
 
-        await Task.Delay(5000).ConfigureAwait(false);
-        await DispatcherHelper.PostToUIThreadIfNecessary(() => IsCommittingChanges = false, DispatcherPriority.Normal).ConfigureAwait(false);
+        await DispatcherHelper.PostToUIThreadIfNecessary(() =>
+        {
+            IsCommittingChanges = false;
+            CustomCommitMessageTitle = null;
+        }, DispatcherPriority.Normal).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -61,6 +65,16 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
     {
         get => _uncommittedChanges;
         private set => this.RaiseAndSetIfChanged(ref _uncommittedChanges, value);
+    }
+
+    /// <inheritdoc />
+    public string DefaultCommitMessageTitle { get; } = "Home Lab Manager Changes Committed";
+
+    /// <inheritdoc />
+    public string CustomCommitMessageTitle 
+    {
+        get => _customCommitMessageTitle;
+        set => this.RaiseAndSetIfChanged(ref _customCommitMessageTitle, value);
     }
 
     /// <inheritdoc />
@@ -128,6 +142,7 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
 
     private GitStatusIndicatorDisplayMode _currentDisplayMode;
     private IReadOnlyList<string> _uncommittedChanges;
+    private string _customCommitMessageTitle;
     private bool _canCommitChanges;
     private bool _isCommittingChanges;
 }
