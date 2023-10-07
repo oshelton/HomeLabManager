@@ -1,0 +1,49 @@
+<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:HomeLabManager.Manager.Windows.MainWindowComponents.GitStatusIndicator">
+	<Design.PreviewWith>
+		<Border Height="300">
+			<StackPanel
+				Width="500"
+				VerticalAlignment="Top"
+				Orientation="Horizontal">
+				<local:GitStatusIndicatorControl Margin="8">
+					<local:GitStatusIndicatorControl.DataContext>
+						<local:DesignGitStatusIndicatorViewModel CurrentDisplayMode="NoRepoPath" />
+					</local:GitStatusIndicatorControl.DataContext>
+				</local:GitStatusIndicatorControl>
+
+				<local:GitStatusIndicatorControl Margin="8">
+					<local:GitStatusIndicatorControl.DataContext>
+						<local:DesignGitStatusIndicatorViewModel CurrentDisplayMode="NoValidGitRepo" />
+					</local:GitStatusIndicatorControl.DataContext>
+				</local:GitStatusIndicatorControl>
+
+				<local:GitStatusIndicatorControl Margin="8">
+					<local:GitStatusIndicatorControl.DataContext>
+						<local:DesignGitStatusIndicatorViewModel CurrentDisplayMode="NoChanges" />
+					</local:GitStatusIndicatorControl.DataContext>
+				</local:GitStatusIndicatorControl>
+
+				<local:GitStatusIndicatorControl Margin="8">
+					<local:GitStatusIndicatorControl.DataContext>
+						<local:DesignGitStatusIndicatorViewModel CanCommitChanges="True" CurrentDisplayMode="UncommittedChanges" />
+					</local:GitStatusIndicatorControl.DataContext>
+				</local:GitStatusIndicatorControl>
+
+				<local:GitStatusIndicatorControl Margin="8">
+					<local:GitStatusIndicatorControl.DataContext>
+						<local:DesignGitStatusIndicatorViewModel CanCommitChanges="False" CurrentDisplayMode="UncommittedChanges" />
+					</local:GitStatusIndicatorControl.DataContext>
+				</local:GitStatusIndicatorControl>
+
+				<local:GitStatusIndicatorControl Margin="8">
+					<local:GitStatusIndicatorControl.DataContext>
+						<local:DesignGitStatusIndicatorViewModel CurrentDisplayMode="UncommittedChanges" IsCommittingChanges="True" />
+					</local:GitStatusIndicatorControl.DataContext>
+				</local:GitStatusIndicatorControl>
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+</Styles>

@@ -105,18 +105,17 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         };
     }
 
-    public override Task<bool> TryNavigateAway()
+    public override async Task<bool> TryNavigateAway()
     {
         var logger = LogManager.GetApplicationLogger();
-        if (!HasChanges)
+        if (!HasChanges || IsSaving)
         {
-            logger.Information("Leaving page without having made any changes");
-            return Task.FromResult(true);
+            return true;
         }
         else
         {
             logger.Information("Attempting to leave page with unsaved changes");
-            return _sharedDialogService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.");
+            return  await _sharedDialogService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.").ConfigureAwait(false);
         }
     }
 
@@ -128,7 +127,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     public bool CanSave => _canSave.Value;
 
     /// Whether or not this page has changes, regardless of whether or not they are valid.
-    public bool HasChanges => _hasChanges?.Value ?? false;
+    public bool HasChanges => _hasChanges.Value;
 
     /// Whether or not this page is currently saving data.
     public bool IsSaving => _isSaving.Value;

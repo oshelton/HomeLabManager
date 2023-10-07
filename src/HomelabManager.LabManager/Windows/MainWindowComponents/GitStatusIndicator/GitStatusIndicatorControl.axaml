@@ -1,0 +1,136 @@
+<TemplatedControl
+	x:Class="HomeLabManager.Manager.Windows.MainWindowComponents.GitStatusIndicator.GitStatusIndicatorControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:eventBinder="using:EventBinder"
+	xmlns:local="using:HomeLabManager.Manager.Windows.MainWindowComponents.GitStatusIndicator"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	Classes.NoChanges="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static local:GitStatusIndicatorDisplayMode.NoChanges}}"
+	Classes.NoRepoPath="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static local:GitStatusIndicatorDisplayMode.NoRepoPath}}"
+	Classes.NoValidGitRepo="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static local:GitStatusIndicatorDisplayMode.NoValidGitRepo}}"
+	Classes.UncommittedChanges="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static local:GitStatusIndicatorDisplayMode.UncommittedChanges}}">
+	<TemplatedControl.Styles>
+		<Style Selector="materialIcons|MaterialIcon.Primary">
+			<Setter Property="Kind" Value="Git" />
+		</Style>
+
+		<Style Selector="local|GitStatusIndicatorControl.NoChanges">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<materialIcons:MaterialIcon
+						Margin="4"
+						Classes="Primary"
+						ToolTip.Tip="There are no uncommitted changes." />
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="local|GitStatusIndicatorControl.NoRepoPath">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<materialIcons:MaterialIcon
+						Margin="4"
+						Classes="Primary"
+						Opacity="0.5"
+						ToolTip.Tip="There is no repo path set in Settings." />
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="local|GitStatusIndicatorControl.NoValidGitRepo">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Grid ToolTip.Tip="The repo path does not point to a valid Git repo.">
+						<materialIcons:MaterialIcon Margin="4" Classes="Primary" />
+						<materialIcons:MaterialIcon Classes="ValidationError SmallIconBadge" />
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="local|GitStatusIndicatorControl.UncommittedChanges">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Grid>
+						<ToggleButton
+							Name="gitChangesButton"
+							Classes="ToolbarIconButton"
+							ToolTip.Tip="There are uncommitted changes.">
+							<Grid>
+								<materialIcons:MaterialIcon Classes="Primary" />
+								<materialIcons:MaterialIcon
+									Margin="-4,-4,0,0"
+									Classes="SecondaryIcon SmallIconBadge"
+									Kind="SyncCircle" />
+							</Grid>
+						</ToggleButton>
+
+						<Popup
+							IsLightDismissEnabled="True"
+							IsOpen="{Binding #gitChangesButton.IsChecked, Mode=TwoWay}"
+							PlacementAnchor="BottomLeft"
+							PlacementGravity="BottomLeft"
+							PlacementTarget="{Binding #gitChangesButton}"
+							VerticalOffset="4">
+							<Border
+								BorderBrush="Black"
+								BorderThickness="1"
+								CornerRadius="3">
+								<materialControls:Card>
+									<StackPanel MaxWidth="400">
+										<ScrollViewer MaxHeight="400">
+											<ItemsRepeater Margin="4" ItemsSource="{Binding UncommittedChanges}">
+												<ItemsRepeater.ItemTemplate>
+													<DataTemplate>
+														<TextBlock Text="{Binding Mode=OneTime}" TextTrimming="CharacterEllipsis" />
+													</DataTemplate>
+												</ItemsRepeater.ItemTemplate>
+											</ItemsRepeater>
+										</ScrollViewer>
+
+										<Separator Margin="4" />
+
+										<DockPanel IsVisible="{Binding !IsCommittingChanges}">
+											<Button
+												Height="40"
+												Margin="4"
+												Click="{eventBinder:EventBinding CommitChanges}"
+												DockPanel.Dock="Right"
+												IsEnabled="{Binding CanCommitChanges}">
+												Commit Changes
+											</Button>
+
+											<TextBox
+												Margin="4,4,4,10"
+												Classes="outline dense"
+												FontSize="12"
+												Text="{Binding CustomCommitMessageTitle}"
+												Theme="{StaticResource OutlineTextBox}"
+												ToolTip.Tip="Title of the commit message."
+												Watermark="{Binding DefaultCommitMessageTitle}" />
+										</DockPanel>
+
+										<StackPanel IsVisible="{Binding IsCommittingChanges}" Orientation="Horizontal">
+											<TextBlock Margin="4,4,8,4">
+												Committing...
+											</TextBlock>
+
+											<ProgressBar
+												Width="16"
+												Height="16"
+												Classes="circular"
+												IsIndeterminate="True" />
+										</StackPanel>
+									</StackPanel>
+								</materialControls:Card>
+							</Border>
+						</Popup>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+	</TemplatedControl.Styles>
+</TemplatedControl>

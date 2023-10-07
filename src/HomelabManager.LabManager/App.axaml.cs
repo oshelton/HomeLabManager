@@ -2,8 +2,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using HomeLabManager.Common.Services.Logging;
+using HomeLabManager.Manager.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace HomeLabManager.Manager;
 

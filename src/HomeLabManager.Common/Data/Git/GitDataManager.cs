@@ -26,10 +26,7 @@ namespace HomeLabManager.Common.Data.Git
             _logManager.GetApplicationLogger().Information("Created");
         }
 
-        /// <summary>
-        /// Get whether or not the HomeLabRepoDataPath corresponds to an actual Git Repo.
-        /// </summary>
-        /// <returns>True if the Directory exists and is an actual Git Repo.</returns>
+        /// <inheritdoc />
         public bool IsDataPathARepo()
         {
             var logger = _logManager.GetApplicationLogger();
@@ -46,10 +43,7 @@ namespace HomeLabManager.Common.Data.Git
             return isValid;
         }
 
-        /// <summary>
-        /// Get whether or not the Repo has uncommitted changes.
-        /// </summary>
-        /// <returns>True if so, false if not.</returns>
+        /// <inheritdoc />
         public bool RepoHasUncommitedChanges()
         {
             var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
@@ -61,9 +55,7 @@ namespace HomeLabManager.Common.Data.Git
             return isDirty;
         }
 
-        /// <summary>
-        /// Get the current changes (if any) in the raw form straight from LibGit2Sharp.
-        /// </summary>
+        /// <inheritdoc />
         public RepositoryStatus GetRepoStatus()
         {
             var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
@@ -74,9 +66,7 @@ namespace HomeLabManager.Common.Data.Git
             return repo.RetrieveStatus();
         }
 
-        /// <summary>
-        /// Pull the latest changes from the remote repo.
-        /// </summary>
+        /// <inheritdoc />
         public void PullLatestChanges()
         {
             var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
@@ -102,13 +92,7 @@ namespace HomeLabManager.Common.Data.Git
             });
         }
 
-        /// <summary>
-        /// Commit any uncommitted changes in the working copy.
-        /// </summary>
-        /// <param name="commitMessage">Message to be associated with the commit.</param>
-        /// <returns>True if changes were committed, false otherwise.</returns>
-        /// <exception cref="ArgumentNullException">If no commit message is supplied.</exception>
-        /// <exception cref="InvalidDataException">If the git config file does not exist or does not contain the expected username and email information.</exception>
+        /// <inheritdoc />
         public bool CommitAndPushChanges(string commitMessage)
         {
             if (string.IsNullOrWhiteSpace(commitMessage))
@@ -156,12 +140,11 @@ namespace HomeLabManager.Common.Data.Git
 
             using (logManager.StartTimedOperation("Constructing Signature from Git Config File"))
             {
-                var gitInfo = File.ReadAllText(gitConfigFilePath)
-                .Split("\\n", StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Replace("\\t", "", StringComparison.InvariantCultureIgnoreCase).Trim())
-                .Where(line => line.StartsWith("name", true, CultureInfo.InvariantCulture) || line.StartsWith("email", true, CultureInfo.InvariantCulture))
-                .Select(line => line.Split('=', StringSplitOptions.TrimEntries))
-                .ToDictionary(lineParts => lineParts[0], lineParts => lineParts[1]);
+                var gitInfo = File.ReadAllLines(gitConfigFilePath)
+                    .Select(line => line.Trim())
+                    .Where(line => line.StartsWith("name", true, CultureInfo.InvariantCulture) || line.StartsWith("email", true, CultureInfo.InvariantCulture))
+                    .Select(line => line.Split('=', StringSplitOptions.TrimEntries))
+                    .ToDictionary(lineParts => lineParts[0], lineParts => lineParts[1]);
 
                 if (gitInfo.Count != 2)
                     throw new InvalidDataException($"Contents of Git configuration file '{gitConfigFilePath}' does not contain the username and email information.");

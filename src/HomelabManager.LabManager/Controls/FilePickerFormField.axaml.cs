@@ -4,8 +4,8 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using HomeLabManager.Common.Services.Logging;
+using HomeLabManager.Manager.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace HomeLabManager.Manager.Controls;
 
