@@ -153,6 +153,7 @@ public sealed class ServerDataManager : IServerDataManager
             .Concat(status.Missing)
             .Concat(status.Staged)
             .Concat(status.Untracked)
+            .DistinctBy(x => x.FilePath)
             .GroupBy(x => x.State);
 
         foreach (var statusChanges in allChanges)

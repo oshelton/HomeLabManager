@@ -51,6 +51,8 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
             IsCommittingChanges = false;
             CustomCommitMessageTitle = null;
         }, DispatcherPriority.Normal).ConfigureAwait(false);
+
+        await UpdateGitStatus().ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -96,8 +98,10 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
     /// </summary>
     private async Task UpdateGitStatus()
     {
-        if (IsCommittingChanges)
+        if (IsCommittingChanges || _isUpdatingStatus)
             return;
+
+        _isUpdatingStatus = true;
 
         var displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
         IReadOnlyList<string> statusMessages = Array.Empty<string>();
@@ -133,6 +137,8 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
             UncommittedChanges = statusMessages;
             CanCommitChanges = canCommit;
         }, DispatcherPriority.Normal).ConfigureAwait(false);
+
+        _isUpdatingStatus = false;
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
@@ -145,4 +151,5 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
     private string _customCommitMessageTitle;
     private bool _canCommitChanges;
     private bool _isCommittingChanges;
+    private bool _isUpdatingStatus;
 }
