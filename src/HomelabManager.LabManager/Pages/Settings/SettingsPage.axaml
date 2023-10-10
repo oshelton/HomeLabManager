@@ -4,6 +4,7 @@
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:eventBinder="using:EventBinder"
+	xmlns:formFields="using:HomeLabManager.Manager.Controls.FormFields"
 	xmlns:materialAssists="using:Material.Styles.Assists"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
@@ -46,46 +47,48 @@
 
 			<ScrollViewer>
 				<StackPanel>
-					<controls:FolderPickerFormField
+					<formFields:FolderPickerFormField
 						FolderPath="{Binding HomeLabRepoDataPath}"
 						Label="Home Lab Repo Data Path"
 						OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
-						<controls:FolderPickerFormField.InfoTip>
+						<formFields:FolderPickerFormField.InfoTip>
 							<TextBlock MaxWidth="384" TextWrapping="Wrap">
 								<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
 								<LineBreak />
 								<LineBreak />
 								<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
 							</TextBlock>
-						</controls:FolderPickerFormField.InfoTip>
-					</controls:FolderPickerFormField>
+						</formFields:FolderPickerFormField.InfoTip>
+					</formFields:FolderPickerFormField>
 
-					<controls:FilePickerFormField
+					<formFields:FilePickerFormField
 						FilePath="{Binding GitConfigFilePath}"
 						Label="Git Config File Path"
 						OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
-						<controls:FilePickerFormField.InfoTip>
+						<formFields:FilePickerFormField.InfoTip>
 							<TextBlock MaxWidth="384" TextWrapping="Wrap">
 								This is the path to the standard Git config file containing the Name and Email Address to use.
 							</TextBlock>
-						</controls:FilePickerFormField.InfoTip>
-					</controls:FilePickerFormField>
+						</formFields:FilePickerFormField.InfoTip>
+					</formFields:FilePickerFormField>
 
-					<controls:BasicStringFormField
+					<formFields:BasicStringFormField
 						InfoTip="This is the User Name used when signing into Github."
 						Label="Github User Name"
 						StringValue="{Binding GithubUserName}" />
 
-					<controls:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
-						<controls:BasicStringFormField.InfoTip>
+					<formFields:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
+						<formFields:BasicStringFormField.InfoTip>
 							<TextBlock MaxWidth="384" TextWrapping="Wrap">
 								<Run>This is the Github PAT used when pushing up to Github.</Run>
 								<LineBreak />
 								<LineBreak />
 								<Run>See Github PAT documentation for details.</Run>
 							</TextBlock>
-						</controls:BasicStringFormField.InfoTip>
-					</controls:BasicStringFormField>
+						</formFields:BasicStringFormField.InfoTip>
+					</formFields:BasicStringFormField>
+
+
 				</StackPanel>
 			</ScrollViewer>
 		</DockPanel>

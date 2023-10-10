@@ -1,8 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using HomeLabManager.Manager.Controls.FormFields;
 
-namespace HomeLabManager.Manager.Controls;
+namespace HomeLabManager.Manager.Controls.FormFields;
 
 /// <summary>
 /// Simple string based form field class.

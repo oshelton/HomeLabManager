@@ -1,9 +1,9 @@
 ﻿<TemplatedControl
-	x:Class="HomeLabManager.Manager.Controls.FilePickerFormField"
+	x:Class="HomeLabManager.Manager.Controls.FormFields.FilePickerFormField"
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:controls="clr-namespace:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:formFields="clr-namespace:HomeLabManager.Manager.Controls.FormFields"
 	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
 	xmlns:materialControls="using:Material.Styles.Controls"
@@ -11,7 +11,7 @@
 	d:DesignHeight="70"
 	d:DesignWidth="520">
 	<TemplatedControl.Styles>
-		<Style Selector="controls|FilePickerFormField">
+		<Style Selector="formFields|FilePickerFormField">
 			<Setter Property="(i:Interaction.Behaviors)">
 				<i:BehaviorCollectionTemplate>
 					<i:BehaviorCollection>
@@ -30,43 +30,43 @@
 			</Setter>
 		</Style>
 
-		<Style Selector="controls|FilePickerFormField materialIcons|MaterialIcon.InfoTip">
+		<Style Selector="formFields|FilePickerFormField materialIcons|MaterialIcon.InfoTip">
 			<Setter Property="Height" Value="14" />
 			<Setter Property="Width" Value="14" />
 			<Setter Property="Kind" Value="Information" />
 			<Setter Property="VerticalAlignment" Value="Top" />
 			<Setter Property="HorizontalAlignment" Value="Left" />
-			<Setter Property="IsVisible" Value="{Binding $parent[controls:FilePickerFormField].InfoTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[controls:FilePickerFormField].InfoTip}" />
+			<Setter Property="IsVisible" Value="{Binding $parent[formFields:FilePickerFormField].InfoTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[formFields:FilePickerFormField].InfoTip}" />
 		</Style>
 
-		<Style Selector="controls|FilePickerFormField materialIcons|MaterialIcon.FieldValidationError">
-			<Setter Property="IsVisible" Value="{Binding $parent[controls:FilePickerFormField].(DataValidationErrors.Errors), Converter={x:Static ObjectConverters.IsNotNull}}" />
+		<Style Selector="formFields|FilePickerFormField materialIcons|MaterialIcon.FieldValidationError">
+			<Setter Property="IsVisible" Value="{Binding $parent[formFields:FilePickerFormField].(DataValidationErrors.Errors), Converter={x:Static ObjectConverters.IsNotNull}}" />
 			<Setter Property="(ToolTip.Tip)">
 				<Setter.Value>
 					<Template>
 						<ToolTip>
-							<DataValidationErrors MaxWidth="250" Errors="{Binding $parent[controls:FilePickerFormField].(DataValidationErrors.Errors)}" />
+							<DataValidationErrors MaxWidth="250" Errors="{Binding $parent[formFields:FilePickerFormField].(DataValidationErrors.Errors)}" />
 						</ToolTip>
 					</Template>
 				</Setter.Value>
 			</Setter>
 		</Style>
 
-		<Style Selector="controls|FilePickerFormField materialControls|FloatingButton.BrowseButton">
+		<Style Selector="formFields|FilePickerFormField materialControls|FloatingButton.BrowseButton">
 			<Setter Property="Margin" Value="8" />
 			<Setter Property="Content">
 				<Template>
 					<materialIcons:MaterialIcon Kind="Folder" />
 				</Template>
 			</Setter>
-			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[controls:FilePickerFormField].OpenFilePickerButtonToolTip}" />
+			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[formFields:FilePickerFormField].OpenFilePickerButtonToolTip}" />
 		</Style>
 
-		<Style Selector="controls|FilePickerFormField.Default">
+		<Style Selector="formFields|FilePickerFormField.Default">
 			<Setter Property="Margin" Value="4" />
 			<Setter Property="Template">
-				<ControlTemplate TargetType="{x:Type controls:FilePickerFormField}">
+				<ControlTemplate TargetType="{x:Type formFields:FilePickerFormField}">
 					<Grid
 						Name="Container"
 						Margin="4"
@@ -105,10 +105,10 @@
 			</Setter>
 		</Style>
 
-		<Style Selector="controls|FilePickerFormField.Small">
+		<Style Selector="formFields|FilePickerFormField.Small">
 			<Setter Property="Margin" Value="4" />
 			<Setter Property="Template">
-				<ControlTemplate TargetType="{x:Type controls:FilePickerFormField}">
+				<ControlTemplate TargetType="{x:Type formFields:FilePickerFormField}">
 					<StackPanel
 						Name="Container"
 						Margin="4,8,4,4"

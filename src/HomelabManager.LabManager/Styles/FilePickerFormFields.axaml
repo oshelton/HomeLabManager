@@ -1,7 +1,7 @@
 ﻿<Styles
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:controls="clr-namespace:HomeLabManager.Manager.Controls"
+	xmlns:formFields="clr-namespace:HomeLabManager.Manager.Controls.FormFields"
 	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
 	xmlns:materialIcons="using:Material.Icons.Avalonia">
@@ -9,38 +9,38 @@
 		<Border MinWidth="700" Padding="20">
 			<StackPanel>
 				<StackPanel.Styles>
-					<Style Selector="controls|FolderPickerFormField.Red">
+					<Style Selector="formFields|FolderPickerFormField.Red">
 						<Setter Property="Foreground" Value="Red" />
 					</Style>
 				</StackPanel.Styles>
 
 				<TextBlock Classes="Headline5" Text="Default Styles and Behavior" />
 
-				<controls:FolderPickerFormField Label="Test" />
-				<controls:FolderPickerFormField
+				<formFields:FolderPickerFormField Label="Test" />
+				<formFields:FolderPickerFormField
 					InfoTip="Help for this label."
 					Label="Really Long Label"
 					OpenFolderPickerButtonToolTip="Test button tip." />
-				<controls:FolderPickerFormField Classes="Red" Label="Custom Styled Label" />
-				<controls:FolderPickerFormField Label="Customized Info Tips">
-					<controls:FolderPickerFormField.InfoTip>
+				<formFields:FolderPickerFormField Classes="Red" Label="Custom Styled Label" />
+				<formFields:FolderPickerFormField Label="Customized Info Tips">
+					<formFields:FolderPickerFormField.InfoTip>
 						<TextBlock>
 							<Run Text="Line 1" />
 							<LineBreak />
 							<Run Text="Line 2" />
 						</TextBlock>
-					</controls:FolderPickerFormField.InfoTip>
-					<controls:FolderPickerFormField.OpenFolderPickerButtonToolTip>
+					</formFields:FolderPickerFormField.InfoTip>
+					<formFields:FolderPickerFormField.OpenFolderPickerButtonToolTip>
 						<TextBlock>
 							<Run Text="Line 1" />
 							<LineBreak />
 							<Run Text="Line 2" />
 						</TextBlock>
-					</controls:FolderPickerFormField.OpenFolderPickerButtonToolTip>
-				</controls:FolderPickerFormField>
+					</formFields:FolderPickerFormField.OpenFolderPickerButtonToolTip>
+				</formFields:FolderPickerFormField>
 
 				<StackPanel MaxWidth="300">
-					<controls:FolderPickerFormField InfoTip="Small Field Test" Label="Small Test" />
+					<formFields:FolderPickerFormField InfoTip="Small Field Test" Label="Small Test" />
 				</StackPanel>
 			</StackPanel>
 		</Border>
