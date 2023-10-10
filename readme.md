@@ -4,16 +4,6 @@
 
 This repo contains libraries and applications that I use to manage my soon to be further developed home lab.  These applications have the goal of making it easier to track the status of and be able to manage my home lab with software that isn't necesarily running on my actual home lab; because sometimes it's nice to know what's up when everything is on fire besides just an error page.
 
-## License (MIT)
-
-Copyright 2023 Jack Owen Shelton
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 ## Contents
 
 This repo contains two Applications:
@@ -31,6 +21,22 @@ At this point this project is being mostly built to meet my own needs as they gr
 If you are interested in contributing feel free to open a PR and I'll figure out what sort of policies I need to implement regarding it at that time.
 
 Otherwise feel free to fork the codebase and do what you want.
+
+## Building
+
+For the UI application simply open the HomeLabManager solution file and run the HomeLabManager.Manager project.
+
+## Running Tests
+
+In order to be able to run the tests successfully you will need to create a couple of things:
+
+1. Create the following files in the tests\TestData directory.
+    * github_pat.txt - Containing a valid Github PAT that can be used to commit and push code.
+        * I strongly recomend creating a new PAT with as minimal permissions as possible (specifically limited to the repo in the url in the github_repo.txt file) and not reuse an existing one.
+    * github_username.txt - Containing a valid github user name/email associated with the above PAT.
+    * github_repo.txt - Containing a valid url to a Github repo where test data will be pushed to and later deleted from.
+
+You can confirm by examining the code that nothing untoward is done with the above information.  An important part of how the manager works is that it uses Github to store homelab information and the tests exercise that capavility.
 
 ## Dependencies
 

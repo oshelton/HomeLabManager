@@ -44,12 +44,10 @@ namespace HomeLabManager.DataTests
             Directory.Delete(directory);
         }
 
-        /// <summary>
-        /// Write the test .gitconfig file.
-        /// </summary>
-        public static void WriteTestGitConfig() => File.WriteAllText(Utils.TestGitConfigFilePath, "[user]\n\tname = Test User\n\temail = TestUser@nowhere.com");
+        public static string GetTestRepoUrl() => File.ReadAllText(GithubRepoUrlFilePath);
 
         private const string GithubUserNameFilePath = "../../../../../TestData/github_username.txt";
         private const string GithubUserPatFilePath = "../../../../../TestData/github_pat.txt";
+        private const string GithubRepoUrlFilePath = "../../../../../TestData/github_repo.txt";
     }
 }
