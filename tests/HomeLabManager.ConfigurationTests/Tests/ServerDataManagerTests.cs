@@ -31,8 +31,6 @@ public sealed class ServerDataManagerTests
                 File.WriteAllText(Path.Combine(vmDirectory, ServerDataManager.ServerMetadataFileName), serializer.Serialize(vm.Metadata!));
             }
         }
-
-        Utils.WriteTestGitConfig();
     }
 
     [TearDown]

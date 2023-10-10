@@ -219,3 +219,4 @@ src/Browser/Avalonia.Browser/wwwroot
 tests/TestData/github_pat.txt
 tests/TestData/github_username.txt
 /tests/TestData/.gitconfig
+/tests/TestData/github_repo.txt

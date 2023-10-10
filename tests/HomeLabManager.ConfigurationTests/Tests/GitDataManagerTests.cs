@@ -26,7 +26,7 @@ public sealed class GitDataManagerTests
 
         using (var repo = new Repository(repoPath))
         {
-            var remote = repo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
+            var remote = repo.Network.Remotes.Add("origin", Utils.GetTestRepoUrl());
             var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
             Commands.Fetch(repo, remote.Name, Array.Empty<string>(), CreateFetchOptions(config.GithubUserName, config.GithubPat, logManager), "log");
 
@@ -55,7 +55,7 @@ public sealed class GitDataManagerTests
         var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
         repo.Commit("Initial empty commit", GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager), GitDataManager.CreateGitSignature(config.GitConfigFilePath, logManager), new CommitOptions { AllowEmptyCommit = true });
 
-        var testRemote = repo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
+        var testRemote = repo.Network.Remotes.Add("origin", Utils.GetTestRepoUrl());
         _testBranchName = $"test-branch_{DateTime.Now.ToString("MM-dd-yyyy_hh-mm-ss", CultureInfo.CurrentCulture)}";
         var testBranch = repo.CreateBranch(_testBranchName);
 
@@ -153,7 +153,7 @@ public sealed class GitDataManagerTests
 
         using (var tempRepo = new Repository(tempRepoDirectory))
         {
-            var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
+            var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", Utils.GetTestRepoUrl());
             var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
             Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager), "log");
 
@@ -199,7 +199,7 @@ public sealed class GitDataManagerTests
 
         using (var tempRepo = new Repository(tempRepoDirectory))
         {
-            var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", "https://github.com/oshelton/HomeLabManager_UnitTests.git");
+            var testRemote = tempRepo.Network.Remotes.FirstOrDefault(Remote => Remote.Name == "origin") ?? tempRepo.Network.Remotes.Add("origin", Utils.GetTestRepoUrl());
             var logManager = new LogManager(true).CreateContextualizedLogManager<GitDataManager>();
             Commands.Fetch(tempRepo, "origin", Array.Empty<string>(), CreateFetchOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager), "log");
 
@@ -256,7 +256,6 @@ public sealed class GitDataManagerTests
     {
         Directory.CreateDirectory(Utils.TestDirectory);
         Directory.CreateDirectory(Utils.TestGitDirectory);
-        Utils.WriteTestGitConfig();
     }
 
     private CoreConfigurationManager _coreConfigurationManager;

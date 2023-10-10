@@ -10,7 +10,6 @@ public sealed class CoreConfigurationManagerTests
     {
         Directory.CreateDirectory(Utils.TestDirectory);
         Directory.CreateDirectory(Utils.TestGitDirectory);
-        Utils.WriteTestGitConfig();
     }
 
     [TearDown]
