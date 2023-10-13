@@ -41,6 +41,7 @@ You can confirm by examining the code that nothing untoward is done with the abo
 ## Dependencies
 
 - [AvaloniaUI](https://github.com/AvaloniaUI/Avalonia)
+- [Avalonia UI Edit](https://github.com/AvaloniaUI/AvaloniaEdit)
 - [AvaloniaUI Material UI](https://github.com/AvaloniaCommunity/Material.Avalonia)
 - [AvaloniaUI Material UI Icons](https://github.com/AvaloniaUtils/Material.Icons.Avalonia/)
 - [Avalonis XAML Behaviors](https://github.com/AvaloniaUI/Avalonia.Xaml.Behaviors)
@@ -48,6 +49,7 @@ You can confirm by examining the code that nothing untoward is done with the abo
 - [Docker.DotNet](https://github.com/dotnet/Docker.DotNet/)
 - [EventBinder](https://github.com/Serg046/EventBinder)
 - [libgit2sharp](https://github.com/libgit2/libgit2sharp)
+- [Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia)
 - [mmcagno's SSh.NET fork](https://github.com/mmacagno/SSH.NET).
 - [Moq](https://github.com/devlooped/moq)
 - [NUnit](https://nunit.org/)

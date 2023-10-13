@@ -13,6 +13,8 @@
 			SecondaryColor="Lime" />
 		<materialIcons:MaterialIconStyles />
 
+		<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+
 		<!--  Application Styles  -->
 		<StyleInclude Source="/Styles/Icons.axaml" />
 		<StyleInclude Source="/Styles/Containers.axaml" />
