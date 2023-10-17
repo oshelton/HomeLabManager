@@ -1,0 +1,32 @@
+<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:formFields="clr-namespace:HomeLabManager.Manager.Controls.FormFields"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
+	xmlns:materialIcons="using:Material.Icons.Avalonia">
+	<Design.PreviewWith>
+		<Grid
+			Width="600"
+			Height="500"
+			ColumnDefinitions="*,*"
+			RowDefinitions="*,*">
+			<formFields:MarkdownFormField
+				Grid.ColumnSpan="2"
+				InfoTip="First Field"
+				Label="Markdown Field 1"
+				StringValue="* Unnumbered List" />
+
+			<formFields:MarkdownFormField
+				Grid.Row="1"
+				Label="Markdown Field 2"
+				StringValue="*Italic Text* **Bold Text**" />
+			<formFields:MarkdownFormField
+				Grid.Row="1"
+				Grid.Column="1"
+				InfoTip="3rd Field"
+				Label="Markdown Field 3"
+				StringValue="* Unnumbered List" />
+		</Grid>
+	</Design.PreviewWith>
+</Styles>

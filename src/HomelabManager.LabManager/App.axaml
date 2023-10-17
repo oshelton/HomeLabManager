@@ -3,7 +3,8 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-	xmlns:materialThemes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles">
+	xmlns:materialThemes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+	RequestedThemeVariant="Dark">
 	<Application.Styles>
 
 		<!--  Third Party Styles  -->
@@ -14,6 +15,7 @@
 		<materialIcons:MaterialIconStyles />
 
 		<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+		<StyleInclude Source="/Styles/AvaloniaEdit.axaml" />
 
 		<!--  Application Styles  -->
 		<StyleInclude Source="/Styles/Icons.axaml" />

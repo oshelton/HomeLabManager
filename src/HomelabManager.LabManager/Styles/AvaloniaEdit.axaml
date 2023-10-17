@@ -1,0 +1,36 @@
+<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:sys="using:System">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<UniformGrid Width="600" Columns="2">
+				<avaloniaEdit:TextEditor
+					Height="100"
+					Margin="4"
+					ShowLineNumbers="True"
+					SyntaxHighlighting="C#"
+					Text="public var x = 0;" />
+
+				<avaloniaEdit:TextEditor
+					Height="100"
+					Margin="4"
+					ShowLineNumbers="True"
+					SyntaxHighlighting="MarkDown"
+					Text="*Itallic Text* Some other text [link]()" />
+			</UniformGrid>
+		</Border>
+	</Design.PreviewWith>
+
+	<Styles.Resources>
+		<sys:Int32 x:Key="FontSizeNormal">12</sys:Int32>
+		<StaticResource x:Key="ControlContentThemeFontSize" ResourceKey="FontSizeNormal" />
+		<FontFamily x:Key="ContentControlThemeFontFamily">Cascadia Code,Consolas,Menlo,Monospace</FontFamily>
+	</Styles.Resources>
+
+	<Style Selector="avaloniaEdit|TextEditor">
+		<Setter Property="FontFamily" Value="Cascadia Code,Consolas,Menlo,Monospace" />
+	</Style>
+</Styles>

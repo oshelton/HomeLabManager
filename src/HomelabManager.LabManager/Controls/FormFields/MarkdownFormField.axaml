@@ -1,0 +1,157 @@
+﻿<TemplatedControl
+	x:Class="HomeLabManager.Manager.Controls.FormFields.MarkdownFormField"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+	xmlns:avaloniaMarkdown="https://github.com/whistyun/Markdown.Avalonia"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:formFields="clr-namespace:HomeLabManager.Manager.Controls.FormFields"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	d:DesignHeight="200"
+	d:DesignWidth="520">
+	<TemplatedControl.Styles>
+		<Style Selector="formFields|MarkdownFormField">
+			<Setter Property="(i:Interaction.Behaviors)">
+				<i:BehaviorCollectionTemplate>
+					<i:BehaviorCollection>
+						<ir:AdaptiveBehavior SourceControl="{Binding $self}">
+							<ir:AdaptiveClassSetter
+								MinWidth="500"
+								MaxWidth="Infinity"
+								ClassName="Default" />
+							<ir:AdaptiveClassSetter
+								MinWidth="0"
+								MaxWidth="500"
+								ClassName="Small" />
+						</ir:AdaptiveBehavior>
+					</i:BehaviorCollection>
+				</i:BehaviorCollectionTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="formFields|MarkdownFormField materialIcons|MaterialIcon.InfoTip">
+			<Setter Property="Height" Value="14" />
+			<Setter Property="Width" Value="14" />
+			<Setter Property="Kind" Value="Information" />
+			<Setter Property="VerticalAlignment" Value="Top" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+			<Setter Property="IsVisible" Value="{Binding $parent[formFields:MarkdownFormField].InfoTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+			<Setter Property="(ToolTip.Tip)" Value="{Binding $parent[formFields:MarkdownFormField].InfoTip}" />
+		</Style>
+
+		<Style Selector="formFields|MarkdownFormField materialIcons|MaterialIcon.FieldValidationError">
+			<Setter Property="IsVisible" Value="{Binding $parent[formFields:MarkdownFormField].(DataValidationErrors.Errors), Converter={x:Static ObjectConverters.IsNotNull}}" />
+			<Setter Property="(ToolTip.Tip)">
+				<Setter.Value>
+					<Template>
+						<ToolTip>
+							<DataValidationErrors MaxWidth="250" Errors="{Binding $parent[formFields:MarkdownFormField].(DataValidationErrors.Errors)}" />
+						</ToolTip>
+					</Template>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="formFields|MarkdownFormField.Default">
+			<Setter Property="Margin" Value="4" />
+			<Setter Property="Template">
+				<ControlTemplate TargetType="{x:Type formFields:MarkdownFormField}">
+					<Grid
+						Name="Container"
+						Margin="4"
+						ColumnDefinitions="*,*"
+						RowDefinitions="Auto,*">
+
+						<TextBlock
+							Name="Label"
+							Margin="8,18,0,0"
+							VerticalAlignment="Top"
+							Classes="Body1"
+							TextTrimming="CharacterEllipsis">
+							<Run Text="{TemplateBinding Label}" />
+							<Run Text=":" />
+						</TextBlock>
+
+						<materialIcons:MaterialIcon Margin="0,8,0,0" Classes="InfoTip" />
+
+						<TextBlock
+							Grid.Column="1"
+							Margin="8,0,0,0"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Bottom"
+							Classes="Caption"
+							Text="Preview:" />
+
+						<materialIcons:MaterialIcon
+							Grid.Column="1"
+							Margin="0,0,8,0"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Center"
+							Classes="ValidationError FieldValidationError" />
+
+						<materialControls:Card Grid.Row="1" Margin="8,8,4,8">
+							<avaloniaEdit:TextEditor SyntaxHighlighting="MarkDown">
+								<i:Interaction.Behaviors>
+									<controls:TextEditorDocumentTextBindingBehavior Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+								</i:Interaction.Behaviors>
+							</avaloniaEdit:TextEditor>
+						</materialControls:Card>
+
+						<materialControls:Card
+							Grid.Row="1"
+							Grid.Column="1"
+							Margin="8,8,4,8">
+							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding StringValue}" />
+						</materialControls:Card>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="formFields|MarkdownFormField.Small">
+			<Setter Property="Margin" Value="4" />
+			<Setter Property="Template">
+				<ControlTemplate TargetType="{x:Type formFields:MarkdownFormField}">
+					<Grid
+						Name="Container"
+						Margin="4,8,4,4"
+						ColumnDefinitions="*"
+						RowDefinitions="Auto,*,*">
+						<TextBlock
+							Name="Label"
+							Margin="8,0,0,0"
+							VerticalAlignment="Center"
+							Classes="Body1"
+							TextTrimming="CharacterEllipsis">
+							<Run Text="{TemplateBinding Label}" />
+							<Run Text=":" />
+						</TextBlock>
+
+						<materialIcons:MaterialIcon Margin="-2,-9,0,0" Classes="InfoTip" />
+
+						<materialIcons:MaterialIcon
+							Margin="8,0,0,0"
+							HorizontalAlignment="Right"
+							Classes="ValidationError FieldValidationError" />
+
+						<materialControls:Card Grid.Row="1" Margin="8,8,4,4">
+							<avaloniaEdit:TextEditor SyntaxHighlighting="MarkDown">
+								<i:Interaction.Behaviors>
+									<controls:TextEditorDocumentTextBindingBehavior Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+								</i:Interaction.Behaviors>
+							</avaloniaEdit:TextEditor>
+						</materialControls:Card>
+
+						<materialControls:Card Grid.Row="2" Margin="8,4,4,8">
+							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding StringValue}" />
+						</materialControls:Card>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+	</TemplatedControl.Styles>
+</TemplatedControl>
