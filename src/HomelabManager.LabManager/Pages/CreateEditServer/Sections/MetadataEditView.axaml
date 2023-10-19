@@ -28,7 +28,7 @@
 					Classes="Headline5"
 					Text="Metadata" />
 
-				<Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto">
+				<Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,*">
 					<formFields:BasicStringFormField
 						Name="displayNameField"
 						InfoTip="The easily readable display name of the Server or VM."
@@ -41,6 +41,15 @@
 						InfoTip="The Hostname/Computer name of the server or VM."
 						Label="Name"
 						StringValue="{Binding Name}" />
+
+					<formFields:MarkdownFormField
+						Name="descriptionField"
+						Grid.Row="1"
+						Grid.ColumnSpan="3"
+						Height="300"
+						InfoTip="Description of the Server/VM"
+						Label="Description"
+						StringValue="{Binding Description}" />
 				</Grid>
 			</StackPanel>
 		</materialControls:Card>
