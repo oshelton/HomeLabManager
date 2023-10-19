@@ -1,7 +1,9 @@
-﻿using Avalonia;
+﻿using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using HomeLabManager.Manager.Controls.FormFields;
+using ReactiveUI;
 
 namespace HomeLabManager.Manager.Controls.FormFields;
 
@@ -21,7 +23,22 @@ public partial class MarkdownFormField : FormField
             defaultBindingMode: Avalonia.Data.BindingMode.TwoWay,
             enableDataValidation: true);
 
-    public MarkdownFormField() => InitializeComponent();
+    public static readonly DirectProperty<MarkdownFormField, string> RenderedTextProperty =
+    AvaloniaProperty.RegisterDirect<MarkdownFormField, string>(
+        nameof(RenderedText),
+        o => o.RenderedText);
+
+    public MarkdownFormField()
+    {
+        InitializeComponent();
+
+        RenderedText = StringValue;
+
+        this.WhenAnyValue(x => x.StringValue)
+            .Throttle(TimeSpan.FromSeconds(1))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(x => RenderedText = x);
+    }
 
     /// <summary>
     /// Gets or sets a value for the Field's value.
@@ -30,6 +47,15 @@ public partial class MarkdownFormField : FormField
     {
         get => _stringValue;
         set => SetAndRaise(StringValueProperty, ref _stringValue, value);
+    }
+
+    /// <summary>
+    /// Gets the text displayed in the preview.
+    /// </summary>
+    public string RenderedText
+    {
+        get => _renderedText;
+        private set => SetAndRaise(RenderedTextProperty, ref _renderedText, value);
     }
 
     protected override void UpdateDataValidation(
@@ -42,4 +68,5 @@ public partial class MarkdownFormField : FormField
     }
 
     private string _stringValue;
+    private string _renderedText;
 }

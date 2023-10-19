@@ -13,20 +13,41 @@
 			RowDefinitions="*,*">
 			<formFields:MarkdownFormField
 				Grid.ColumnSpan="2"
+				xml:space="preserve"
 				InfoTip="First Field"
-				Label="Markdown Field 1"
-				StringValue="* Unnumbered List" />
+				Label="Markdown Field 1">
+				<formFields:MarkdownFormField.StringValue>
+* Unnumbered List 1
+* Unnumbered List 2
+
+1. Numbered List 1
+1. Numbered List 2
+        </formFields:MarkdownFormField.StringValue>
+			</formFields:MarkdownFormField>
 
 			<formFields:MarkdownFormField
 				Grid.Row="1"
-				Label="Markdown Field 2"
-				StringValue="*Italic Text* **Bold Text**" />
+				xml:space="preserve"
+				Label="Markdown Field 2">
+        <formFields:MarkdownFormField.StringValue>
+*Italic Text*
+
+**Bold Text**
+
+***Bold Italic Text***
+        </formFields:MarkdownFormField.StringValue>
+      </formFields:MarkdownFormField>
 			<formFields:MarkdownFormField
 				Grid.Row="1"
 				Grid.Column="1"
+				xml:space="preserve"
 				InfoTip="3rd Field"
-				Label="Markdown Field 3"
-				StringValue="* Unnumbered List" />
+				Label="Markdown Field 3">
+        <formFields:MarkdownFormField.StringValue>
+## Header 2
+[Link Text]()
+        </formFields:MarkdownFormField.StringValue>  
+      </formFields:MarkdownFormField>
 		</Grid>
 	</Design.PreviewWith>
 </Styles>

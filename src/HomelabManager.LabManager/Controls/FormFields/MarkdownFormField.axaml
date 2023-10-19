@@ -105,7 +105,7 @@
 							Grid.Row="1"
 							Grid.Column="1"
 							Margin="8,8,4,8">
-							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding StringValue}" />
+							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}" />
 						</materialControls:Card>
 					</Grid>
 				</ControlTemplate>
@@ -147,7 +147,7 @@
 						</materialControls:Card>
 
 						<materialControls:Card Grid.Row="2" Margin="8,4,4,8">
-							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding StringValue}" />
+							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}" />
 						</materialControls:Card>
 					</Grid>
 				</ControlTemplate>
