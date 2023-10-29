@@ -5,6 +5,11 @@
 	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
 	xmlns:materialThemes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
 	RequestedThemeVariant="Dark">
+	<Application.Resources>
+		<!--  Simple style resources  -->
+		<SolidColorBrush x:Key="CardContentDarkBackgroundBrush" Color="#111111" />
+	</Application.Resources>
+
 	<Application.Styles>
 
 		<!--  Third Party Styles  -->

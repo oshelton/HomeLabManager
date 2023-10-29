@@ -34,7 +34,7 @@
 		</Style>
 
 		<Style Selector="formFields|MarkdownFormField.ExtraDark materialControls|Card">
-			<Setter Property="Background" Value="#111111" />
+			<Setter Property="Background" Value="{StaticResource CardContentDarkBackgroundBrush}" />
 		</Style>
 
 		<Style Selector="formFields|MarkdownFormField materialIcons|MaterialIcon.InfoTip">
