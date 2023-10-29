@@ -38,10 +38,11 @@
 
 ***Bold Italic Text*** `Preformatted`
 
-```C#
-var x = 0;
-
-Console.WriteLine("Hi!");
+```csharp
+public void DoSomething(string value)
+{
+  Console.WriteLine(value);
+}
 ```
         </formFields:MarkdownFormField.StringValue>
       </formFields:MarkdownFormField>
