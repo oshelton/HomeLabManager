@@ -16,25 +16,33 @@
 				xml:space="preserve"
 				InfoTip="First Field"
 				Label="Markdown Field 1">
-				<formFields:MarkdownFormField.StringValue>
-* Unnumbered List 1
+				<formFields:MarkdownFormField.StringValue>* Unnumbered List 1
 * Unnumbered List 2
 
 1. Numbered List 1
 1. Numbered List 2
+
+> Blockquote
+> `Preformatted`
         </formFields:MarkdownFormField.StringValue>
 			</formFields:MarkdownFormField>
 
 			<formFields:MarkdownFormField
 				Grid.Row="1"
 				xml:space="preserve"
+				Classes="ExtraDark"
 				Label="Markdown Field 2">
-        <formFields:MarkdownFormField.StringValue>
-*Italic Text*
+        <formFields:MarkdownFormField.StringValue>*Italic Text*
 
 **Bold Text**
 
-***Bold Italic Text***
+***Bold Italic Text*** `Preformatted`
+
+```C#
+var x = 0;
+
+Console.WriteLine("Hi!");
+```
         </formFields:MarkdownFormField.StringValue>
       </formFields:MarkdownFormField>
 			<formFields:MarkdownFormField
@@ -43,8 +51,18 @@
 				xml:space="preserve"
 				InfoTip="3rd Field"
 				Label="Markdown Field 3">
-        <formFields:MarkdownFormField.StringValue>
+        <formFields:MarkdownFormField.StringValue># Header 1
+
 ## Header 2
+
+### Header 3
+
+#### Header 4
+
+##### Header 5
+
+###### Header 6
+
 [Link Text]()
         </formFields:MarkdownFormField.StringValue>  
       </formFields:MarkdownFormField>

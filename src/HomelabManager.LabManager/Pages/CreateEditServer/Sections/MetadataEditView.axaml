@@ -47,6 +47,7 @@
 						Grid.Row="1"
 						Grid.ColumnSpan="3"
 						Height="300"
+						Classes="ExtraDark"
 						InfoTip="Description of the Server/VM"
 						Label="Description"
 						StringValue="{Binding Description}" />

@@ -1,0 +1,69 @@
+<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:avaloniaMarkdown="https://github.com/whistyun/Markdown.Avalonia"
+	xmlns:colorTextBlock="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+	xmlns:sys="using:System">
+	<Design.PreviewWith>
+		<!--  These styles can't really take advantage of Design.PreviewWith Sadly.  -->
+	</Design.PreviewWith>
+
+	<Style Selector="colorTextBlock|CTextBlock">
+		<Setter Property="FontFamily" Value="{StaticResource MaterialDesignFonts}" />
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyBrush}" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CCode">
+		<Setter Property="Padding" Value="6,3,6,0" />
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="TextVerticalAlignment" Value="Center" />
+		<Setter Property="CornerRadius" Value="4" />
+		<Setter Property="Background" Value="#222222" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyBrush}" />
+		<Setter Property="FontFamily" Value="Cascadia Code,Consolas,Menlo,Monospace" />
+	</Style>
+
+	<Style Selector="Border.CodeBlock">
+		<Setter Property="Padding" Value="6,4,6,4" />
+		<Setter Property="CornerRadius" Value="4" />
+		<Setter Property="Background" Value="#222222" />
+		<Setter Property="BorderThickness" Value="0" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CTextBlock.Heading1">
+		<Setter Property="FontFamily" Value="{StaticResource MaterialDesignFonts}" />
+		<Setter Property="FontSize" Value="18" />
+		<Setter Property="FontWeight" Value="Bold" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyLightBrush}" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CTextBlock.Heading2">
+		<Setter Property="FontSize" Value="16" />
+		<Setter Property="FontWeight" Value="Bold" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyLightBrush}" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CTextBlock.Heading3">
+		<Setter Property="FontSize" Value="15" />
+		<Setter Property="FontWeight" Value="Bold" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyLightBrush}" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CTextBlock.Heading4">
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="FontWeight" Value="Bold" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyLightBrush}" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CTextBlock.Heading5">
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="FontWeight" Value="Normal" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyLightBrush}" />
+	</Style>
+
+	<Style Selector="colorTextBlock|CTextBlock.Heading6">
+		<Setter Property="FontWeight" Value="Light" />
+		<Setter Property="Foreground" Value="{StaticResource MaterialBodyLightBrush}" />
+	</Style>
+</Styles>

@@ -33,6 +33,10 @@
 			</Setter>
 		</Style>
 
+		<Style Selector="formFields|MarkdownFormField.ExtraDark materialControls|Card">
+			<Setter Property="Background" Value="#111111" />
+		</Style>
+
 		<Style Selector="formFields|MarkdownFormField materialIcons|MaterialIcon.InfoTip">
 			<Setter Property="Height" Value="14" />
 			<Setter Property="Width" Value="14" />
@@ -94,7 +98,7 @@
 							Classes="ValidationError FieldValidationError" />
 
 						<materialControls:Card Grid.Row="1" Margin="8,8,4,8">
-							<avaloniaEdit:TextEditor SyntaxHighlighting="MarkDown">
+							<avaloniaEdit:TextEditor Padding="0,4,0,0" SyntaxHighlighting="MarkDown">
 								<i:Interaction.Behaviors>
 									<controls:TextEditorDocumentTextBindingBehavior Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
 								</i:Interaction.Behaviors>
@@ -105,7 +109,11 @@
 							Grid.Row="1"
 							Grid.Column="1"
 							Margin="8,8,4,8">
-							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}" />
+							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}">
+								<avaloniaMarkdown:MarkdownScrollViewer.Styles>
+									<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />
+								</avaloniaMarkdown:MarkdownScrollViewer.Styles>
+							</avaloniaMarkdown:MarkdownScrollViewer>
 						</materialControls:Card>
 					</Grid>
 				</ControlTemplate>
@@ -147,7 +155,11 @@
 						</materialControls:Card>
 
 						<materialControls:Card Grid.Row="2" Margin="8,4,4,8">
-							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}" />
+							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}">
+								<avaloniaMarkdown:MarkdownScrollViewer.Styles>
+									<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />
+								</avaloniaMarkdown:MarkdownScrollViewer.Styles>
+							</avaloniaMarkdown:MarkdownScrollViewer>
 						</materialControls:Card>
 					</Grid>
 				</ControlTemplate>
