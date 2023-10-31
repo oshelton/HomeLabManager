@@ -1,0 +1,28 @@
+<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+	xmlns:materialIcons="using:Material.Icons.Avalonia"
+	xmlns:sys="using:System">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<UniformGrid Width="600" Columns="2">
+				<TextBox
+					Height="200"
+					xml:Space="preserve"
+					AcceptsReturn="True"
+					Classes="code"
+					Text="Hello!&#x0a;Good Morning!&#x0a;Qwerty&#x0a;b&#x0a;c&#x0a;d&#x0a;e f g h i j k l m n o p q r s t u v w x y z&#x0a;f&#x0a;g&#x0a;h&#x0a;i&#x0a;j" />
+			</UniformGrid>
+		</Border>
+	</Design.PreviewWith>
+
+	<Style Selector="TextBox.code">
+		<Setter Property="FontFamily" Value="Cascadia Code,Consolas,Menlo,Monospace" />
+		<Setter Property="TextWrapping" Value="NoWrap" />
+		<Setter Property="AcceptsReturn" Value="True" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="FontSize" Value="14" />
+		<Setter Property="Padding" Value="0" />
+	</Style>
+</Styles>

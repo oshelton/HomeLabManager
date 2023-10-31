@@ -92,24 +92,20 @@
 
 						<materialIcons:MaterialIcon
 							Grid.Column="1"
-							Margin="0,0,8,0"
+							Margin="0,4,8,0"
 							HorizontalAlignment="Right"
 							VerticalAlignment="Center"
 							Classes="ValidationError FieldValidationError" />
 
 						<materialControls:Card Grid.Row="1" Margin="8,8,4,8">
-							<avaloniaEdit:TextEditor Padding="0,4,0,0" SyntaxHighlighting="MarkDown">
-								<i:Interaction.Behaviors>
-									<controls:TextEditorDocumentTextBindingBehavior Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
-								</i:Interaction.Behaviors>
-							</avaloniaEdit:TextEditor>
+							<TextBox Classes="code" Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
 						</materialControls:Card>
 
 						<materialControls:Card
 							Grid.Row="1"
 							Grid.Column="1"
 							Margin="8,8,4,8">
-							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}">
+							<avaloniaMarkdown:MarkdownScrollViewer Margin="0,12,0,0" Markdown="{TemplateBinding RenderedText}">
 								<avaloniaMarkdown:MarkdownScrollViewer.Styles>
 									<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />
 								</avaloniaMarkdown:MarkdownScrollViewer.Styles>
@@ -147,15 +143,11 @@
 							Classes="ValidationError FieldValidationError" />
 
 						<materialControls:Card Grid.Row="1" Margin="8,8,4,4">
-							<avaloniaEdit:TextEditor SyntaxHighlighting="MarkDown">
-								<i:Interaction.Behaviors>
-									<controls:TextEditorDocumentTextBindingBehavior Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
-								</i:Interaction.Behaviors>
-							</avaloniaEdit:TextEditor>
+							<TextBox Classes="code" Text="{Binding StringValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
 						</materialControls:Card>
 
 						<materialControls:Card Grid.Row="2" Margin="8,4,4,8">
-							<avaloniaMarkdown:MarkdownScrollViewer Markdown="{TemplateBinding RenderedText}">
+							<avaloniaMarkdown:MarkdownScrollViewer Margin="0,12,0,0" Markdown="{TemplateBinding RenderedText}">
 								<avaloniaMarkdown:MarkdownScrollViewer.Styles>
 									<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />
 								</avaloniaMarkdown:MarkdownScrollViewer.Styles>
