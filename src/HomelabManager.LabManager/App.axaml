@@ -20,16 +20,13 @@
 		<materialIcons:MaterialIconStyles />
 
 		<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
-		<StyleInclude Source="/Styles/AvaloniaEdit.axaml" />
 
-		<!--  Application Styles  -->
-		<StyleInclude Source="/Styles/Icons.axaml" />
-		<StyleInclude Source="/Styles/Containers.axaml" />
-		<StyleInclude Source="/Styles/Buttons.axaml" />
-		<StyleInclude Source="/Styles/TextBoxes.axaml" />
-		<StyleInclude Source="/Styles/BasicStringFormFields.axaml" />
-		<StyleInclude Source="/Styles/FilePickerFormFields.axaml" />
-		<StyleInclude Source="/Styles/FolderPickerFormFields.axaml" />
+		<!--  Common Application Styles  -->
 		<StyleInclude Source="/Styles/AddItemInlineSeperator.axaml" />
+		<StyleInclude Source="/Styles/AvaloniaEdit.axaml" />
+		<StyleInclude Source="/Styles/Buttons.axaml" />
+		<StyleInclude Source="/Styles/Containers.axaml" />
+		<StyleInclude Source="/Styles/Icons.axaml" />
+		<StyleInclude Source="/Styles/TextBoxes.axaml" />
 	</Application.Styles>
 </Application>
