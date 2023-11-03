@@ -28,5 +28,6 @@
 		<StyleInclude Source="/Styles/Containers.axaml" />
 		<StyleInclude Source="/Styles/Icons.axaml" />
 		<StyleInclude Source="/Styles/TextBoxes.axaml" />
+		<StyleInclude Source="/Styles/ToolTips.axaml" />
 	</Application.Styles>
 </Application>
