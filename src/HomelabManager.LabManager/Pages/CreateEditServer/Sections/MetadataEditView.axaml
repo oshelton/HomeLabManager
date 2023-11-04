@@ -2,9 +2,9 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
-	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:eventBinder="using:EventBinder"
+	xmlns:formFields="using:HomeLabManager.Manager.Controls.FormFields"
 	xmlns:materialControls="using:Material.Styles.Controls"
 	xmlns:materialIcons="using:Material.Icons.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -28,19 +28,29 @@
 					Classes="Headline5"
 					Text="Metadata" />
 
-				<Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto">
-					<controls:BasicStringFormField
+				<Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,*">
+					<formFields:BasicStringFormField
 						Name="displayNameField"
 						InfoTip="The easily readable display name of the Server or VM."
 						Label="Display Name"
 						StringValue="{Binding DisplayName}" />
 
-					<controls:BasicStringFormField
+					<formFields:BasicStringFormField
 						Name="nameField"
 						Grid.Column="1"
 						InfoTip="The Hostname/Computer name of the server or VM."
 						Label="Name"
 						StringValue="{Binding Name}" />
+
+					<formFields:MarkdownFormField
+						Name="descriptionField"
+						Grid.Row="1"
+						Grid.ColumnSpan="3"
+						Height="300"
+						Classes="ExtraDark"
+						InfoTip="Description of the Server/VM"
+						Label="Description"
+						StringValue="{Binding Description}" />
 				</Grid>
 			</StackPanel>
 		</materialControls:Card>

@@ -7,14 +7,16 @@ public sealed class ServerViewModel: ReactiveObject
 {
     public ServerViewModel(ServerHostDto dto)
     {
-        if (dto is null)
-            throw new ArgumentNullException(nameof(dto));
-
-        Name = dto.Metadata.Name;
-        DisplayIndex = dto.Metadata.DisplayIndex;
+        _dto = dto ?? throw new ArgumentNullException(nameof(dto));
     }
 
-    public string Name { get; }
+    public string DisplayName => _dto.Metadata.DisplayName;
 
-    public int DisplayIndex { get; }
+    public string Name => _dto.Metadata.Name;
+
+    public string Description => _dto.Metadata.Description;
+
+    public int DisplayIndex => _dto.Metadata.DisplayIndex;
+
+    private readonly ServerHostDto _dto;
 }

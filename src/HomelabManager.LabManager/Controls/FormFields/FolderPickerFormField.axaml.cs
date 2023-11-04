@@ -4,11 +4,12 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using HomeLabManager.Common.Services.Logging;
+using HomeLabManager.Manager.Controls.FormFields;
 using HomeLabManager.Manager.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace HomeLabManager.Manager.Controls;
+namespace HomeLabManager.Manager.Controls.FormFields;
 
 /// <summary>
 /// Form field class for a file picker.

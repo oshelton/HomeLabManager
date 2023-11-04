@@ -3,7 +3,13 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-	xmlns:materialThemes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles">
+	xmlns:materialThemes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+	RequestedThemeVariant="Dark">
+	<Application.Resources>
+		<!--  Simple style resources  -->
+		<SolidColorBrush x:Key="CardContentDarkBackgroundBrush" Color="#111111" />
+	</Application.Resources>
+
 	<Application.Styles>
 
 		<!--  Third Party Styles  -->
@@ -13,13 +19,15 @@
 			SecondaryColor="Lime" />
 		<materialIcons:MaterialIconStyles />
 
-		<!--  Application Styles  -->
-		<StyleInclude Source="/Styles/Icons.axaml" />
-		<StyleInclude Source="/Styles/Containers.axaml" />
-		<StyleInclude Source="/Styles/Buttons.axaml" />
-		<StyleInclude Source="/Styles/BasicStringFormFields.axaml" />
-		<StyleInclude Source="/Styles/FilePickerFormFields.axaml" />
-		<StyleInclude Source="/Styles/FolderPickerFormFields.axaml" />
+		<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+
+		<!--  Common Application Styles  -->
 		<StyleInclude Source="/Styles/AddItemInlineSeperator.axaml" />
+		<StyleInclude Source="/Styles/AvaloniaEdit.axaml" />
+		<StyleInclude Source="/Styles/Buttons.axaml" />
+		<StyleInclude Source="/Styles/Containers.axaml" />
+		<StyleInclude Source="/Styles/Icons.axaml" />
+		<StyleInclude Source="/Styles/TextBoxes.axaml" />
+		<StyleInclude Source="/Styles/ToolTips.axaml" />
 	</Application.Styles>
 </Application>

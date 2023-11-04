@@ -1,7 +1,6 @@
 ﻿using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Manager.Pages.Settings;
 using ReactiveUI;
 using ReactiveValidation;
 using ReactiveValidation.Extensions;
@@ -54,22 +53,25 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             
             DisplayName = sourceDto.Metadata.DisplayName;
             Name = sourceDto.Metadata.Name;
+            Description = sourceDto.Metadata.Description;
 
             // Capture the initial state of the data.
             _initialState = new TrackedPropertyState()
             {
                 DisplayName = DisplayName,
                 Name = Name,
+                Description = Description,
             };
 
             // Set up an observable to check when content has actually changed.
-            _hasChanges = this.WhenAnyValue(x => x.DisplayName, x => x.Name,
-                (displayName, name) =>
+            _hasChanges = this.WhenAnyValue(x => x.DisplayName, x => x.Name, x => x.Description,
+                (displayName, name, description) =>
                 {
                     return !(new TrackedPropertyState()
                     {
                         DisplayName = displayName,
-                        Name = name
+                        Name = name,
+                        Description = description
                     }.Equals(_initialState));
                 })
                 .Throttle(TimeSpan.FromSeconds(0.5))
@@ -96,6 +98,13 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
+        /// Description of the server or VM.
+        public string Description
+        {
+            get => _description;
+            set => this.RaiseAndSetIfChanged(ref _description, value);
+        }
+
         /// Whether or not the metadata has changes.
         public bool HasChanges => _hasChanges.Value;
 
@@ -110,11 +119,13 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
 
         private string _displayName;
         private string _name;
+        private string _description;
 
         private struct TrackedPropertyState
         {
             public string DisplayName;
             public string Name;
+            public string Description;
         }
     }
 }

@@ -49,6 +49,18 @@ public sealed class ServerViewModel : ReactiveObject, IDisposable
             {
                 DisplayName = "Test Display Name",
                 Name = "TEST-HOST-NAME",
+                Description = @"# Description
+Good morning **America**!
+
+* List item 1
+* List item 2
+
+> Quote
+
+```csharp
+var x = 0;
+Debug.WriteLine(x);
+```",
                 DisplayIndex = 5,
             }
         }, new ServerListingViewModel(), 0) { }
@@ -72,6 +84,11 @@ public sealed class ServerViewModel : ReactiveObject, IDisposable
     /// Name/Host Name of the server.
     /// </summary>
     public string Name => _dto.Metadata.Name;
+
+    /// <summary>
+    /// Description of the server.
+    /// </summary>
+    public string Description => _dto.Metadata.Description;
 
     /// <summary>
     /// Display index/order of the server.

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
 
-namespace HomeLabManager.Manager.Controls;
+namespace HomeLabManager.Manager.Controls.FormFields;
 
 /// <summary>
 /// Base class for simple form fields.

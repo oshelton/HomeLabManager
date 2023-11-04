@@ -1,6 +1,7 @@
 <ResourceDictionary
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:avaloniaMarkdown="https://github.com/whistyun/Markdown.Avalonia"
 	xmlns:commonConverters="using:HomeLabManager.Common.Converters"
 	xmlns:controls="using:HomeLabManager.Manager.Controls"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -22,7 +23,7 @@
 
 	<DataTemplate x:Key="ServerDisplayTemplate" DataType="{x:Type page:ServerViewModel}">
 		<materialControls:Card>
-			<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+			<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
 				<TextBlock
 					Name="DisplayNameText"
 					Classes="Headline6"
@@ -77,6 +78,18 @@
 					Classes="Headline7"
 					Text="{Binding Name}"
 					TextTrimming="CharacterEllipsis" />
+
+				<materialControls:Card
+					Grid.Row="2"
+					Grid.ColumnSpan="2"
+					Margin="8"
+					Background="{StaticResource CardContentDarkBackgroundBrush}">
+					<avaloniaMarkdown:MarkdownScrollViewer Markdown="{Binding Description}">
+						<avaloniaMarkdown:MarkdownScrollViewer.Styles>
+							<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />
+						</avaloniaMarkdown:MarkdownScrollViewer.Styles>
+					</avaloniaMarkdown:MarkdownScrollViewer>
+				</materialControls:Card>
 			</Grid>
 		</materialControls:Card>
 	</DataTemplate>
