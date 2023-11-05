@@ -57,7 +57,8 @@ public partial class FilePickerFormField : FormField
     {
         InitializeComponent();
 
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<FilePickerFormField>();
+        if (!Avalonia.Controls.Design.IsDesignMode)
+            _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<FilePickerFormField>();
     }
 
     /// <summary>

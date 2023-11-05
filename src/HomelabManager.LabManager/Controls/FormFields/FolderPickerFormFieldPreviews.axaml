@@ -14,29 +14,29 @@
 					</Style>
 				</StackPanel.Styles>
 
-				<TextBlock Classes="Headline5" Text="Default Styles and Behavior" />
+				<TextBlock Classes="Headline5" Text="Form Field Picker Previews" />
 
 				<formFields:FolderPickerFormField Label="Test" />
 				<formFields:FolderPickerFormField
 					InfoTip="Help for this label."
 					Label="Really Long Label"
-					OpenFilePickerButtonToolTip="Test button tip." />
+					OpenFolderPickerButtonToolTip="Test button tip." />
 				<formFields:FolderPickerFormField Classes="Red" Label="Custom Styled Label" />
 				<formFields:FolderPickerFormField Label="Customized Info Tips">
-					<formFields:FolderPickerFormField>
+					<formFields:FolderPickerFormField.InfoTip>
 						<TextBlock>
 							<Run Text="Line 1" />
 							<LineBreak />
 							<Run Text="Line 2" />
 						</TextBlock>
-					</formFields:FolderPickerFormField>
-					<formFields:FolderPickerFormField.OpenFilePickerButtonToolTip>
+					</formFields:FolderPickerFormField.InfoTip>
+					<formFields:FolderPickerFormField.OpenFolderPickerButtonToolTip>
 						<TextBlock>
 							<Run Text="Line 1" />
 							<LineBreak />
 							<Run Text="Line 2" />
 						</TextBlock>
-					</formFields:FolderPickerFormField.OpenFilePickerButtonToolTip>
+					</formFields:FolderPickerFormField.OpenFolderPickerButtonToolTip>
 				</formFields:FolderPickerFormField>
 
 				<StackPanel MaxWidth="300">
@@ -45,6 +45,4 @@
 			</StackPanel>
 		</Border>
 	</Design.PreviewWith>
-
-	<!--  Additional Styles go here.  -->
 </Styles>

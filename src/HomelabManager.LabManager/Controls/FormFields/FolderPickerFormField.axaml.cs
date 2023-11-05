@@ -49,7 +49,8 @@ public partial class FolderPickerFormField : FormField
     {
         InitializeComponent();
 
-        _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<FolderPickerFormField>();
+        if (!Avalonia.Controls.Design.IsDesignMode)
+            _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<FolderPickerFormField>();
     }
 
     /// <summary>
