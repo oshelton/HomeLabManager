@@ -83,7 +83,8 @@
 					Grid.Row="2"
 					Grid.ColumnSpan="2"
 					Margin="8"
-					Background="{StaticResource CardContentDarkBackgroundBrush}">
+					Background="{StaticResource CardContentDarkBackgroundBrush}"
+					IsVisible="{Binding !!Description}">
 					<avaloniaMarkdown:MarkdownScrollViewer Markdown="{Binding Description}">
 						<avaloniaMarkdown:MarkdownScrollViewer.Styles>
 							<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />

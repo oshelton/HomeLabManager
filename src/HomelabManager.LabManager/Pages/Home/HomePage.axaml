@@ -125,7 +125,7 @@
 										<DataTemplate>
 											<materialControls:Card MinWidth="250" MinHeight="150">
 												<ToolTip.Tip>
-													<avaloniaMarkdown:MarkdownScrollViewer MaxWidth="300" Markdown="{Binding Description}">
+													<avaloniaMarkdown:MarkdownScrollViewer MaxWidth="300" Markdown="{Binding Description, TargetNullValue='**No Description Provided**'}">
 														<avaloniaMarkdown:MarkdownScrollViewer.Styles>
 															<StyleInclude Source="/Styles/MarkdownScrollViewer.axaml" />
 														</avaloniaMarkdown:MarkdownScrollViewer.Styles>
