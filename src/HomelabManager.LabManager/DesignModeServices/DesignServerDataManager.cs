@@ -54,7 +54,7 @@ internal sealed class DesignServerDataManager: IServerDataManager
                 Name = "server3",
                 IPAddress = "192.168.1.3",
                 Description = "Server 3 Description",
-                Kind = ServerKind.TrueNas,
+                Kind = ServerKind.TrueNasScale,
             },
             VMs = new[]
             {

@@ -14,7 +14,7 @@
 					</Style>
 				</StackPanel.Styles>
 
-				<TextBlock Classes="Headline5" Text="String Field Picker Previews" />
+				<TextBlock Classes="Headline5" Text="String Field Previews" />
 
 				<formFields:BasicStringFormField Label="Test" />
 				<formFields:BasicStringFormField InfoTip="Help for this label." Label="Really Long Label" />

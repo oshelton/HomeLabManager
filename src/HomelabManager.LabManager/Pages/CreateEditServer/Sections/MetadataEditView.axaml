@@ -42,6 +42,30 @@
 						Label="Name"
 						StringValue="{Binding Name}" />
 
+					<formFields:ComboBoxFormField
+						Name="kindFied"
+						Grid.Column="2"
+						Items="{Binding ServerKinds, Mode=OneTime}"
+						Label="Kind"
+						SelectedItem="{Binding SelectedServerKind}">
+						<formFields:ComboBoxFormField.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<materialIcons:MaterialIcon
+										Width="16"
+										Height="16"
+										Margin="4"
+										Kind="{Binding Converter={x:Static commonConverters:CommonConverters.ServerKindToIconConverter}}" />
+
+									<TextBlock
+										Margin="4,6,4,4"
+										VerticalAlignment="Center"
+										Text="{Binding Converter={x:Static commonConverters:CommonConverters.ServerKindToLabelConverter}}" />
+								</StackPanel>
+							</DataTemplate>
+						</formFields:ComboBoxFormField.ItemTemplate>
+					</formFields:ComboBoxFormField>
+
 					<formFields:MarkdownFormField
 						Name="descriptionField"
 						Grid.Row="1"

@@ -10,9 +10,10 @@ namespace HomeLabManager.Common.Data.Git.Server;
 /// </summary>
 public enum ServerKind
 {
+    Unspecified,
     Windows,
     StandardLinux,
-    TrueNas,
+    TrueNasScale,
 }
 
 /// <summary>

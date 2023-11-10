@@ -8,13 +8,14 @@ using HomeLabManager.Manager.Services.Navigation.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ReactiveUI;
+using static HomeLabManager.ManagerTests.Utils;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
 
 public sealed class ServerListingViewModelTests
 {
     [SetUp]
-    public void SetUp() => _services = Utils.RegisterTestServices();
+    public void SetUp() => _services = RegisterTestServices();
 
     /// <summary>
     /// Test view model creation and initial state.
@@ -244,5 +245,5 @@ public sealed class ServerListingViewModelTests
         }
     }
 
-    private Utils.MockServices _services;
+    private MockServices _services;
 }

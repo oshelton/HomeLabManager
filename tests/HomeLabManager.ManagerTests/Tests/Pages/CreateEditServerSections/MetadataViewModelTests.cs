@@ -1,12 +1,13 @@
 ﻿using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
+using static HomeLabManager.ManagerTests.Utils;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages.CreateEditServerSections;
 
 public sealed class MetadataViewModelTests
 {
     [SetUp]
-    public void SetUp() => Utils.RegisterTestServices();
+    public void SetUp() => RegisterTestServices();
 
     [Test]
     public void Constructor_ConfirmExpectedConstructorBehavior()
@@ -15,8 +16,9 @@ public sealed class MetadataViewModelTests
         {
             Metadata = new ServerMetadataDto
             {
+                Kind = ServerKind.Windows,
                 DisplayName = "Test",
-                Name = "TEST-SERVER-NAME"
+                Name = "TEST-SERVER-NAME",
             }
         };
         using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
@@ -24,8 +26,30 @@ public sealed class MetadataViewModelTests
             Assert.That(editor.HasChanges, Is.False);
             Assert.That(editor.HasErrors, Is.False);
             Assert.That(editor.Validator, Is.Not.Null);
+            Assert.That(editor.SelectedServerKind, Is.EqualTo(ServerKind.Windows));
             Assert.That(editor.DisplayName, Is.EqualTo(server.Metadata.DisplayName));
             Assert.That(editor.Name, Is.EqualTo(server.Metadata.Name));
+        }
+    }
+
+    [Test]
+    public void Constructor_NoKindSpecified_VerifyNullKindIsHandledAppropriately()
+    {
+        var server = new ServerHostDto
+        {
+            Metadata = new ServerMetadataDto
+            {
+                Kind = null,
+                DisplayName = "Test",
+                Name = "TEST-SERVER-NAME",
+            }
+        };
+        using (var editor = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>()))
+        {
+            Assert.That(editor.HasChanges, Is.False);
+            Assert.That(editor.HasErrors, Is.False);
+            Assert.That(editor.Validator, Is.Not.Null);
+            Assert.That(editor.SelectedServerKind, Is.EqualTo(ServerKind.Unspecified));
         }
     }
 

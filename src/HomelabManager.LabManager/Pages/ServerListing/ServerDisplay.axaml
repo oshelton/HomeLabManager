@@ -23,15 +23,24 @@
 
 	<DataTemplate x:Key="ServerDisplayTemplate" DataType="{x:Type page:ServerViewModel}">
 		<materialControls:Card>
-			<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
+			<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,*">
+				<materialIcons:MaterialIcon
+					Width="18"
+					Height="18"
+					Margin="4,4,8,4"
+					VerticalAlignment="Top"
+					Kind="{Binding Kind, Converter={x:Static commonConverters:CommonConverters.ServerKindToIconConverter}}"
+					ToolTip.Tip="{Binding Kind, Converter={x:Static commonConverters:CommonConverters.ServerKindToLabelConverter}}" />
+
 				<TextBlock
 					Name="DisplayNameText"
+					Grid.Column="1"
 					Classes="Headline6"
 					Text="{Binding DisplayName}"
 					TextTrimming="CharacterEllipsis" />
 
 				<StackPanel
-					Grid.Column="1"
+					Grid.Column="2"
 					Orientation="Horizontal"
 					Spacing="0">
 					<Button
@@ -75,13 +84,14 @@
 
 				<TextBlock
 					Grid.Row="1"
+					Grid.ColumnSpan="2"
 					Classes="Headline7"
 					Text="{Binding Name}"
 					TextTrimming="CharacterEllipsis" />
 
 				<materialControls:Card
 					Grid.Row="2"
-					Grid.ColumnSpan="2"
+					Grid.ColumnSpan="3"
 					Margin="8"
 					Background="{StaticResource CardContentDarkBackgroundBrush}"
 					IsVisible="{Binding !!Description}">

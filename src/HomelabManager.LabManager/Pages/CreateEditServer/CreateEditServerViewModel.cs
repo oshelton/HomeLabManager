@@ -160,6 +160,7 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
             {
                 DisplayName = Metadata.DisplayName,
                 Name = Metadata.Name,
+                Kind = Metadata.SelectedServerKind,
                 Description = Metadata.Description,
                 DisplayIndex = _afterIndex.HasValue ? _afterIndex.Value + 1 : 0,
             }

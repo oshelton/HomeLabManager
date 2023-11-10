@@ -42,6 +42,9 @@
     <Compile Update="Controls\AddItemInlineSeperator.axaml.cs">
       <DependentUpon>AddItemInlineSeperator.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Controls\FormFields\ComboBoxFormField.axaml.cs">
+      <DependentUpon>ComboBoxFormField.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Controls\FormFields\MarkdownFormField.axaml.cs">
       <DependentUpon>MarkdownFormField.axaml</DependentUpon>
     </Compile>
