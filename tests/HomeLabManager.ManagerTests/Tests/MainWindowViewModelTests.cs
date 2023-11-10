@@ -1,6 +1,7 @@
 ﻿using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Windows;
 using Moq;
+using static HomeLabManager.ManagerTests.Utils;
 
 namespace HomeLabManager.ManagerTests.Tests;
 
@@ -10,7 +11,7 @@ namespace HomeLabManager.ManagerTests.Tests;
 public class MainWindowViewModelTests
 {
     [SetUp]
-    public void Setup() => _services = Utils.RegisterTestServices();
+    public void Setup() => _services = RegisterTestServices();
 
 
     /// <summary>
@@ -39,5 +40,5 @@ public class MainWindowViewModelTests
         _services.MockNavigationService.Verify(x => x.NavigateTo(It.IsAny<HomeNavigationRequest>(), false), Times.Once());
     }
 
-    private Utils.MockServices _services;
+    private MockServices _services;
 }

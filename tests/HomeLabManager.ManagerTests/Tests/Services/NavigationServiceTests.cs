@@ -3,6 +3,7 @@ using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Pages.Settings;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
+using static HomeLabManager.ManagerTests.Utils;
 
 namespace HomeLabManager.ManagerTests.Tests.Services;
 
@@ -12,7 +13,7 @@ namespace HomeLabManager.ManagerTests.Tests.Services;
 public class NavigationServiceTests
 {
     [SetUp]
-    public void SetUp() => Utils.RegisterTestServices();
+    public void SetUp() => RegisterTestServices();
 
     [Test]
     public void NavigationService_Creation_TestDefaultConstructor()

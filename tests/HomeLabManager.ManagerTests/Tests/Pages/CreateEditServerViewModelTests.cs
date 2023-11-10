@@ -3,13 +3,14 @@ using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Pages.CreateEditServer;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using Moq;
+using static HomeLabManager.ManagerTests.Utils;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
 
 public sealed class CreateEditServerViewModelTests
 {
     [SetUp]
-    public void SetUp() => _services = Utils.RegisterTestServices();
+    public void SetUp() => _services = RegisterTestServices();
 
     [Test]
     public async Task Constructor_PageTitleVariations_ConfirmExpectedPageTitleVariations()
@@ -330,5 +331,5 @@ public sealed class CreateEditServerViewModelTests
         }
     }
 
-    private Utils.MockServices _services;
+    private MockServices _services;
 }

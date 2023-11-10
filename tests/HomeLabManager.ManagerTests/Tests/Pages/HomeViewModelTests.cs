@@ -1,6 +1,7 @@
 ﻿using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Services.Navigation.Requests;
+using static HomeLabManager.ManagerTests.Utils;
 
 namespace HomeLabManager.ManagerTests.Tests.Pages;
 
@@ -10,7 +11,7 @@ namespace HomeLabManager.ManagerTests.Tests.Pages;
 public class HomeViewModelTests
 {
     [SetUp]
-    public void SetUp() => _services = Utils.RegisterTestServices();
+    public void SetUp() => _services = RegisterTestServices();
 
     /// <summary>
     /// Test view model creation and initial state.
@@ -54,5 +55,5 @@ public class HomeViewModelTests
         homePage.Dispose();
     }
 
-    private Utils.MockServices _services;
+    private MockServices _services;
 }
