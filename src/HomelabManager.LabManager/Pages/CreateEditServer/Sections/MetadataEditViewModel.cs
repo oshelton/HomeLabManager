@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using HomeLabManager.Common.Data.Git.Server;
+using Material.Icons;
 using ReactiveUI;
 using ReactiveValidation;
 using ReactiveValidation.Extensions;
@@ -35,6 +36,14 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             _allOtherDisplayNames = allOtherDisplayNames ?? throw new ArgumentNullException(nameof(allOtherDisplayNames));
             _allOtherNames = allOtherNames ?? throw new ArgumentNullException(nameof(allOtherNames));
 
+            ServerKinds = new[]
+            {
+                ServerKind.Unspecified,
+                ServerKind.Windows,
+                ServerKind.StandardLinux,
+                ServerKind.TrueNasScale,
+            };
+
             // Set up validation.
             var builder = new ValidationBuilder<MetadataEditViewModel>();
 
@@ -53,6 +62,7 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             
             DisplayName = sourceDto.Metadata.DisplayName;
             Name = sourceDto.Metadata.Name;
+            SelectedServerKind = ServerKinds.FirstOrDefault(x => x == sourceDto.Metadata.Kind);
             Description = sourceDto.Metadata.Description;
 
             // Capture the initial state of the data.
@@ -61,20 +71,22 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
                 DisplayName = DisplayName,
                 Name = Name,
                 Description = Description,
+                Kind = SelectedServerKind,
             };
 
             // Set up an observable to check when content has actually changed.
-            _hasChanges = this.WhenAnyValue(x => x.DisplayName, x => x.Name, x => x.Description,
-                (displayName, name, description) =>
+            _hasChanges = this.WhenAnyValue(x => x.DisplayName, x => x.Name, x => x.Description, x => x.SelectedServerKind)
+                .Throttle(TimeSpan.FromSeconds(0.5))
+                .Select(x =>
                 {
                     return !(new TrackedPropertyState()
                     {
-                        DisplayName = displayName,
-                        Name = name,
-                        Description = description
+                        DisplayName = x.Item1,
+                        Name = x.Item2,
+                        Description = x.Item3,
+                        Kind = x.Item4,
                     }.Equals(_initialState));
                 })
-                .Throttle(TimeSpan.FromSeconds(0.5))
                 .ToProperty(this, nameof(HasChanges));
         }
 
@@ -98,6 +110,16 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
+        /// Collection of server kinds available.
+        public IReadOnlyList<ServerKind> ServerKinds { get; }
+
+        /// Currently selected server kind.
+        public ServerKind SelectedServerKind
+        {
+            get => _selectedServerKind;
+            set => this.RaiseAndSetIfChanged(ref _selectedServerKind, value);
+        }
+
         /// Description of the server or VM.
         public string Description
         {
@@ -119,13 +141,15 @@ namespace HomeLabManager.Manager.Pages.CreateEditServer.Sections
 
         private string _displayName;
         private string _name;
+        private ServerKind _selectedServerKind;
         private string _description;
 
-        private struct TrackedPropertyState
+        private record struct TrackedPropertyState
         {
             public string DisplayName;
             public string Name;
             public string Description;
+            public ServerKind Kind;
         }
     }
 }

@@ -132,21 +132,32 @@
 													</avaloniaMarkdown:MarkdownScrollViewer>
 												</ToolTip.Tip>
 
-												<StackPanel>
+												<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+													<materialIcons:MaterialIcon
+														Width="18"
+														Height="18"
+														Margin="4,4,8,4"
+														VerticalAlignment="Top"
+														Kind="{Binding Kind, Converter={x:Static commonConverters:CommonConverters.ServerKindToIconConverter}}"
+														ToolTip.Tip="{Binding Kind, Converter={x:Static commonConverters:CommonConverters.ServerKindToLabelConverter}}" />
+
 													<TextBlock
-														Classes="Headline4"
+														Grid.Column="1"
+														Classes="Headline6"
 														MaxLines="2"
 														Text="{Binding DisplayName}"
 														TextTrimming="CharacterEllipsis"
 														TextWrapping="Wrap" />
 
 													<TextBlock
-														Classes="Headline6"
+														Grid.Row="1"
+														Grid.Column="1"
+														Classes="Headline7"
 														MaxLines="2"
 														Text="{Binding Name}"
 														TextTrimming="CharacterEllipsis"
 														TextWrapping="Wrap" />
-												</StackPanel>
+												</Grid>
 											</materialControls:Card>
 										</DataTemplate>
 									</ItemsRepeater.ItemTemplate>

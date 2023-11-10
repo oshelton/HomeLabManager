@@ -3,12 +3,17 @@ using ReactiveUI;
 
 namespace HomeLabManager.Manager.Pages.Home;
 
+/// <summary>
+/// View Model for servers on the home page.
+/// </summary>
 public sealed class ServerViewModel: ReactiveObject
 {
     public ServerViewModel(ServerHostDto dto)
     {
         _dto = dto ?? throw new ArgumentNullException(nameof(dto));
     }
+
+    public ServerKind Kind => _dto.Metadata.Kind ?? ServerKind.Unspecified;
 
     public string DisplayName => _dto.Metadata.DisplayName;
 

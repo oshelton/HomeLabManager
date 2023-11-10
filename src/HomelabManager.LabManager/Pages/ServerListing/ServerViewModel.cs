@@ -76,6 +76,11 @@ Debug.WriteLine(x);
     public Guid UniqueId => _dto.UniqueId ?? Guid.Empty;
 
     /// <summary>
+    /// Kind of the sserver.
+    /// </summary>
+    public ServerKind? Kind => _dto.Metadata.Kind ?? ServerKind.Unspecified;
+
+    /// <summary>
     /// Display name of the Server.
     /// </summary>
     public string DisplayName => _dto.Metadata.DisplayName;

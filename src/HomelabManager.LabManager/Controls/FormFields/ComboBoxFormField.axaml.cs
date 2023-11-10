@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
-using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Metadata;
-using HomeLabManager.Manager.Controls.FormFields;
 
 namespace HomeLabManager.Manager.Controls.FormFields;
 
 /// <summary>
 /// ComboBox based form field class.
 /// </summary>
+[TemplatePart(ComboBoxFormField.ComboBoxPartName, typeof(ComboBox))]
 public partial class ComboBoxFormField : FormField
 {
+    /// Name for the ComboBox that backs the field.
+    public const string ComboBoxPartName = "PART_ComboBox";
+
     /// <summary>
     /// Defines the <see cref="ItemsProperty"/> property.
     /// </summary>
@@ -73,6 +77,20 @@ public partial class ComboBoxFormField : FormField
         set => SetValue(ItemTemplateProperty, value);
     }
 
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        if (e is null)
+            return;
+
+        if (_currentComboBox is not null)
+            _currentComboBox.PropertyChanged -= FieldComboBoxPropertyChanged;
+
+        _currentComboBox = e.NameScope.Find<ComboBox>(ComboBoxPartName);
+        _currentComboBox.ItemsSource = Items;
+        _currentComboBox.SelectedItem = SelectedItem;
+        _currentComboBox.PropertyChanged += FieldComboBoxPropertyChanged;
+    }
+
     protected override void UpdateDataValidation(
             AvaloniaProperty property,
             BindingValueType state,
@@ -82,6 +100,13 @@ public partial class ComboBoxFormField : FormField
             DataValidationErrors.SetError(this, error);
     }
 
+    private void FieldComboBoxPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs args)
+    {
+        if (args.Property == ComboBox.SelectedItemProperty)
+            SelectedItem = _currentComboBox.SelectedItem;
+    }
+
     private IEnumerable _items;
     private object _selectedItem;
+    private ComboBox _currentComboBox;
 }
