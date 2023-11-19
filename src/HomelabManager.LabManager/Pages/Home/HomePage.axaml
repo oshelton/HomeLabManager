@@ -16,7 +16,7 @@
 			Height="600"
 			ContentTemplate="{DynamicResource HomePageTemplate}">
 			<ContentControl.Content>
-				<page:HomeViewModel />
+				<page:HomeViewModel DesignDisplayMode="HasServers" />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>

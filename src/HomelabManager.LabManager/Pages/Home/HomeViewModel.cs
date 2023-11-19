@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using System.Reactive.Disposables;
+using Avalonia.Threading;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
 using HomeLabManager.Manager.Services.Navigation;
@@ -29,32 +30,90 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
         _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
 
-        if (Avalonia.Controls.Design.IsDesignMode)
-        {
-            var mode = new Random().NextInt64(0, 5);
-            switch (mode)
+        this.WhenAnyValue(x => x.DesignDisplayMode)
+            .Subscribe(x =>
             {
-                case 0:
-                    CurrentDisplayMode = HomeDisplayMode.NoRepoPath;
-                    break;
-                case 1:
-                    CurrentDisplayMode = HomeDisplayMode.RepoPathDoesNotExist;
-                    break;
-                case 2:
-                    CurrentDisplayMode = HomeDisplayMode.IsLoading;
-                    break;
-                case 3:
-                    CurrentDisplayMode = HomeDisplayMode.NoServers;
-                    break;
-                case 4:
-                    _servers = _serverDataManager.GetServers()
-                        .Select(x => new ServerViewModel(x))
-                        .OrderBy(x => x.DisplayIndex)
-                        .ToArray();
-                    CurrentDisplayMode = HomeDisplayMode.HasServers;
-                    break;
-            }
-        }
+                switch (x)
+                {
+                    case HomeDisplayMode.NoRepoPath:
+                        CurrentDisplayMode = HomeDisplayMode.NoRepoPath;
+                        break;
+                    case HomeDisplayMode.RepoPathDoesNotExist:
+                        CurrentDisplayMode = HomeDisplayMode.RepoPathDoesNotExist;
+                        break;
+                    case HomeDisplayMode.IsLoading:
+                        CurrentDisplayMode = HomeDisplayMode.IsLoading;
+                        break;
+                    case HomeDisplayMode.NoServers:
+                        CurrentDisplayMode = HomeDisplayMode.NoServers;
+                        break;
+                    case HomeDisplayMode.HasServers:
+                        _servers = new[]
+                        {
+                                    new ServerHostDto()
+                            {
+                                Metadata = new ServerMetadataDto()
+                                {
+                                    DisplayName = "server 1",
+                                    Name = "server1",
+                                    IPAddress = "192.168.1.1",
+                                    Description = "Server 1 Description",
+                                    Kind = ServerKind.Windows,
+                                },
+                            },
+                            new ServerHostDto()
+                            {
+                                Metadata = new ServerMetadataDto()
+                                {
+                                    DisplayName = "server 2",
+                                    Name = "server2",
+                                    IPAddress = "192.168.1.2",
+                                    Description = "Server 2 Description",
+                                    Kind = ServerKind.StandardLinux,
+                                },
+                            },
+                            new ServerHostDto()
+                            {
+                                Metadata = new ServerMetadataDto()
+                                {
+                                    DisplayName = "server 3",
+                                    Name = "server3",
+                                    IPAddress = "192.168.1.3",
+                                    Description = "Server 3 Description",
+                                    Kind = ServerKind.TrueNasScale,
+                                },
+                                VMs = new[]
+                                {
+                                    new ServerVmDto()
+                                    {
+                                        Metadata = new ServerMetadataDto()
+                                        {
+                                            DisplayName = "VM 1",
+                                            Name = "vm1",
+                                            IPAddress = "192.168.1.4",
+                                            Description = "VM 1 Description",
+                                            Kind = ServerKind.StandardLinux,
+                                        },
+                                    },
+                                    new ServerVmDto()
+                                    {
+                                        Metadata = new ServerMetadataDto()
+                                        {
+                                            DisplayName = "VM 2",
+                                            Name = "vm2",
+                                            IPAddress = "192.168.1.5",
+                                            Description = "VM 2 Description",
+                                            Kind = ServerKind.StandardLinux,
+                                        },
+                                    },
+                                }
+                            },
+                        }.Select(y => new ServerViewModel(y)).ToArray();
+                        CurrentDisplayMode = HomeDisplayMode.HasServers;
+                        break;
+                }
+            })
+            .DisposeWith(_disposables);
     }
 
     public override string Title => "Home";
@@ -109,6 +168,15 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
     public async Task NavigateToSettings() => await _navigationService!.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(false);
 
     /// <summary>
+    /// 
+    /// </summary>
+    public HomeDisplayMode DesignDisplayMode
+    {
+        get => _designDisplayMode;
+        set => this.RaiseAndSetIfChanged(ref _designDisplayMode, value);
+    }
+
+    /// <summary>
     /// Current display mode.
     /// </summary>
     public HomeDisplayMode CurrentDisplayMode
@@ -126,12 +194,14 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
         private set => this.RaiseAndSetIfChanged(ref _servers, value);
     }
 
-    protected override void Dispose(bool isDisposing) { }
+    protected override void Dispose(bool isDisposing) => _disposables.Dispose();
 
     private readonly IServerDataManager _serverDataManager;
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
+    private readonly CompositeDisposable _disposables = new();
 
+    private HomeDisplayMode _designDisplayMode;
     private HomeDisplayMode _currentDisplayMode;
     private IReadOnlyList<ServerViewModel> _servers;
 }
