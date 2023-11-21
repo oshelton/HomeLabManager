@@ -16,7 +16,7 @@
 			Height="600"
 			ContentTemplate="{DynamicResource HomePageTemplate}">
 			<ContentControl.Content>
-				<page:HomeViewModel DesignDisplayMode="HasServers" />
+				<page:HomeViewModel DesignDisplayMode="IsLoading" />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>
@@ -83,12 +83,7 @@
 					<Style Selector="ScrollViewer.IsLoading">
 						<Setter Property="Content">
 							<Template>
-								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
-									<StackPanel Margin="8">
-										<ProgressBar Classes="circular" IsIndeterminate="True" />
-										<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Servers...</TextBlock>
-									</StackPanel>
-								</materialControls:Card>
+								<controls:LoadingInProgressCard Label="Loading Servers..." />
 							</Template>
 						</Setter>
 					</Style>
