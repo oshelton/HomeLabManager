@@ -1,0 +1,27 @@
+<TemplatedControl
+	x:Class="HomeLabManager.Manager.Controls.TextBlockCard"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="using:HomeLabManager.Manager.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:materialControls="using:Material.Styles.Controls"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	HorizontalAlignment="Center"
+	VerticalAlignment="Center"
+	d:DesignHeight="50"
+	d:DesignWidth="300"
+	mc:Ignorable="d">
+	<TemplatedControl.Template>
+		<ControlTemplate>
+			<materialControls:Card DataContext="{Binding $parent}">
+				<StackPanel Margin="8">
+					<ProgressBar Classes="circular" IsIndeterminate="True" />
+					<TextBlock
+						Margin="0,8,0,0"
+						Classes="Body1"
+						Text="{Binding Label}" />
+				</StackPanel>
+			</materialControls:Card>
+		</ControlTemplate>
+	</TemplatedControl.Template>
+</TemplatedControl>
