@@ -1,0 +1,18 @@
+﻿<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="clr-namespace:HomeLabManager.Manager.Controls"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
+	xmlns:materialIcons="using:Material.Icons.Avalonia">
+	<Design.PreviewWith>
+		<UniformGrid
+			Width="600"
+			Height="200"
+			Columns="3">
+			<controls:LoadingInProgressCard />
+
+			<controls:LoadingInProgressCard Label="Some Basic Text" />
+		</UniformGrid>
+	</Design.PreviewWith>
+</Styles>
