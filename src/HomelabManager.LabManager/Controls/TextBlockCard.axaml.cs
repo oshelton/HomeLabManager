@@ -1,13 +1,11 @@
-using System.Security;
-using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Metadata;
-using Material.Icons;
+using Material.Styles.Controls;
 
 namespace HomeLabManager.Manager.Controls;
 
@@ -37,12 +35,22 @@ public partial class TextBlockCard : TemplatedControl
         AvaloniaProperty.RegisterDirect<TextBlockCard, InlineCollection>(
             nameof(Inlines), t => t.Inlines, (t, v) => t.Inlines = v);
 
-    public TextBlockCard() => InitializeComponent();
+    /// <summary>
+    /// Defines the <see cref="TextAlignment"/> property.
+    /// </summary>
+    public static readonly DirectProperty<TextBlockCard, TextAlignment> TextAlignmentProperty =
+        AvaloniaProperty.RegisterDirect<TextBlockCard, TextAlignment>(
+            nameof(Inlines), t => t.TextAlignment, (t, v) => t.TextAlignment = v);
+
+    public TextBlockCard()
+    {
+        _inlines = new InlineCollection();
+        InitializeComponent();
+    }
 
     /// <summary>
     /// Gets or sets the text.
     /// </summary>
-    [Content]
     public string Text
     {
         get => _text;
@@ -59,6 +67,12 @@ public partial class TextBlockCard : TemplatedControl
         set => SetAndRaise(InlinesProperty, ref _inlines, value);
     }
 
+    public TextAlignment TextAlignment
+    {
+        get => _textAlignment;
+        set => SetAndRaise(TextAlignmentProperty, ref _textAlignment, value);
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         if (e is null)
@@ -69,26 +83,47 @@ public partial class TextBlockCard : TemplatedControl
         _block = e.NameScope.Get<TextBlock>(PartTextBlockName) ?? throw new InvalidOperationException($"TextBlockCard templates must define a {PartTextBlockName} TextBlock element.");
 
         _block.Text = _text;
-        _block.Inlines = Inlines;
+        _block.Inlines.AddRange(Inlines);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
+        if (change is null)
+            throw new ArgumentNullException(nameof(change));
+
+        base.OnPropertyChanged(change);
+
         switch (change.Property.Name)
         {
             case nameof(Text):
-                _block.Inlines = null;
-                _block.Text = Text;
+                if (Text is not null)
+                {
+                    Inlines.Clear();
+                    if (_block is not null)
+                    {
+                        _block.Inlines.Clear();
+                        _block.Text = Text;
+                    }
+                }
                 break;
             case nameof(Inlines):
-                _block.Text = null;
-                _block.Inlines = Inlines;
+                if (Inlines is not null)
+                {
+                    Text = null;
+                    if (_block is not null)
+                    {
+                        _block.Text = null;
+                        _block.Inlines.Clear();
+                        _block.Inlines.AddRange(Inlines);
+                    }
+                }
                 break;
         }
     }
 
     private string _text;
     private InlineCollection _inlines;
+    private TextAlignment _textAlignment = TextAlignment.Center;
 
     private TextBlock _block;
 }

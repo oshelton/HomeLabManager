@@ -16,7 +16,7 @@
 			Height="600"
 			ContentTemplate="{DynamicResource HomePageTemplate}">
 			<ContentControl.Content>
-				<page:HomeViewModel DesignDisplayMode="IsLoading" />
+				<page:HomeViewModel DesignDisplayMode="HasServers" />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>
@@ -49,16 +49,11 @@
 					<Style Selector="ScrollViewer.NoRepoPath">
 						<Setter Property="Content">
 							<Template>
-								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
-									<TextBlock
-										Margin="8"
-										Classes="Body1"
-										TextAlignment="Center">
-										<Run Text="No Home Lab Git Repo Path has been specified." />
-										<LineBreak />
-										<Run Text="Set the path using the Settings button below." />
-									</TextBlock>
-								</materialControls:Card>
+								<controls:TextBlockCard TextAlignment="Center">
+									<Run Text="No Home Lab Git Repo Path has been specified." />
+									<LineBreak />
+									<Run Text="Set the path using the Settings button to the right." />
+								</controls:TextBlockCard>
 							</Template>
 						</Setter>
 					</Style>
@@ -66,16 +61,11 @@
 					<Style Selector="ScrollViewer.RepoPathDoesNotExist">
 						<Setter Property="Content">
 							<Template>
-								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
-									<TextBlock
-										Margin="8"
-										Classes="Body1"
-										TextAlignment="Center">
-										<Run Text="The Home Lab Git Repo Path is not a directory or does not exist." />
-										<LineBreak />
-										<Run Text="Correct the path using the Settings button below." />
-									</TextBlock>
-								</materialControls:Card>
+								<controls:TextBlockCard TextAlignment="Center">
+									<Run Text="The Home Lab Git Repo Path is not a directory or does not exist." />
+									<LineBreak />
+									<Run Text="Correct the path using the Settings button to the right." />
+								</controls:TextBlockCard>
 							</Template>
 						</Setter>
 					</Style>
@@ -91,16 +81,11 @@
 					<Style Selector="ScrollViewer.NoServers">
 						<Setter Property="Content">
 							<Template>
-								<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
-									<TextBlock
-										Margin="8"
-										Classes="Body1"
-										TextAlignment="Center">
-										<Run Text="No Servers Exist." />
-										<LineBreak />
-										<Run Text="Add one or more using the Servers button below." />
-									</TextBlock>
-								</materialControls:Card>
+								<controls:TextBlockCard TextAlignment="Center">
+									<Run Text="No Servers Exist." />
+									<LineBreak />
+									<Run Text="Add one or more using the Servers button to the right." />
+								</controls:TextBlockCard>
 							</Template>
 						</Setter>
 					</Style>

@@ -1,0 +1,39 @@
+﻿<Styles
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="clr-namespace:HomeLabManager.Manager.Controls"
+	xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+	xmlns:ir="clr-namespace:Avalonia.Xaml.Interactions.Responsive;assembly=Avalonia.Xaml.Interactions.Responsive"
+	xmlns:materialIcons="using:Material.Icons.Avalonia">
+	<Design.PreviewWith>
+		<UniformGrid
+			Width="600"
+			Height="200"
+			Columns="3">
+			<controls:TextBlockCard Text="Some Basic Text" />
+
+			<controls:TextBlockCard>
+				<Run>Line of text.</Run>
+				<LineBreak />
+				<Run FontWeight="Bold">Line of Bold Text</Run>
+			</controls:TextBlockCard>
+
+			<controls:TextBlockCard>
+				<materialIcons:MaterialIcon
+					Width="18"
+					Height="18"
+					VerticalAlignment="Center"
+					Kind="About" />
+				<Run FontWeight="Bold">
+					Icon with text.
+				</Run>
+			</controls:TextBlockCard>
+
+			<controls:TextBlockCard TextAlignment="Left">
+				<Run>Left align Text.</Run>
+				<LineBreak />
+				<Run FontWeight="Bold">Line of Bold Text</Run>
+			</controls:TextBlockCard>
+		</UniformGrid>
+	</Design.PreviewWith>
+</Styles>
