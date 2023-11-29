@@ -1,15 +1,18 @@
 ﻿using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Data.Git.Server;
+using HomeLabManager.Manager.Pages.Home;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using ReactiveValidation;
 
 namespace HomeLabManager.Manager.Pages.ServerListing;
 
@@ -32,26 +35,87 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
 
-        if (Avalonia.Controls.Design.IsDesignMode)
-        {
-            var mode = new Random().NextInt64(0, 3);
-            switch (mode)
+        this.WhenAnyValue(x => x.DesignDisplayMode)
+            .Subscribe(x =>
             {
-                case 0:
-                    CurrentDisplayMode = ServerListingDisplayMode.IsLoading;
-                    break;
-                case 1:
-                    CurrentDisplayMode = ServerListingDisplayMode.NoServers;
-                    break;
-                case 2:
-                    var servers = _serverDataManager.GetServers();
-                    _serverCache.AddOrUpdate(servers.Select(x => new ServerViewModel(x, this, servers.Count)));
-                    CurrentDisplayMode = ServerListingDisplayMode.HasServers;
-                    break;
-            }
-        }
-
-        _disposables = new CompositeDisposable();
+                switch (x)
+                {
+                    case ServerListingDisplayMode.IsLoading:
+                        CurrentDisplayMode = ServerListingDisplayMode.IsLoading;
+                        break;
+                    case ServerListingDisplayMode.NoServers:
+                        CurrentDisplayMode = ServerListingDisplayMode.NoServers;
+                        break;
+                    case ServerListingDisplayMode.HasServers:
+                        _serverCache.AddOrUpdate(new[]
+                        {
+                            new ServerHostDto(Guid.NewGuid())
+                            {
+                                Metadata = new ServerMetadataDto()
+                                {
+                                    DisplayName = "server 1",
+                                    Name = "server1",
+                                    IPAddress = "192.168.1.1",
+                                    Description = "Server 1 Description",
+                                    Kind = ServerKind.Windows,
+                                    DisplayIndex = 0,
+                                },
+                            },
+                            new ServerHostDto(Guid.NewGuid())
+                            {
+                                Metadata = new ServerMetadataDto()
+                                {
+                                    DisplayName = "server 2",
+                                    Name = "server2",
+                                    IPAddress = "192.168.1.2",
+                                    Description = "Server 2 Description",
+                                    Kind = ServerKind.StandardLinux,
+                                    DisplayIndex = 1,
+                                },
+                            },
+                            new ServerHostDto(Guid.NewGuid())
+                            {
+                                Metadata = new ServerMetadataDto()
+                                {
+                                    DisplayName = "server 3",
+                                    Name = "server3",
+                                    IPAddress = "192.168.1.3",
+                                    Description = "Server 3 Description",
+                                    Kind = ServerKind.TrueNasScale,
+                                    DisplayIndex = 2,
+                                },
+                                VMs = new[]
+                                {
+                                    new ServerVmDto(Guid.NewGuid())
+                                    {
+                                        Metadata = new ServerMetadataDto()
+                                        {
+                                            DisplayName = "VM 1",
+                                            Name = "vm1",
+                                            IPAddress = "192.168.1.4",
+                                            Description = "VM 1 Description",
+                                            Kind = ServerKind.StandardLinux,
+                                        },
+                                    },
+                                    new ServerVmDto(Guid.NewGuid())
+                                    {
+                                        Metadata = new ServerMetadataDto()
+                                        {
+                                            DisplayName = "VM 2",
+                                            Name = "vm2",
+                                            IPAddress = "192.168.1.5",
+                                            Description = "VM 2 Description",
+                                            Kind = ServerKind.StandardLinux,
+                                        },
+                                    },
+                                }
+                            },
+                        }.Select(x => new ServerViewModel(x, this, 3)));
+                        CurrentDisplayMode = ServerListingDisplayMode.HasServers;
+                        break;
+                }
+            })
+            .DisposeWith(_disposables);
 
         CreateNewServerHostCommand = ReactiveCommand.CreateFromTask<int?>(CreateNewServerHost)
             .DisposeWith(_disposables);
@@ -69,13 +133,11 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
             .DisposeWith(_disposables);
 
         var serverListObservable = _serverCache.Connect().Publish();
-
         serverListObservable.AutoRefresh(server => server.DisplayIndex, propertyChangeThrottle: TimeSpan.FromMilliseconds(10))
             .SortBy(x => x.DisplayIndex)
             .Bind(out _sortedServers)
             .Subscribe()
             .DisposeWith(_disposables);
-
         _disposables.Add(serverListObservable.Connect());
     }
 
@@ -136,6 +198,15 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
     /// Delete server command.
     /// </summary>
     public ReactiveCommand<ServerViewModel, Unit> DeleteServerCommand { get; }
+
+    /// <summary>
+    /// Display mode to use at design time.
+    /// </summary>
+    public ServerListingDisplayMode DesignDisplayMode
+    {
+        get => _designDisplayMode;
+        set => this.RaiseAndSetIfChanged(ref _designDisplayMode, value);
+    }
 
     /// <summary>
     /// Current display mode.
@@ -263,9 +334,10 @@ public class ServerListingViewModel : PageBaseViewModel<ServerListingViewModel>
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogsService;
 
-    private readonly CompositeDisposable _disposables;
+    private readonly CompositeDisposable _disposables = new();
 
     // Property backing fields.
+    private ServerListingDisplayMode _designDisplayMode;
     private ServerListingDisplayMode _currentDisplayMode;
     private SourceCache<ServerViewModel, Guid> _serverCache = new SourceCache<ServerViewModel, Guid>(x => x.UniqueId);
     private ReadOnlyObservableCollection<ServerViewModel> _sortedServers;

@@ -1,7 +1,6 @@
 ﻿using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using HomeLabManager.Common.Data.Git.Server;
-using Material.Icons;
 using ReactiveUI;
 using ReactiveValidation;
 using ReactiveValidation.Extensions;

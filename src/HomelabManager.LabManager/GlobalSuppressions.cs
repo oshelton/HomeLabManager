@@ -9,3 +9,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 [assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Does not account for objects disposed with COmpositeDisposable.")]
 [assembly: SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Does not account for objects disposed with COmpositeDisposable.")]
+[assembly: SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is an often impossible guideline in Avalonia and other XAML based UIs.")]

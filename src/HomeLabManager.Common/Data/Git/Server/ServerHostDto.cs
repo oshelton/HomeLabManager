@@ -11,6 +11,11 @@ namespace HomeLabManager.Common.Data.Git.Server;
 /// <remarks>This is for a physical server which can have one or more VMs also hosting services.</remarks>
 public sealed record ServerHostDto : BaseServerDto
 {
+    public ServerHostDto() : base() { }
+
+    public ServerHostDto(Guid uniqueId): base()
+        => UniqueId = uniqueId;
+
     /// <summary>
     /// List of VMs associated with this physical host.
     /// </summary>

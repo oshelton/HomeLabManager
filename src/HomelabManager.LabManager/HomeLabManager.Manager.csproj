@@ -39,6 +39,12 @@
     </AvaloniaXaml>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Controls\TextBlockCard.axaml.cs">
+      <DependentUpon>TextBlockCard.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\LoadingInProgressCard.axaml.cs">
+      <DependentUpon>LoadingInProgressCard.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Controls\AddItemInlineSeperator.axaml.cs">
       <DependentUpon>AddItemInlineSeperator.axaml</DependentUpon>
     </Compile>
