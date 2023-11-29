@@ -18,45 +18,71 @@
 			Height="600"
 			ContentTemplate="{DynamicResource CreateEditServerPageTemplate}">
 			<ContentControl.Content>
-				<page:CreateEditServerViewModel />
+				<page:CreateEditServerViewModel DesignDisplayMode="Ready" />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>
 
 	<DataTemplate x:Key="CreateEditServerPageTemplate" DataType="{x:Type page:CreateEditServerViewModel}">
-		<DockPanel IsEnabled="{Binding !IsSaving}">
-			<StackPanel Classes="PageSidebar" DockPanel.Dock="Right">
-				<Grid>
-					<controls:PageNavButton
-						Command="{Binding SaveCommand}"
-						Icon="FloppyDisc"
-						Text="Save" />
+		<Border
+			Classes.IsLoading="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:CreateEditServerDisplayMode.IsLoading}}"
+			Classes.Ready="{Binding CurrentDisplayMode, Converter={x:Static commonConverters:CommonConverters.ObjectsAreEqual}, ConverterParameter={x:Static page:CreateEditServerDisplayMode.Ready}}"
+			IsEnabled="{Binding !IsSaving}">
+			<Border.Styles>
+				<Style Selector="Border.IsLoading">
+					<Setter Property="Child">
+						<Template>
+							<materialControls:Card HorizontalAlignment="Center" VerticalAlignment="Center">
+								<StackPanel Margin="8">
+									<ProgressBar Classes="circular" IsIndeterminate="True" />
+									<TextBlock Margin="0,8,0,0" Classes="Body1">Loading Server...</TextBlock>
+								</StackPanel>
+							</materialControls:Card>
+						</Template>
+					</Setter>
+				</Style>
 
-					<Border>
-						<materialIcons:MaterialIcon
-							Width="16"
-							Height="16"
-							Margin="-8,-8,0,0"
-							HorizontalAlignment="Left"
-							VerticalAlignment="Top"
-							Classes="ValidationError"
-							IsVisible="{Binding HasErrors}"
-							ToolTip.Tip="Validation errors must be addressed before data can be saved." />
-					</Border>
-				</Grid>
+				<Style Selector="Border.Ready">
+					<Setter Property="Child">
+						<Template>
+							<DockPanel>
+								<StackPanel Classes="PageSidebar" DockPanel.Dock="Right">
+									<Grid>
+										<controls:PageNavButton
+											Command="{Binding SaveCommand}"
+											Icon="FloppyDisc"
+											Text="Save" />
 
-				<controls:PageNavButton
-					Command="{Binding CancelCommand}"
-					Icon="Cancel"
-					IsOutline="True"
-					Text="Cancel" />
-			</StackPanel>
+										<Border>
+											<materialIcons:MaterialIcon
+												Width="16"
+												Height="16"
+												Margin="-8,-8,0,0"
+												HorizontalAlignment="Left"
+												VerticalAlignment="Top"
+												Classes="ValidationError"
+												IsVisible="{Binding HasErrors}"
+												ToolTip.Tip="Validation errors must be addressed before data can be saved." />
+										</Border>
+									</Grid>
 
-			<ScrollViewer DockPanel.Dock="Top">
-				<StackPanel>
-					<ContentControl Content="{Binding Metadata}" ContentTemplate="{StaticResource MetadataEditorTemplate}" />
-				</StackPanel>
-			</ScrollViewer>
-		</DockPanel>
+									<controls:PageNavButton
+										Command="{Binding CancelCommand}"
+										Icon="Cancel"
+										IsOutline="True"
+										Text="Cancel" />
+								</StackPanel>
+
+								<ScrollViewer DockPanel.Dock="Top">
+									<StackPanel>
+										<ContentControl Content="{Binding Metadata}" ContentTemplate="{StaticResource MetadataEditorTemplate}" />
+									</StackPanel>
+								</ScrollViewer>
+							</DockPanel>
+						</Template>
+					</Setter>
+				</Style>
+			</Border.Styles>
+		</Border>
 	</DataTemplate>
 </ResourceDictionary>

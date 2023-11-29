@@ -15,7 +15,7 @@
 			Height="600"
 			ContentTemplate="{DynamicResource ServerListingPageTemplate}">
 			<ContentControl.Content>
-				<page:ServerListingViewModel />
+				<page:ServerListingViewModel DesignDisplayMode="HasServers" />
 			</ContentControl.Content>
 		</ContentControl>
 	</Design.PreviewWith>

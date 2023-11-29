@@ -168,7 +168,7 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
     public async Task NavigateToSettings() => await _navigationService!.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(false);
 
     /// <summary>
-    /// 
+    /// Display mode to use at design time.
     /// </summary>
     public HomeDisplayMode DesignDisplayMode
     {

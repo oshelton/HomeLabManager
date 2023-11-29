@@ -2,7 +2,6 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using HomeLabManager.Common.Data.Git.Server;
-using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Pages.CreateEditServer.Sections;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
@@ -11,6 +10,12 @@ using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 
 namespace HomeLabManager.Manager.Pages.CreateEditServer;
+
+public enum CreateEditServerDisplayMode
+{
+    IsLoading,
+    Ready,
+}
 
 /// <summary>
 /// Create/Edit Server Page View Model.
@@ -27,6 +32,39 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
         _sharedDialogsService = Program.ServiceProvider.Services.GetService<ISharedDialogsService>();
 
         _disposables = new CompositeDisposable();
+
+        this.WhenAnyValue(x => x.DesignDisplayMode)
+            .Subscribe(x =>
+            {
+                switch (x)
+                {
+                    case CreateEditServerDisplayMode.IsLoading:
+                        CurrentDisplayMode = CreateEditServerDisplayMode.IsLoading;
+                        break;
+                    case CreateEditServerDisplayMode.Ready:
+                        var server = new ServerHostDto(Guid.NewGuid())
+                        {
+                            Metadata = new ServerMetadataDto()
+                            {
+                                DisplayName = "server 1",
+                                Name = "server1",
+                                IPAddress = "192.168.1.1",
+                                Description = "Server 1 Description",
+                                Kind = ServerKind.Windows,
+                                DisplayIndex = 0,
+                            },
+                        };
+
+                        _serverDto = server;
+
+                        Metadata = new MetadataEditViewModel(server, Array.Empty<string>(), Array.Empty<string>())
+                            .DisposeWith(_disposables);
+
+                        CurrentDisplayMode = CreateEditServerDisplayMode.Ready;
+                        break;
+                }
+            })
+            .DisposeWith(_disposables);
 
         // Set up an observable to check when content has actually changed and there are no errors.
         _canSave = this.WhenAnyValue(x => x.Metadata.HasChanges, x => x.Metadata.HasErrors,
@@ -71,6 +109,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
         _initialServerTitle = !_isNew ? realRequest.Server.Metadata.DisplayName : null;
         _afterIndex = realRequest.AfterIndex;
 
+        CurrentDisplayMode = CreateEditServerDisplayMode.IsLoading;
+
         logger.Information("Loading servers");
 
         IReadOnlyList<ServerHostDto> allServers = null;
@@ -104,6 +144,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
             var vm = _serverDto as ServerVmDto;
             _allExistingSiblingServers = vm.Host.VMs.Where(x => x.UniqueId != _serverDto.UniqueId).ToList();
         }
+
+        CurrentDisplayMode = CreateEditServerDisplayMode.Ready;
     }
 
     public override Task<bool> TryNavigateAway()
@@ -124,6 +166,24 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
+
+    /// <summary>
+    /// Display mode to use at design time.
+    /// </summary>
+    public CreateEditServerDisplayMode DesignDisplayMode
+    {
+        get => _designDisplayMode;
+        set => this.RaiseAndSetIfChanged(ref _designDisplayMode, value);
+    }
+
+    /// <summary>
+    /// Current display mode.
+    /// </summary>
+    public CreateEditServerDisplayMode CurrentDisplayMode
+    {
+        get => _currentDisplayMode;
+        private set => this.RaiseAndSetIfChanged(ref _currentDisplayMode, value);
+    }
 
     public MetadataEditViewModel Metadata
     {
@@ -229,6 +289,8 @@ public sealed class CreateEditServerViewModel : PageBaseViewModel<CreateEditServ
     private readonly ObservableAsPropertyHelper<bool> _isSaving;
 
     // Property backing fields.
+    private CreateEditServerDisplayMode _designDisplayMode;
+    private CreateEditServerDisplayMode _currentDisplayMode;
     private MetadataEditViewModel _metadata;
 
     // Set once and read internally only fields.

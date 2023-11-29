@@ -18,6 +18,11 @@ namespace HomeLabManager.Common.Data.Git.Server
         /// </summary>
         public static readonly string UniqueIdPrefix = "vm-";
 
+        public ServerVmDto() : base() { }
+
+        public ServerVmDto(Guid uniqueId) : base()
+            => UniqueId = uniqueId;
+
         /// <summary>
         /// Reference back to the host that owns this VM.
         /// </summary>
