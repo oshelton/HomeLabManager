@@ -33,6 +33,11 @@
 				<controls:PageNavButton Icon="Console" Text="Commands" />
 				<controls:PageNavButton Icon="Toolbox" Text="Tools" />
 				<controls:PageNavButton
+					x:Name="docsButton"
+					Click="{eventBinder:EventBinding NavigateToDocsReports}"
+					Icon="DocumentSign"
+					Text="Docs/Reports" />
+				<controls:PageNavButton
 					x:Name="settingsButton"
 					Click="{eventBinder:EventBinding NavigateToSettings}"
 					Icon="CogOutline"

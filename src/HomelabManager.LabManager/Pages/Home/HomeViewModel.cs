@@ -165,6 +165,8 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
 
     public async Task NavigateToServerListing() => await _navigationService!.NavigateTo(new ServerListingNavigationRequest()).ConfigureAwait(false);
 
+    public async Task NavigateToDocsReports() => await _navigationService!.NavigateTo(new DocsReportsNavigationRequest()).ConfigureAwait(false);
+
     public async Task NavigateToSettings() => await _navigationService!.NavigateTo(new SettingsNavigationRequest()).ConfigureAwait(false);
 
     /// <summary>
