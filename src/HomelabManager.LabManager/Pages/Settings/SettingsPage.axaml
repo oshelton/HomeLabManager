@@ -45,52 +45,119 @@
 					Text="Cancel" />
 			</StackPanel>
 
-			<ScrollViewer>
-				<StackPanel>
-					<formFields:FolderPickerFormField
-						FolderPath="{Binding HomeLabRepoDataPath}"
-						Label="Home Lab Repo Data Path"
-						OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
-						<formFields:FolderPickerFormField.InfoTip>
-							<TextBlock MaxWidth="384" TextWrapping="Wrap">
-								<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
-								<LineBreak />
-								<LineBreak />
-								<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
-							</TextBlock>
-						</formFields:FolderPickerFormField.InfoTip>
-					</formFields:FolderPickerFormField>
+			<StackPanel>
+				<Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto, Auto">
+					<TextBlock
+						Margin="12"
+						VerticalAlignment="Center"
+						Classes="Body1">
+						Current Configuration:
+					</TextBlock>
 
-					<formFields:FilePickerFormField
-						FilePath="{Binding GitConfigFilePath}"
-						Label="Git Config File Path"
-						OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
-						<formFields:FilePickerFormField.InfoTip>
-							<TextBlock MaxWidth="384" TextWrapping="Wrap">
-								This is the path to the standard Git config file containing the Name and Email Address to use.
-							</TextBlock>
-						</formFields:FilePickerFormField.InfoTip>
-					</formFields:FilePickerFormField>
+					<ComboBox
+						Grid.Column="1"
+						VerticalAlignment="Center"
+						ItemsSource="{Binding AllConfigurationNames}"
+						SelectedItem="{Binding CurrentCoreConfigurationName}">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock
+									VerticalAlignment="Center"
+									Classes="Body1"
+									Text="{Binding}" />
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
 
-					<formFields:BasicStringFormField
-						InfoTip="This is the User Name used when signing into Github."
-						Label="Github User Name"
-						StringValue="{Binding GithubUserName}" />
+					<TextBlock
+						Grid.Column="2"
+						Margin="4"
+						VerticalAlignment="Center"
+						Classes="Body1"
+						Foreground="Red"
+						ToolTip.Tip="This is the current active configuration.">
+						Active
+					</TextBlock>
 
-					<formFields:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
-						<formFields:BasicStringFormField.InfoTip>
-							<TextBlock MaxWidth="384" TextWrapping="Wrap">
-								<Run>This is the Github PAT used when pushing up to Github.</Run>
-								<LineBreak />
-								<LineBreak />
-								<Run>See Github PAT documentation for details.</Run>
-							</TextBlock>
-						</formFields:BasicStringFormField.InfoTip>
-					</formFields:BasicStringFormField>
+					<Button
+						Grid.Column="2"
+						Margin="4"
+						VerticalAlignment="Center"
+						IsVisible="{Binding !CurrentConfigurationIsActive}"
+						ToolTip.Tip="Make this configuration be the currently active one.">
+						<TextBlock Classes="Body1" FontWeight="Bold">
+							Make Active
+						</TextBlock>
+					</Button>
 
+					<materialControls:FloatingButton
+						Name="PickFileButton"
+						Grid.Column="3"
+						Margin="4"
+						Classes="Mini">
+						<Border>
+							<materialIcons:MaterialIcon Kind="Delete" ToolTip.Tip="Delete this core configuration." />
+						</Border>
+					</materialControls:FloatingButton>
 
-				</StackPanel>
-			</ScrollViewer>
+					<materialControls:FloatingButton
+						Name="CreateConfigButton"
+						Grid.Column="4"
+						Margin="4"
+						Classes="Mini">
+						<Border>
+							<materialIcons:MaterialIcon Kind="PlusBold" ToolTip.Tip="Create a new Core Configuration." />
+						</Border>
+					</materialControls:FloatingButton>
+				</Grid>
+
+				<Separator />
+
+				<ScrollViewer>
+					<StackPanel>
+						<formFields:FolderPickerFormField
+							FolderPath="{Binding HomeLabRepoDataPath}"
+							Label="Home Lab Repo Data Path"
+							OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
+							<formFields:FolderPickerFormField.InfoTip>
+								<TextBlock MaxWidth="384" TextWrapping="Wrap">
+									<Run>This is the directory in which the Home Lab's configuration and management files are stored.</Run>
+									<LineBreak />
+									<LineBreak />
+									<Run>This should be a proper Clone of a Git Repo or many application features will not work.</Run>
+								</TextBlock>
+							</formFields:FolderPickerFormField.InfoTip>
+						</formFields:FolderPickerFormField>
+
+						<formFields:FilePickerFormField
+							FilePath="{Binding GitConfigFilePath}"
+							Label="Git Config File Path"
+							OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
+							<formFields:FilePickerFormField.InfoTip>
+								<TextBlock MaxWidth="384" TextWrapping="Wrap">
+									This is the path to the standard Git config file containing the Name and Email Address to use.
+								</TextBlock>
+							</formFields:FilePickerFormField.InfoTip>
+						</formFields:FilePickerFormField>
+
+						<formFields:BasicStringFormField
+							InfoTip="This is the User Name used when signing into Github."
+							Label="Github User Name"
+							StringValue="{Binding GithubUserName}" />
+
+						<formFields:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
+							<formFields:BasicStringFormField.InfoTip>
+								<TextBlock MaxWidth="384" TextWrapping="Wrap">
+									<Run>This is the Github PAT used when pushing up to Github.</Run>
+									<LineBreak />
+									<LineBreak />
+									<Run>See Github PAT documentation for details.</Run>
+								</TextBlock>
+							</formFields:BasicStringFormField.InfoTip>
+						</formFields:BasicStringFormField>
+					</StackPanel>
+				</ScrollViewer>
+			</StackPanel>
 		</DockPanel>
 	</DataTemplate>
 </ResourceDictionary>

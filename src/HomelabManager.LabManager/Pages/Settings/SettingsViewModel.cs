@@ -1,6 +1,8 @@
-﻿using System.Reactive;
+﻿using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using DynamicData;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Services;
 using HomeLabManager.Common.Services.Logging;
@@ -88,7 +90,16 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
         LogManager.GetApplicationLogger().Information("Loading configuration settings");
-        var coreConfig = _coreConfigurationManager.GetActiveCoreConfiguration();
+
+        _allConfigurationInfos = new List<(string Name, bool IsActive)>(_coreConfigurationManager.GetAllCoreConfigurations())
+            .OrderBy(x => x.Name).ToArray();
+        AllConfigurationNames = _allConfigurationInfos.Select(x => x.Name).ToArray();
+
+        var activeConfigurationInfo = _allConfigurationInfos.First(x => x.IsActive);
+        CurrentConfigurationIsActive = true;
+        CurrentCoreConfigurationName = activeConfigurationInfo.Name;
+
+        var coreConfig = _coreConfigurationManager.GetCoreConfiguration(CurrentCoreConfigurationName);
 
         HomeLabRepoDataPath = coreConfig.HomeLabRepoDataPath;
         GitConfigFilePath = coreConfig.GitConfigFilePath;
@@ -131,6 +142,24 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
     /// Whether or not this page is currently saving data.
     public bool IsSaving => _isSaving.Value;
+
+    public IReadOnlyList<string> AllConfigurationNames
+    {
+        get => _allConfigurationNames;
+        private set => this.RaiseAndSetIfChanged(ref _allConfigurationNames, value);
+    }
+
+    public string CurrentCoreConfigurationName
+    {
+        get => _currentCoreConfigurationName;
+        set => this.RaiseAndSetIfChanged(ref _currentCoreConfigurationName, value);
+    }
+
+    public bool CurrentConfigurationIsActive
+    {
+        get => _currentConfigurationIsActive;
+        set => this.RaiseAndSetIfChanged(ref _currentConfigurationIsActive, value);
+    }
 
     public string HomeLabRepoDataPath
     {
@@ -190,6 +219,10 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     private readonly ObservableAsPropertyHelper<bool> _hasChanges;
     private readonly ObservableAsPropertyHelper<bool> _isSaving;
 
+    private IReadOnlyList<(string Name, bool IsActive)> _allConfigurationInfos;
+    private IReadOnlyList<string> _allConfigurationNames;
+    private string _currentCoreConfigurationName;
+    private bool _currentConfigurationIsActive;
     private string _homeLabRepoDataPath;
     private string _gitConfigFilePath;
     private string _githubUserName;
