@@ -13,13 +13,18 @@ public interface ICoreConfigurationManager
     /// </summary>
     /// <param name="defaultGenerator">Generator function used to create the initial configuration.</param>
     /// <remarks>This method should only be called when the application is first started.</remarks>
-    public CoreConfigurationDto GetOrCreateCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator);
+    public CoreConfigurationDto GetOrCreateActiveCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator);
 
     /// <summary>
     /// Get an existing core configuration object.
     /// </summary>
     /// <remarks>This should be called in most places that need access to the core configuration.</remarks>
-    public CoreConfigurationDto GetCoreConfiguration();
+    public CoreConfigurationDto GetActiveCoreConfiguration();
+
+    /// <summary>
+    /// Get the core configuration details for a given name.
+    /// </summary>
+    public CoreConfigurationDto GetCoreConfiguration(string name);
 
     /// <summary>
     /// Save an updated core configuration object to disk.
@@ -27,15 +32,15 @@ public interface ICoreConfigurationManager
     public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration);
 
     /// <summary>
-    /// Path tot he core configuratiuon file.
+    /// Get information for all core configurations.
     /// </summary>
-    public string CoreConfigPath { get; }
+    /// <returns>A collection containing the names of all configurations and a flag for which one is the active one.</returns>
+    public IReadOnlyList<(string Name, bool IsActive)> GetAllCoreConfigurations();
 
     /// <summary>
-    /// Disable core config in memory caching; should only be used for testing purposes.
+    /// Path to the active core configuration file.
     /// </summary>
-    /// <remarks>This assumes that the application</remarks>
-    public bool DisableConfigurationCaching { get; set; }
+    public string ActiveCoreConfigPath { get; }
 
     /// <summary>
     /// Subject that publishes the new configuration to consumers when it is updated.

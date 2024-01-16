@@ -12,9 +12,9 @@ namespace HomeLabManager.DataTests
         public static (CoreConfigurationManager manager, CoreConfigurationDto coreConfig) CreateCoreConfigurationManager(bool disableCaching)
         {
             var manager = new CoreConfigurationManager(TestDirectory, new LogManager(true));
-            manager.DisableConfigurationCaching = disableCaching;
-            var coreConfig = manager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
+            var coreConfig = manager.GetOrCreateActiveCoreConfiguration(() => new CoreConfigurationDto
             {
+                Name = "Default",
                 HomeLabRepoDataPath = TestGitDirectory,
                 GitConfigFilePath = TestGitConfigFilePath,
                 GithubUserName = File.ReadAllText(GithubUserNameFilePath),

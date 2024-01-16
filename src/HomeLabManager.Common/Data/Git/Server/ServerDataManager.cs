@@ -24,7 +24,7 @@ public sealed class ServerDataManager : IServerDataManager
     {
         var logger = _logManager.GetApplicationLogger();
 
-        var coreConfiguration = _coreConfigurationManager.GetCoreConfiguration();
+        var coreConfiguration = _coreConfigurationManager.GetActiveCoreConfiguration();
         if (!Directory.Exists(coreConfiguration.HomeLabRepoDataPath))
         {
             logger.Warning("Home lab repo path \"{RepoPath}\" does not exist", coreConfiguration.HomeLabRepoDataPath);
@@ -69,7 +69,7 @@ public sealed class ServerDataManager : IServerDataManager
         using var _ = _logManager.StartTimedOperation("Reading Servers From Repo Directory");
 
         var foundServerDtos = new List<ServerHostDto>();
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
+        var repoPath = _coreConfigurationManager.GetActiveCoreConfiguration().HomeLabRepoDataPath;
         var serversDir = Path.Combine(repoPath, ServersDirectoryName);
         if (Directory.Exists(serversDir))
         {
@@ -87,7 +87,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <inheritdoc />
     public void AddUpdateServer(ServerHostDto server)
     {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
+        if (!Directory.Exists(_coreConfigurationManager.GetActiveCoreConfiguration().HomeLabRepoDataPath))
             throw new InvalidOperationException("Server cannot be added if the repo data path directory does not exist.");
 
         if (server is null)
@@ -98,7 +98,7 @@ public sealed class ServerDataManager : IServerDataManager
 
         var logger = _logManager.GetApplicationLogger();
 
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
+        var repoPath = _coreConfigurationManager.GetActiveCoreConfiguration().HomeLabRepoDataPath;
         var serversDirectory = Path.Combine(repoPath, ServersDirectoryName);
 
         logger.Information("Updating server in directory \"{ServerDirectory}\" with unique Id \"{UniqueId}\"", serversDirectory, server.UniqueId);
@@ -116,7 +116,7 @@ public sealed class ServerDataManager : IServerDataManager
     /// <inheritdoc />
     public void DeleteServer(ServerHostDto server)
     {
-        if (!Directory.Exists(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!))
+        if (!Directory.Exists(_coreConfigurationManager.GetActiveCoreConfiguration().HomeLabRepoDataPath!))
             throw new InvalidOperationException("Server cannot be deleted if the repo data path directory does not exist.");
 
         if (server is null)
@@ -125,7 +125,7 @@ public sealed class ServerDataManager : IServerDataManager
         if (server.UniqueId is null)
             throw new InvalidDataException("This server doess not have an Id and should be added, not deleted.");
 
-        var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+        var repoPath = _coreConfigurationManager.GetActiveCoreConfiguration().HomeLabRepoDataPath!;
         var serverDirectory = Path.Combine(repoPath, ServersDirectoryName, server.UniqueIdToDirectoryName());
 
         _logManager.GetApplicationLogger().Information("Deleting server with Unique Id \"{UniqueId}\" and directory \"{serverDirectory}\"", server.UniqueId, serverDirectory);

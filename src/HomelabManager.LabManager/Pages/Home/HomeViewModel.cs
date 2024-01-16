@@ -126,7 +126,7 @@ public sealed class HomeViewModel : PageBaseViewModel<HomeViewModel>
         var logger = LogManager.GetApplicationLogger();
 
         // Confirm there is a repo data path and that it exists.
-        var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
+        var coreConfig = _coreConfigurationManager.GetActiveCoreConfiguration();
 
         if (string.IsNullOrEmpty(coreConfig.HomeLabRepoDataPath))
         {

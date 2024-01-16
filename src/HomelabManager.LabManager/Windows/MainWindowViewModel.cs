@@ -16,8 +16,9 @@ public sealed class MainWindowViewModel : ReactiveObject
     public MainWindowViewModel()
     {
         var coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
-        coreConfigurationManager.GetOrCreateCoreConfiguration(() => new CoreConfigurationDto
+        coreConfigurationManager.GetOrCreateActiveCoreConfiguration(() => new CoreConfigurationDto
         {
+            Name = "Default",
             GitConfigFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gitconfig"),
             GithubPat = "",
             GithubUserName = "",
@@ -25,7 +26,7 @@ public sealed class MainWindowViewModel : ReactiveObject
         });
         coreConfigurationManager.CoreConfigurationUpdated.Subscribe(UpdateConfigProperties);
 
-        UpdateConfigProperties(coreConfigurationManager.GetCoreConfiguration());
+        UpdateConfigProperties(coreConfigurationManager.GetActiveCoreConfiguration());
 
         _navigationService = Program.ServiceProvider.Services.GetService<INavigationService>();
         _logManager = Program.ServiceProvider.Services.GetService<ILogManager>();

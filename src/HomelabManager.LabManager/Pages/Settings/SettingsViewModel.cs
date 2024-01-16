@@ -88,7 +88,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             throw new InvalidOperationException("Expected navigation request type is HomeNavigationRequest.");
 
         LogManager.GetApplicationLogger().Information("Loading configuration settings");
-        var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
+        var coreConfig = _coreConfigurationManager.GetActiveCoreConfiguration();
 
         HomeLabRepoDataPath = coreConfig.HomeLabRepoDataPath;
         GitConfigFilePath = coreConfig.GitConfigFilePath;

@@ -21,122 +21,187 @@ public class CoreConfigurationManager : ICoreConfigurationManager
         if (!Directory.Exists(coreConfigDirectory))
             throw new InvalidOperationException($"{nameof(coreConfigDirectory)} must exist.");
 
-        CoreConfigPath = Path.Combine(coreConfigDirectory, "CoreConfig.yaml");
+        _coreConfigDir = coreConfigDirectory;
+
+        ActiveCoreConfigPath = GetActiveConfigurationPath(GetAllCoreConfigurationPaths());
         CoreConfigurationUpdated = new Subject<CoreConfigurationDto>();
 
         _logManager = logManager?.CreateContextualizedLogManager<CoreConfigurationManager>() ?? throw new ArgumentNullException(nameof(logManager));
         _logManager.GetApplicationLogger().Information("Created with config directory \"{ConfigDir}\"", coreConfigDirectory);
     }
 
-    /// <summary>
-    /// Get or create the core configuration file if it doesn't exist.
-    /// </summary>
-    /// <param name="defaultGenerator">Generator function used to create the initial configuration.</param>
-    /// <remarks>This method should only be called when the application is first started.</remarks>
-    public CoreConfigurationDto GetOrCreateCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator)
+    /// <inheritdoc />
+    public CoreConfigurationDto GetOrCreateActiveCoreConfiguration(Func<CoreConfigurationDto> defaultGenerator)
     {
         if (defaultGenerator is null)
             throw new ArgumentNullException(nameof(defaultGenerator));
 
         var logger = _logManager.GetApplicationLogger();
 
-        if (!File.Exists(CoreConfigPath))
+        if (ActiveCoreConfigPath is null)
         {
             var defaultConfiguration = defaultGenerator();
+            if (defaultConfiguration.Name is null)
+                throw new InvalidOperationException("Default configuration must have a name.");
+
+            // Default configuration must always start out active.
+            defaultConfiguration.IsActive = true;
+            defaultConfiguration.InitialName = defaultConfiguration.Name;
+            defaultConfiguration.InitialIsActive = defaultConfiguration.IsActive;
+            defaultConfiguration.FilePath = Path.Combine(_coreConfigDir, BuildFileNameForConfiguration(defaultConfiguration));
+            ActiveCoreConfigPath = defaultConfiguration.FilePath;
+
             logger.Information("Core configuration does not exist, creating a new one: {Initial}.", defaultConfiguration);
-            if (!DisableConfigurationCaching)
-                _cachedCoreConfiguration = defaultConfiguration;
 
             using (_logManager.StartTimedOperation("Core Configuration Default Serialization"))
             {
                 var serializer = DataUtils.CreateBasicYamlSerializer();
 
-                File.WriteAllText(CoreConfigPath, serializer.Serialize(defaultConfiguration));
+                File.WriteAllText(ActiveCoreConfigPath, serializer.Serialize(defaultConfiguration));
             }
             return defaultConfiguration;
         }
         else
         {
-            logger.Information("Getting core configuration from file.");
-
-            using (_logManager.StartTimedOperation("Core Configuration Reading and Deserialization"))
-            {
-                var deserializer = DataUtils.CreateBasicYamlDeserializer();
-
-                var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath))!;
-                _cachedCoreConfiguration = readConfiguration;
-                return readConfiguration;
-            }
+            return DeserializeConfigurationFromFile(ActiveCoreConfigPath);
         }
     }
 
-    /// <summary>
-    /// Get an existing core configuration object.
-    /// </summary>
-    /// <remarks>This should be called in most places that need access to the core configuration.</remarks>
-    public CoreConfigurationDto GetCoreConfiguration()
+    /// <inheritdoc />
+    public CoreConfigurationDto GetActiveCoreConfiguration() => DeserializeConfigurationFromFile(ActiveCoreConfigPath);
+
+    /// <inheritdoc />
+    public CoreConfigurationDto GetCoreConfiguration(string name)
     {
-        var logger = _logManager.GetApplicationLogger();
-        if (_cachedCoreConfiguration is not null && !DisableConfigurationCaching)
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("Must not be null or empty.", nameof(name));
+
+        var matchingPath = GetAllCoreConfigurationPaths().FirstOrDefault(x => Path.GetFileName(x).Contains($"{name}.", StringComparison.InvariantCultureIgnoreCase)) 
+            ?? throw new InvalidOperationException($"No configuration was found with name \"{name}\"");
+
+        return DeserializeConfigurationFromFile(matchingPath);
+    }
+
+    /// <inheritdoc />
+    public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration)
+    {
+        if (updatedConfiguration is null)
+            throw new ArgumentNullException(nameof(updatedConfiguration));
+        if (string.IsNullOrEmpty(updatedConfiguration.Name))
+            throw new ArgumentException("Must not be null or empty.", nameof(updatedConfiguration));
+
+        _logManager.GetApplicationLogger().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
+
+        using (_logManager.StartTimedOperation("Core Configuration Serialization and Writing"))
         {
-            logger.Verbose("Getting cached core configuration.");
-            return _cachedCoreConfiguration;
+            var wasActive = updatedConfiguration.InitialIsActive;
+
+            WriteConfigurationToFile(updatedConfiguration);
+
+            if (updatedConfiguration.IsActive)
+                ActiveCoreConfigPath = updatedConfiguration.FilePath;
+            else if (wasActive && !updatedConfiguration.IsActive)
+                ActiveCoreConfigPath = null;
         }
 
-        logger.Information("Getting core configuration from file.");
+        CoreConfigurationUpdated.OnNext(updatedConfiguration);
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyList<(string Name, bool IsActive)> GetAllCoreConfigurations()
+        => GetAllCoreConfigurationPaths().Select(x =>
+        {
+            var fileName = Path.GetFileName(x);
+            var firstPeriodIndex = fileName.IndexOf(".", StringComparison.InvariantCultureIgnoreCase);
+            return (fileName[..firstPeriodIndex], IsPathActiveConfigurationFile(x));
+        }).ToArray();
+
+    /// <inheritdoc />
+    public string ActiveCoreConfigPath { get; private set; }
+
+    /// <inheritdoc />
+    public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
+
+    /// <summary>
+    /// Get the path to the currently active configuration file.
+    /// </summary>
+    private static string GetActiveConfigurationPath(IReadOnlyList<string> configurationPaths) => configurationPaths.SingleOrDefault(x => IsPathActiveConfigurationFile(x));
+
+    /// <summary>
+    /// Determine if the passed in path represents an active configuration file.
+    /// </summary>
+    private static bool IsPathActiveConfigurationFile(string path) => Path.GetFileName(path).Contains($".{CoreConfigFileActivePart}.", StringComparison.InvariantCultureIgnoreCase);
+
+    /// <summary>
+    /// Build the file name for the provided configuration.
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
+    private static string BuildFileNameForConfiguration(CoreConfigurationDto configuration) => $"{configuration.Name}.{CoreConfigFilePrefix}{(configuration.IsActive ? $".{CoreConfigFileActivePart}" : "")}.{CoreConfigFileExtension}";
+
+    /// <summary>
+    /// Deserialize a core configuration object from file.
+    /// </summary>
+    private CoreConfigurationDto DeserializeConfigurationFromFile(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath))
+            throw new ArgumentException("Must not be null or empty.", nameof(filePath));
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"File {filePath} must exist.");
+
+        var deserializer = DataUtils.CreateBasicYamlDeserializer();
 
         using (_logManager.StartTimedOperation("Core Configuration Reading and Deserialization"))
         {
-            var deserializer = DataUtils.CreateBasicYamlDeserializer();
+            var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(filePath))
+                ?? throw new InvalidOperationException($"Error deserializing core configuration file at \"{filePath}\"");
 
-            var readConfiguration = deserializer.Deserialize<CoreConfigurationDto>(File.ReadAllText(CoreConfigPath));
-            if (!DisableConfigurationCaching)
-                _cachedCoreConfiguration = readConfiguration;
+            var fileName = Path.GetFileName(filePath);
+            var firstPeriodIndex = fileName.IndexOf(".", StringComparison.InvariantCultureIgnoreCase);
+
+            readConfiguration.Name = fileName[..firstPeriodIndex];
+            readConfiguration.IsActive = IsPathActiveConfigurationFile(filePath);
+            readConfiguration.InitialName = readConfiguration.Name;
+            readConfiguration.InitialIsActive = readConfiguration.IsActive;
+            readConfiguration.FilePath = filePath;
 
             return readConfiguration;
         }
     }
 
     /// <summary>
-    /// Save an updated core configuration object to disk.
+    /// Write the configuration to a file.
     /// </summary>
-    public void SaveCoreConfiguration(CoreConfigurationDto updatedConfiguration)
+    private void WriteConfigurationToFile(CoreConfigurationDto configuration)
     {
-        if (updatedConfiguration is null)
-            throw new ArgumentNullException(nameof(updatedConfiguration));
+        if (configuration is null)
+            throw new ArgumentNullException(nameof(configuration));
 
-        _logManager.GetApplicationLogger().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
+        if (configuration.FilePath is not null && ((configuration.Name != configuration.InitialName && configuration.InitialName is not null) || configuration.IsActive != configuration.InitialIsActive))
+            File.Delete(configuration.FilePath);
 
-        using (_logManager.StartTimedOperation("Core Configuration Serialization and Writing"))
-        {
-            if (!DisableConfigurationCaching)
-                _cachedCoreConfiguration = updatedConfiguration;
+        var outputPath = Path.Combine(_coreConfigDir, BuildFileNameForConfiguration(configuration));
 
-            var serializer = DataUtils.CreateBasicYamlSerializer();
-            File.WriteAllText(CoreConfigPath, serializer.Serialize(updatedConfiguration));
-        }
+        if (GetAllCoreConfigurations().Any(x => x.Name == configuration.Name) && configuration.Name != configuration.InitialName)
+            throw new InvalidOperationException($"Another configuration with the same name \"{configuration.Name}\" already exists, nothing will be saved!");
 
-        CoreConfigurationUpdated.OnNext(updatedConfiguration);
+        var serializer = DataUtils.CreateBasicYamlSerializer();
+        File.WriteAllText(outputPath, serializer.Serialize(configuration));
+
+        configuration.InitialName = configuration.Name;
+        configuration.InitialIsActive = configuration.IsActive;
+        configuration.FilePath = outputPath;
     }
 
     /// <summary>
-    /// Path tot he core configuratiuon file.
+    /// Get full paths to all available core configuration files.
     /// </summary>
-    public string CoreConfigPath { get; }
+    private IReadOnlyList<string> GetAllCoreConfigurationPaths() => Directory.GetFiles(_coreConfigDir, $"*.{CoreConfigFilePrefix}.*").ToArray();
 
-    /// <summary>
-    /// Disable core config in memory caching; should only be used for testing purposes.
-    /// </summary>
-    /// <remarks>This assumes that the application</remarks>
-    public bool DisableConfigurationCaching { get; set; }
+    private const string CoreConfigFilePrefix = "CoreConfig";
+    private const string CoreConfigFileActivePart = "Active";
+    private const string CoreConfigFileExtension = "yaml";
 
-    /// <summary>
-    /// Subject that publishes the new configuration to consumers when it is updated.
-    /// </summary>
-    /// <remarks>Dtos should be considered transient and not held onto; including this one.</remarks>
-    public Subject<CoreConfigurationDto> CoreConfigurationUpdated { get; }
-
+    private readonly string _coreConfigDir;
     private readonly ContextAwareLogManager<CoreConfigurationManager> _logManager;
-
-    private CoreConfigurationDto _cachedCoreConfiguration;
 }

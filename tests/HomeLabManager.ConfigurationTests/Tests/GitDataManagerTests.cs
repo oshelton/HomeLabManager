@@ -22,7 +22,7 @@ public sealed class GitDataManagerTests
         Assert.That(repoPath, Is.Not.Null);
 
         var coreConfigurationManager = Utils.CreateCoreConfigurationManager(true).manager;
-        var config = coreConfigurationManager.GetCoreConfiguration();
+        var config = coreConfigurationManager.GetActiveCoreConfiguration();
 
         using (var repo = new Repository(repoPath))
         {
@@ -46,7 +46,7 @@ public sealed class GitDataManagerTests
         CreateTestData();
 
         _coreConfigurationManager = Utils.CreateCoreConfigurationManager(true).manager;
-        var config = _coreConfigurationManager.GetCoreConfiguration();
+        var config = _coreConfigurationManager.GetActiveCoreConfiguration();
 
         var repoPath = Repository.Init(Utils.TestGitDirectory);
         Assert.That(repoPath, Is.Not.Null);
@@ -80,14 +80,8 @@ public sealed class GitDataManagerTests
     {
         void UpdateCoreConfig(string path)
         {
-            var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
-            coreConfig = new CoreConfigurationDto()
-            {
-                HomeLabRepoDataPath = path,
-                GitConfigFilePath = coreConfig.GitConfigFilePath,
-                GithubUserName = coreConfig.GithubUserName,
-                GithubPat = coreConfig.GithubPat
-            };
+            var coreConfig = _coreConfigurationManager.GetActiveCoreConfiguration();
+            coreConfig = coreConfig with { HomeLabRepoDataPath = path };
             _coreConfigurationManager.SaveCoreConfiguration(coreConfig);
         }
 
@@ -143,7 +137,7 @@ public sealed class GitDataManagerTests
     [Test]
     public void PullLatestChanges_HasChangesToPull_PullLatestChangesWithChangesOnRemote()
     {
-        var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
+        var coreConfig = _coreConfigurationManager.GetActiveCoreConfiguration();
 
         // Push some testing changes.
         var tempRepoDirectory = Path.Combine(Path.GetTempPath(), "gitdatamanager_tests");
@@ -165,7 +159,7 @@ public sealed class GitDataManagerTests
 
             File.WriteAllText(tempFilePath, "Test Content");
             Commands.Stage(tempRepo, "*");
-            tempRepo.Commit("Test file commit", GitDataManager.CreateGitSignature(_coreConfigurationManager.GetCoreConfiguration().GitConfigFilePath, logManager), GitDataManager.CreateGitSignature(_coreConfigurationManager.GetCoreConfiguration().GitConfigFilePath, logManager));
+            tempRepo.Commit("Test file commit", GitDataManager.CreateGitSignature(_coreConfigurationManager.GetActiveCoreConfiguration().GitConfigFilePath, logManager), GitDataManager.CreateGitSignature(_coreConfigurationManager.GetActiveCoreConfiguration().GitConfigFilePath, logManager));
 
             tempRepo.Network.Push(localBranch, CreatePushOptions(coreConfig.GithubUserName, coreConfig.GithubPat, logManager));
         }
@@ -182,7 +176,7 @@ public sealed class GitDataManagerTests
     [Test]
     public void CommitAndPushChanges_ChangesArePresent_CommitAndPushUncommitedChanges()
     {
-        var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
+        var coreConfig = _coreConfigurationManager.GetActiveCoreConfiguration();
         var gitManager = new GitDataManager(_coreConfigurationManager, new LogManager(true));
 
         File.WriteAllText(Path.Combine(Utils.TestGitDirectory, "testFile.txt"), "Hello World!");

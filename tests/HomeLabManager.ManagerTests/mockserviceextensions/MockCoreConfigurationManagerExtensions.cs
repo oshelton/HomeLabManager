@@ -20,6 +20,6 @@ internal static class MockCoreConfigurationManagerExtensions
         mockService.Reset();
 
         mockService.SetupGet(x => x.CoreConfigurationUpdated).Returns(() => new Subject<CoreConfigurationDto>());
-        mockService.Setup(x => x.GetCoreConfiguration()).Returns(() => new CoreConfigurationDto());
+        mockService.Setup(x => x.GetActiveCoreConfiguration()).Returns(() => new CoreConfigurationDto());
     }
 }

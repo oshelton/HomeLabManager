@@ -20,17 +20,20 @@ namespace HomeLabManager.Common.Data.Git
         /// </summary>
         public GitDataManager(ICoreConfigurationManager coreConfigurationManager, ILogManager logManager) 
         {
-            _coreConfigurationManager = coreConfigurationManager ?? throw new ArgumentNullException(nameof(coreConfigurationManager));
-
+            if (coreConfigurationManager is null)
+                throw new ArgumentNullException(nameof(coreConfigurationManager));
             _logManager = logManager?.CreateContextualizedLogManager<GitDataManager>() ?? throw new ArgumentNullException(nameof(logManager));
             _logManager.GetApplicationLogger().Information("Created");
+
+            _currentCoreConfiguration = coreConfigurationManager.GetActiveCoreConfiguration();
+            coreConfigurationManager.CoreConfigurationUpdated.Subscribe(config => _currentCoreConfiguration = config.IsActive ? config : _currentCoreConfiguration);
         }
 
         /// <inheritdoc />
         public bool IsDataPathARepo()
         {
             var logger = _logManager.GetApplicationLogger();
-            var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
+            var repoPath = _currentCoreConfiguration.HomeLabRepoDataPath;
             if (string.IsNullOrWhiteSpace(repoPath) || !Directory.Exists(repoPath))
             {
                 logger.Warning("Non-existent path available to IsDataPathARepo");
@@ -46,7 +49,7 @@ namespace HomeLabManager.Common.Data.Git
         /// <inheritdoc />
         public bool RepoHasUncommitedChanges()
         {
-            var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath;
+            var repoPath = _currentCoreConfiguration.HomeLabRepoDataPath;
 
             using var repo = new Repository(repoPath);
             var isDirty = repo.RetrieveStatus().IsDirty;
@@ -58,7 +61,7 @@ namespace HomeLabManager.Common.Data.Git
         /// <inheritdoc />
         public RepositoryStatus GetRepoStatus()
         {
-            var repoPath = _coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath!;
+            var repoPath = _currentCoreConfiguration.HomeLabRepoDataPath!;
 
             using var repo = new Repository(repoPath);
             _logManager.GetApplicationLogger().Information("Getting status status of \"{RepoPath}\"", repoPath);
@@ -69,14 +72,13 @@ namespace HomeLabManager.Common.Data.Git
         /// <inheritdoc />
         public void PullLatestChanges()
         {
-            var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
-            var repoPath = coreConfig.HomeLabRepoDataPath!;
+            var repoPath = _currentCoreConfiguration.HomeLabRepoDataPath!;
 
             _logManager.GetApplicationLogger().Information("Pulling latest changes for \"{RepoPath}\"", repoPath);
 
             using var _ = _logManager.StartTimedOperation("Pulling Latest Git Changes");
             using var repo = new Repository(repoPath);
-            Commands.Pull(repo, CreateGitSignature(coreConfig.GitConfigFilePath, _logManager), new PullOptions
+            Commands.Pull(repo, CreateGitSignature(_currentCoreConfiguration.GitConfigFilePath, _logManager), new PullOptions
             {
                 FetchOptions = new FetchOptions
                 {
@@ -84,8 +86,8 @@ namespace HomeLabManager.Common.Data.Git
                     {
                         return new UsernamePasswordCredentials
                         {
-                            Username = coreConfig.GithubUserName,
-                            Password = coreConfig.GithubPat,
+                            Username = _currentCoreConfiguration.GithubUserName,
+                            Password = _currentCoreConfiguration.GithubPat,
                         };
                     }
                 }
@@ -100,8 +102,7 @@ namespace HomeLabManager.Common.Data.Git
 
             var logger = _logManager.GetApplicationLogger();
 
-            var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
-            var repoPath = coreConfig.HomeLabRepoDataPath;
+            var repoPath = _currentCoreConfiguration.HomeLabRepoDataPath;
 
             using var _ = _logManager.StartTimedOperation("Committing and Pushing Changes");
             using var repo = new Repository(repoPath);
@@ -110,13 +111,13 @@ namespace HomeLabManager.Common.Data.Git
                 logger.Information("Committing and pushing changes for \"{RepoPath}\"", repoPath);
 
                 Commands.Stage(repo, "*");
-                var signature = CreateGitSignature(coreConfig.GitConfigFilePath, _logManager);
+                var signature = CreateGitSignature(_currentCoreConfiguration.GitConfigFilePath, _logManager);
                 repo.Commit(commitMessage, signature, signature);
 
                 var currentBranch = repo.Head;
                 repo.Network.Push(currentBranch, new PushOptions
                 {
-                    CredentialsProvider = CreateGithubCredentialsHandler(coreConfig.GithubUserName, coreConfig.GithubPat, _logManager)
+                    CredentialsProvider = CreateGithubCredentialsHandler(_currentCoreConfiguration.GithubUserName, _currentCoreConfiguration.GithubPat, _logManager)
                 });
 
                 return true;
@@ -173,7 +174,8 @@ namespace HomeLabManager.Common.Data.Git
             };
         }
 
-        private readonly ICoreConfigurationManager _coreConfigurationManager;
         private readonly ContextAwareLogManager<GitDataManager> _logManager;
+
+        private CoreConfigurationDto _currentCoreConfiguration;
     }
 }

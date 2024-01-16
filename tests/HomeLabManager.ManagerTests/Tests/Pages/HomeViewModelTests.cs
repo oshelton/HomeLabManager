@@ -34,7 +34,7 @@ public class HomeViewModelTests
     [Test]
     public async Task NavigateTo_HappyPathNavigateTo_ConfirmNavigatingToExpectationsWithFullConfiguration()
     {
-        _services.MockCoreConfigurationManager.Setup(x => x.GetCoreConfiguration())
+        _services.MockCoreConfigurationManager.Setup(x => x.GetActiveCoreConfiguration())
             .Returns(new CoreConfigurationDto
             {
                 HomeLabRepoDataPath = Path.GetTempPath(),

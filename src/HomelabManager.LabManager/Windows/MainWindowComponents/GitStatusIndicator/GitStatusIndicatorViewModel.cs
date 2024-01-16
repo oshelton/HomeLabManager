@@ -21,7 +21,6 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
     /// </summary>
     public GitStatusIndicatorViewModel()
     {
-        _coreConfigurationManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
         _gitDataManager = Program.ServiceProvider.Services.GetService<IGitDataManager>();
         _serverDataManager = Program.ServiceProvider.Services.GetService<IServerDataManager>();
         _logManager = Program.ServiceProvider.Services.GetService<ILogManager>().CreateContextualizedLogManager<GitStatusIndicatorViewModel>();
@@ -29,6 +28,10 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         // Set up the timer for regularly polling the status of the git data. 
         Observable.Timer(TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2), RxApp.MainThreadScheduler)
             .Subscribe(async _ => await UpdateGitStatus().ConfigureAwait(true));
+
+        var coreConfigManager = Program.ServiceProvider.Services.GetService<ICoreConfigurationManager>();
+        _currentCoreConfiguration = coreConfigManager.GetActiveCoreConfiguration();
+        coreConfigManager.CoreConfigurationUpdated.Subscribe(config => _currentCoreConfiguration = config.IsActive ? config : _currentCoreConfiguration);
     }
 
     public async Task CommitChanges()
@@ -111,7 +114,7 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         {
             await Task.Run(() =>
             {
-                if (string.IsNullOrEmpty(_coreConfigurationManager.GetCoreConfiguration().HomeLabRepoDataPath))
+                if (string.IsNullOrEmpty(_currentCoreConfiguration.HomeLabRepoDataPath))
                     displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
                 else if (!_gitDataManager.IsDataPathARepo())
                     displayMode = GitStatusIndicatorDisplayMode.NoValidGitRepo;
@@ -124,8 +127,7 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
 
                     statusMessages = _serverDataManager.MapChangesToHumanReadableInfo(changes);
 
-                    var coreConfig = _coreConfigurationManager.GetCoreConfiguration();
-                    if (!string.IsNullOrEmpty(coreConfig.GithubPat) && !string.IsNullOrEmpty(coreConfig.GithubUserName) && File.Exists(coreConfig.GitConfigFilePath))
+                    if (!string.IsNullOrEmpty(_currentCoreConfiguration.GithubPat) && !string.IsNullOrEmpty(_currentCoreConfiguration.GithubUserName) && File.Exists(_currentCoreConfiguration.GitConfigFilePath))
                         canCommit = true;
                 }
             }).ConfigureAwait(false);
@@ -141,11 +143,11 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         _isUpdatingStatus = false;
     }
 
-    private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly IGitDataManager _gitDataManager;
     private readonly IServerDataManager _serverDataManager;
     private readonly ContextAwareLogManager<GitStatusIndicatorViewModel> _logManager;
 
+    private CoreConfigurationDto _currentCoreConfiguration;
     private GitStatusIndicatorDisplayMode _currentDisplayMode;
     private IReadOnlyList<string> _uncommittedChanges;
     private string _customCommitMessageTitle;
