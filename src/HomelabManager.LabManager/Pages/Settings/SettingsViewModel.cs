@@ -2,6 +2,8 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Avalonia.Threading;
+using Docker.DotNet.Models;
 using DynamicData;
 using HomeLabManager.Common.Data.CoreConfiguration;
 using HomeLabManager.Common.Services;
@@ -9,6 +11,7 @@ using HomeLabManager.Common.Services.Logging;
 using HomeLabManager.Manager.Services.Navigation;
 using HomeLabManager.Manager.Services.Navigation.Requests;
 using HomeLabManager.Manager.Services.SharedDialogs;
+using HomeLabManager.Manager.Utils;
 using LibGit2Sharp;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
@@ -52,11 +55,12 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         Validator = builder.Build(this);
 
         // Set up observable to monitor for validation issues.
-        _hasChanges = this.WhenAnyValue(x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
-            (repoPath, gitPath, userName, pat) =>
+        _hasChanges = this.WhenAnyValue(x => x.CurrentConfigurationIsActive, x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
+            (isActive, repoPath, gitPath, userName, pat) =>
             {
                 return new TrackedPropertyState()
                 {
+                    IsActive = isActive,
                     HomeLabRepoDataPath = repoPath,
                     GitConfigFilePath = gitPath,
                     GithubUserName = userName,
@@ -64,9 +68,21 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
                 };
             })
             .Throttle(TimeSpan.FromSeconds(0.5))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Select(state => !state.Equals(this._initialState))
             .ToProperty(this, nameof(HasChanges))
             .DisposeWith(_disposables);
+
+        // Handle switching the currently selected configuration.
+        this.WhenAnyValue(x => x.CurrentCoreConfigurationName)
+            .Skip(1)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Where(_ => !_isResettingCurrentConfiguration)
+            .Subscribe(async x =>
+            {
+                var coreConfig = _coreConfigurationManager.GetCoreConfiguration(x);
+                HandleSelectedConfigurationChanged(coreConfig);
+            }).DisposeWith(_disposables);
 
         // Set up an observable to check when content has actually changed and there are no errors.
         _canSave = this.WhenAnyValue(x => x.HasErrors, x => x.HasChanges,
@@ -96,24 +112,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         AllConfigurationNames = _allConfigurationInfos.Select(x => x.Name).ToArray();
 
         var activeConfigurationInfo = _allConfigurationInfos.First(x => x.IsActive);
-        CurrentConfigurationIsActive = true;
         CurrentCoreConfigurationName = activeConfigurationInfo.Name;
-
-        var coreConfig = _coreConfigurationManager.GetCoreConfiguration(CurrentCoreConfigurationName);
-
-        HomeLabRepoDataPath = coreConfig.HomeLabRepoDataPath;
-        GitConfigFilePath = coreConfig.GitConfigFilePath;
-        GithubUserName = coreConfig.GithubUserName;
-        GithubPat = coreConfig.GithubPat;
-
-        // Capture the initial state of the data.
-        _initialState = new TrackedPropertyState()
-        {
-            HomeLabRepoDataPath = HomeLabRepoDataPath,
-            GitConfigFilePath = GitConfigFilePath,
-            GithubUserName = GithubUserName,
-            GithubPat = GithubPat
-        };
     }
 
     public override async Task<bool> TryNavigateAway()
@@ -152,7 +151,44 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     public string CurrentCoreConfigurationName
     {
         get => _currentCoreConfigurationName;
-        set => this.RaiseAndSetIfChanged(ref _currentCoreConfigurationName, value);
+        set
+        {
+            if (value == _currentCoreConfigurationName)
+                return;
+
+
+
+            if (HasChanges)
+            {
+                async Task VerifyChangeDesired()
+                {
+                    var shouldContinue = await _sharedDialogService.ShowSimpleYesNoDialog("Unsaved changes will be lost if you continue.").ConfigureAwait(true);
+
+                    if (shouldContinue)
+                    {
+                        this.RaiseAndSetIfChanged(ref _currentCoreConfigurationName, value);
+                    }
+                    else
+                    {
+                        _isResettingCurrentConfiguration = true;
+
+                        var tmp = _currentCoreConfigurationName;
+                        _currentCoreConfigurationName = null;
+                        await DispatcherHelper.InvokeAsync(() => this.RaisePropertyChanged(nameof(CurrentCoreConfigurationName)), DispatcherPriority.Input).ConfigureAwait(false);
+                        _currentCoreConfigurationName = tmp;
+                        await DispatcherHelper.InvokeAsync(() => this.RaisePropertyChanged(nameof(CurrentCoreConfigurationName)), DispatcherPriority.Input).ConfigureAwait(false);
+
+                        _isResettingCurrentConfiguration = false;
+                    }
+                }
+
+                _ = VerifyChangeDesired();
+            }
+            else
+            {
+                this.RaiseAndSetIfChanged(ref _currentCoreConfigurationName, value);
+            }
+        }
     }
 
     public bool CurrentConfigurationIsActive
@@ -191,6 +227,9 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             _disposables.Dispose();
     }
 
+    /// <summary>
+    /// Save the 
+    /// </summary>
     private async Task Save()
     {
         var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
@@ -210,6 +249,28 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         await _navigationService!.NavigateBack().ConfigureAwait(false);
     }
 
+    private void HandleSelectedConfigurationChanged(CoreConfigurationDto config)
+    {
+        if (config is null)
+            throw new ArgumentNullException(nameof(config));
+
+        HomeLabRepoDataPath = config.HomeLabRepoDataPath;
+        CurrentConfigurationIsActive = config.IsActive;
+        GitConfigFilePath = config.GitConfigFilePath;
+        GithubUserName = config.GithubUserName;
+        GithubPat = config.GithubPat;
+
+        // Capture the initial state of the data.
+        _initialState = new TrackedPropertyState()
+        {
+            IsActive = config.IsActive,
+            HomeLabRepoDataPath = HomeLabRepoDataPath,
+            GitConfigFilePath = GitConfigFilePath,
+            GithubUserName = GithubUserName,
+            GithubPat = GithubPat
+        };
+    }
+
     private readonly ICoreConfigurationManager _coreConfigurationManager;
     private readonly INavigationService _navigationService;
     private readonly ISharedDialogsService _sharedDialogService;
@@ -222,6 +283,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     private IReadOnlyList<(string Name, bool IsActive)> _allConfigurationInfos;
     private IReadOnlyList<string> _allConfigurationNames;
     private string _currentCoreConfigurationName;
+    // private bool _isRenamingConfiguration;
+    private bool _isResettingCurrentConfiguration;
     private bool _currentConfigurationIsActive;
     private string _homeLabRepoDataPath;
     private string _gitConfigFilePath;
@@ -232,6 +295,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
     private struct TrackedPropertyState
     {
+        public bool IsActive;
         public string HomeLabRepoDataPath;
         public string GitConfigFilePath;
         public string GithubUserName;

@@ -45,13 +45,13 @@
 					Text="Cancel" />
 			</StackPanel>
 
-			<StackPanel>
+			<StackPanel Margin="0,4,0,0">
 				<Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto, Auto">
 					<TextBlock
 						Margin="12"
 						VerticalAlignment="Center"
 						Classes="Body1">
-						Current Configuration:
+						Configurations:
 					</TextBlock>
 
 					<ComboBox
@@ -75,7 +75,7 @@
 						VerticalAlignment="Center"
 						Classes="Body1"
 						Foreground="Red"
-						ToolTip.Tip="This is the current active configuration.">
+						ToolTip.Tip="This is the current active configuration">
 						Active
 					</TextBlock>
 
@@ -84,29 +84,43 @@
 						Margin="4"
 						VerticalAlignment="Center"
 						IsVisible="{Binding !CurrentConfigurationIsActive}"
-						ToolTip.Tip="Make this configuration be the currently active one.">
+						ToolTip.Tip="Make this configuration be the currently active one">
 						<TextBlock Classes="Body1" FontWeight="Bold">
 							Make Active
 						</TextBlock>
 					</Button>
 
 					<materialControls:FloatingButton
-						Name="PickFileButton"
+						Name="DeleteButton"
 						Grid.Column="3"
 						Margin="4"
-						Classes="Mini">
+						Classes="Mini"
+						IsVisible="{Binding !CurrentConfigurationIsActive}"
+						ToolTip.Tip="Delete this core configuration">
 						<Border>
-							<materialIcons:MaterialIcon Kind="Delete" ToolTip.Tip="Delete this core configuration." />
+							<materialIcons:MaterialIcon Kind="Delete" />
+						</Border>
+					</materialControls:FloatingButton>
+
+					<materialControls:FloatingButton
+						Name="EditNameButton"
+						Grid.Column="4"
+						Margin="4"
+						Classes="Mini"
+						ToolTip.Tip="Update the name of this configuration">
+						<Border>
+							<materialIcons:MaterialIcon Kind="Pencil" />
 						</Border>
 					</materialControls:FloatingButton>
 
 					<materialControls:FloatingButton
 						Name="CreateConfigButton"
-						Grid.Column="4"
+						Grid.Column="5"
 						Margin="4"
-						Classes="Mini">
+						Classes="Mini"
+						ToolTip.Tip="Create a new Core Configuration">
 						<Border>
-							<materialIcons:MaterialIcon Kind="PlusBold" ToolTip.Tip="Create a new Core Configuration." />
+							<materialIcons:MaterialIcon Kind="PlusBold" />
 						</Border>
 					</materialControls:FloatingButton>
 				</Grid>
