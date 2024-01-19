@@ -110,28 +110,25 @@ public sealed class GitStatusIndicatorViewModel : ReactiveObject, IGitStatusIndi
         IReadOnlyList<string> statusMessages = Array.Empty<string>();
         var canCommit = false;
 
-        using (_logManager.StartTimedOperation("Updating Git Status Indicator Status"))
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
+            if (string.IsNullOrEmpty(_currentCoreConfiguration.HomeLabRepoDataPath))
+                displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
+            else if (!_gitDataManager.IsDataPathARepo())
+                displayMode = GitStatusIndicatorDisplayMode.NoValidGitRepo;
+            else if (!_gitDataManager.RepoHasUncommitedChanges())
+                displayMode = GitStatusIndicatorDisplayMode.NoChanges;
+            else
             {
-                if (string.IsNullOrEmpty(_currentCoreConfiguration.HomeLabRepoDataPath))
-                    displayMode = GitStatusIndicatorDisplayMode.NoRepoPath;
-                else if (!_gitDataManager.IsDataPathARepo())
-                    displayMode = GitStatusIndicatorDisplayMode.NoValidGitRepo;
-                else if (!_gitDataManager.RepoHasUncommitedChanges())
-                    displayMode = GitStatusIndicatorDisplayMode.NoChanges;
-                else
-                {
-                    displayMode = GitStatusIndicatorDisplayMode.UncommittedChanges;
-                    var changes = _gitDataManager.GetRepoStatus();
+                displayMode = GitStatusIndicatorDisplayMode.UncommittedChanges;
+                var changes = _gitDataManager.GetRepoStatus();
 
-                    statusMessages = _serverDataManager.MapChangesToHumanReadableInfo(changes);
+                statusMessages = _serverDataManager.MapChangesToHumanReadableInfo(changes);
 
-                    if (!string.IsNullOrEmpty(_currentCoreConfiguration.GithubPat) && !string.IsNullOrEmpty(_currentCoreConfiguration.GithubUserName) && File.Exists(_currentCoreConfiguration.GitConfigFilePath))
-                        canCommit = true;
-                }
-            }).ConfigureAwait(false);
-        }
+                if (!string.IsNullOrEmpty(_currentCoreConfiguration.GithubPat) && !string.IsNullOrEmpty(_currentCoreConfiguration.GithubUserName) && File.Exists(_currentCoreConfiguration.GitConfigFilePath))
+                    canCommit = true;
+            }
+        }).ConfigureAwait(false);
 
         await DispatcherHelper.PostToUIThreadIfNecessary(() =>
         {
