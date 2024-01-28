@@ -83,6 +83,7 @@
 						Grid.Column="2"
 						Margin="4"
 						VerticalAlignment="Center"
+						Command="{Binding MakeCurrentConfigurationActiveCommand}"
 						IsVisible="{Binding !CurrentConfigurationIsActive}"
 						ToolTip.Tip="Make this configuration be the currently active one">
 						<TextBlock Classes="Body1" FontWeight="Bold">

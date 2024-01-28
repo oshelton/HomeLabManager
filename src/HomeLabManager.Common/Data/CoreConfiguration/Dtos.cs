@@ -38,7 +38,7 @@ public sealed record CoreConfigurationDto
     /// Whether or not this configuration is active.
     /// </summary>
     [YamlIgnore]
-    public bool IsActive { get; internal set; }
+    public bool IsActive { get; set; }
 
     /// <summary>
     /// Name portion of the file the configuration came from.

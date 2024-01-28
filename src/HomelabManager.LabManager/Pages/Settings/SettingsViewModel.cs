@@ -96,6 +96,9 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         CancelCommand = ReactiveCommand.CreateFromTask(_navigationService.NavigateBack)
             .DisposeWith(_disposables);
+
+        MakeCurrentConfigurationActiveCommand = ReactiveCommand.Create(() => CurrentConfigurationIsActive = true, outputScheduler: RxApp.MainThreadScheduler)
+            .DisposeWith(_disposables);
     }
 
     public override string Title => "Settings";
@@ -133,6 +136,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
 
+    public ReactiveCommand<Unit, bool> MakeCurrentConfigurationActiveCommand { get; }
+
     /// Whether or not this page has changes and is in a valid state to be saved.
     public bool CanSave => _canSave.Value;
 
@@ -155,8 +160,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         {
             if (value == _currentCoreConfigurationName)
                 return;
-
-
 
             if (HasChanges)
             {
@@ -236,13 +239,26 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
 
-        await Task.Run(() => _coreConfigurationManager!.SaveCoreConfiguration(new CoreConfigurationDto()
+        var didIsActiveChange = CurrentConfigurationIsActive && CurrentConfigurationIsActive != _currentCoreConfiguration.IsActive;
+
+        await Task.Run(() =>
         {
-            HomeLabRepoDataPath = HomeLabRepoDataPath,
-            GitConfigFilePath = GitConfigFilePath,
-            GithubUserName = GithubUserName,
-            GithubPat = GithubPat
-        })).ConfigureAwait(true);
+            if (didIsActiveChange)
+            {
+                var previouslyActiveConfiguration = _coreConfigurationManager.GetActiveCoreConfiguration();
+                previouslyActiveConfiguration.IsActive = false;
+                _coreConfigurationManager.SaveCoreConfiguration(previouslyActiveConfiguration);
+            }
+
+            _coreConfigurationManager!.SaveCoreConfiguration(_currentCoreConfiguration with
+            {
+                IsActive = CurrentConfigurationIsActive,
+                HomeLabRepoDataPath = HomeLabRepoDataPath,
+                GitConfigFilePath = GitConfigFilePath,
+                GithubUserName = GithubUserName,
+                GithubPat = GithubPat
+            });
+        }).ConfigureAwait(true);
 
         dialog?.GetWindow().Close();
 
@@ -253,6 +269,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     {
         if (config is null)
             throw new ArgumentNullException(nameof(config));
+
+        _currentCoreConfiguration = config;
 
         HomeLabRepoDataPath = config.HomeLabRepoDataPath;
         CurrentConfigurationIsActive = config.IsActive;
@@ -282,6 +300,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
     private IReadOnlyList<(string Name, bool IsActive)> _allConfigurationInfos;
     private IReadOnlyList<string> _allConfigurationNames;
+    private CoreConfigurationDto _currentCoreConfiguration;
     private string _currentCoreConfigurationName;
     // private bool _isRenamingConfiguration;
     private bool _isResettingCurrentConfiguration;
