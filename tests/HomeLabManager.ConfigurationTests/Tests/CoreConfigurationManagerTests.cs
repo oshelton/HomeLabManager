@@ -155,6 +155,37 @@ public sealed class CoreConfigurationManagerTests
     }
 
     [Test]
+    public void SaveCoreConfiguration_SaveNewActiveConfig_SaveANewActiveCoreConfig()
+    {
+        var (manager, defaultConfiguration) = Utils.CreateCoreConfigurationManager(true);
+
+        var newConfig = new CoreConfigurationDto
+        {
+            Name = "New Config",
+            GithubUserName = "Owen",
+            HomeLabRepoDataPath = Path.GetTempPath(),
+            IsActive = true,
+        };
+        manager.SaveCoreConfiguration(newConfig);
+
+        var retrieved = manager.GetCoreConfiguration(newConfig.Name);
+
+        Assert.That(retrieved.Name, Is.EqualTo(newConfig.Name));
+        Assert.That(retrieved.GithubUserName, Is.EqualTo(newConfig.GithubUserName));
+        Assert.That(retrieved.HomeLabRepoDataPath, Is.EqualTo(newConfig.HomeLabRepoDataPath));
+        Assert.That(retrieved.InitialName, Is.EqualTo(newConfig.InitialName));
+        Assert.That(retrieved.FilePath, Is.EqualTo(newConfig.FilePath));
+        Assert.That(retrieved.IsActive, Is.True);
+
+        var defaultConfig = manager.GetCoreConfiguration(defaultConfiguration.Name);
+
+        Assert.That(defaultConfig.IsActive, Is.False);
+
+        var allConfigs = manager.GetAllCoreConfigurations();
+        Assert.That(allConfigs.Count, Is.EqualTo(2));
+    }
+
+    [Test]
     public void GetAllCoreConfigurations_CoreConfigurationsExpectedExist_AllCoreConfigurationsRetrievedAsExpected()
     {
         var (manager, defaultConfiguration) = Utils.CreateCoreConfigurationManager(true);

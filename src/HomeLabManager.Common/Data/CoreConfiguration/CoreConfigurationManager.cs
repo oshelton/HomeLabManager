@@ -92,6 +92,13 @@ public class CoreConfigurationManager : ICoreConfigurationManager
 
         _logManager.GetApplicationLogger().Information("Saving updated core configuration {Configuration}", updatedConfiguration);
 
+        if (updatedConfiguration.IsActive && !updatedConfiguration.InitialIsActive && ActiveCoreConfigPath is not null)
+        {
+            var previousActiveConfig = GetActiveCoreConfiguration();
+            previousActiveConfig.IsActive = false;
+            SaveCoreConfiguration(previousActiveConfig);
+        }
+
         using (_logManager.StartTimedOperation("Core Configuration Serialization and Writing"))
         {
             var wasActive = updatedConfiguration.InitialIsActive;
