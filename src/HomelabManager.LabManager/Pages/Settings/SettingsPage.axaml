@@ -96,6 +96,7 @@
 						Grid.Column="3"
 						Margin="4"
 						Classes="Mini"
+						Command="{Binding DeleteConfigurationCommand}"
 						IsVisible="{Binding !CurrentConfigurationIsActive}"
 						ToolTip.Tip="Delete this core configuration">
 						<Border>

@@ -77,7 +77,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         this.WhenAnyValue(x => x.CurrentCoreConfigurationName)
             .Skip(1)
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Where(_ => !_isResettingCurrentConfiguration)
+            .Where(x => !_isResettingCurrentConfiguration && x != null)
             .Subscribe(async x =>
             {
                 var coreConfig = _coreConfigurationManager.GetCoreConfiguration(x);
@@ -99,6 +99,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         MakeCurrentConfigurationActiveCommand = ReactiveCommand.Create(() => CurrentConfigurationIsActive = true, outputScheduler: RxApp.MainThreadScheduler)
             .DisposeWith(_disposables);
+
+        DeleteConfigurationCommand = ReactiveCommand.CreateFromTask(DeleteConfiguration);
     }
 
     public override string Title => "Settings";
@@ -137,6 +139,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
 
     public ReactiveCommand<Unit, bool> MakeCurrentConfigurationActiveCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> DeleteConfigurationCommand { get; }
 
     /// Whether or not this page has changes and is in a valid state to be saved.
     public bool CanSave => _canSave.Value;
@@ -231,40 +235,9 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     }
 
     /// <summary>
-    /// Save the 
+    /// Handle updating the Page's state when changing the selected Core Configuration.
     /// </summary>
-    private async Task Save()
-    {
-        var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
-
-        LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
-
-        var didIsActiveChange = CurrentConfigurationIsActive && CurrentConfigurationIsActive != _currentCoreConfiguration.IsActive;
-
-        await Task.Run(() =>
-        {
-            if (didIsActiveChange)
-            {
-                var previouslyActiveConfiguration = _coreConfigurationManager.GetActiveCoreConfiguration();
-                previouslyActiveConfiguration.IsActive = false;
-                _coreConfigurationManager.SaveCoreConfiguration(previouslyActiveConfiguration);
-            }
-
-            _coreConfigurationManager!.SaveCoreConfiguration(_currentCoreConfiguration with
-            {
-                IsActive = CurrentConfigurationIsActive,
-                HomeLabRepoDataPath = HomeLabRepoDataPath,
-                GitConfigFilePath = GitConfigFilePath,
-                GithubUserName = GithubUserName,
-                GithubPat = GithubPat
-            });
-        }).ConfigureAwait(true);
-
-        dialog?.GetWindow().Close();
-
-        await _navigationService!.NavigateBack().ConfigureAwait(false);
-    }
-
+    /// <param name="config">The configuration being changed to, must not be null.</param>
     private void HandleSelectedConfigurationChanged(CoreConfigurationDto config)
     {
         if (config is null)
@@ -287,6 +260,63 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             GithubUserName = GithubUserName,
             GithubPat = GithubPat
         };
+    }
+
+    /// <summary>
+    /// Save any pending changes to the currently selected core configuration.
+    /// </summary>
+    private async Task Save()
+    {
+        if (!HasChanges)
+            throw new InvalidOperationException($"Core configuration {CurrentCoreConfigurationName} has no changes but we are trying to save anyway.");
+
+        var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
+
+        LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
+
+        await Task.Run(() =>
+        {
+            _coreConfigurationManager!.SaveCoreConfiguration(_currentCoreConfiguration with
+            {
+                IsActive = CurrentConfigurationIsActive,
+                HomeLabRepoDataPath = HomeLabRepoDataPath,
+                GitConfigFilePath = GitConfigFilePath,
+                GithubUserName = GithubUserName,
+                GithubPat = GithubPat
+            });
+        }).ConfigureAwait(true);
+
+        dialog?.GetWindow().Close();
+
+        await _navigationService!.NavigateBack().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Delete the currently selected configuration.
+    /// </summary>
+    /// <remarks>Only inactive configurations may be deleted.</remarks>
+    private async Task DeleteConfiguration()
+    {
+        var continueDeleting = await _sharedDialogService.ShowSimpleYesNoDialog("Are you sure you want to delete this configuration?\n\nThis operation cannot be undone.").ConfigureAwait(true);
+        if (!continueDeleting)
+            return;
+
+        var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Deleting the current core configuration...");
+
+        IReadOnlyList<string> updatedConfigurationList = null;
+        CoreConfigurationDto activeCoreConfiguration = null;
+
+        await Task.Run(() =>
+        {
+            _coreConfigurationManager.DeleteCoreConfiguration(_currentCoreConfiguration);
+            updatedConfigurationList = _coreConfigurationManager.GetAllCoreConfigurations().Select(x => x.Name).ToArray();
+            activeCoreConfiguration = _coreConfigurationManager.GetActiveCoreConfiguration();
+        }).ConfigureAwait(true);
+
+        AllConfigurationNames = updatedConfigurationList;
+        CurrentCoreConfigurationName = activeCoreConfiguration.Name;
+
+        dialog?.GetWindow()?.Close();
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
