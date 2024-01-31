@@ -116,6 +116,19 @@ public class CoreConfigurationManager : ICoreConfigurationManager
             return (fileName[..firstPeriodIndex], IsPathActiveConfigurationFile(x));
         }).ToArray();
 
+    /// <inheritdoc/>
+    public void DeleteCoreConfiguration(CoreConfigurationDto configuration)
+    {
+        if (configuration is null)
+            throw new ArgumentNullException(nameof(configuration));
+        if (configuration.IsActive)
+            throw new InvalidOperationException("Cannot delete an active configuration.");
+        if (!File.Exists(configuration.FilePath))
+            throw new InvalidOperationException($"File \"{configuration.FilePath}\" does not exist and there is nothing to be deleted.");
+
+        File.Delete(configuration.FilePath);
+    }
+
     /// <inheritdoc />
     public string ActiveCoreConfigPath { get; private set; }
 

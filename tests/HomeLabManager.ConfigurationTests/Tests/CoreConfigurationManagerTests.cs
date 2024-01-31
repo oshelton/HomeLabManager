@@ -176,6 +176,29 @@ public sealed class CoreConfigurationManagerTests
     }
 
     [Test]
+    public void DeleteCoreConfiguration_VerifyErrorConditions_VerifyArgumentExceptionsThrownAsExpected()
+    {
+        var (manager, defaultConfiguration) = Utils.CreateCoreConfigurationManager(true);
+        var newConfiguration = new CoreConfigurationDto() { Name = "Test" };
+
+        Assert.Throws<ArgumentNullException>(() => manager.DeleteCoreConfiguration(null));
+        Assert.Throws<InvalidOperationException>(() => manager.DeleteCoreConfiguration(defaultConfiguration));
+        Assert.Throws<InvalidOperationException>(() => manager.DeleteCoreConfiguration(newConfiguration));
+    }
+
+    [Test]
+    public void DeleteCoreConfiguration_DeleteExistingConfiguration_VerifyDeletingConfigurationsWorks()
+    {
+        var (manager, defaultConfiguration) = Utils.CreateCoreConfigurationManager(true);
+        var newConfiguration = new CoreConfigurationDto() { Name = "Test" };
+        manager.SaveCoreConfiguration(newConfiguration);
+
+        Assert.That(File.Exists(newConfiguration.FilePath), Is.True);
+        manager.DeleteCoreConfiguration(newConfiguration);
+        Assert.That(File.Exists(newConfiguration.FilePath), Is.False);
+    }
+
+    [Test]
     public void ActiveCoreConfigPath_VerifyActiveCoreConfigRetrievalWorks_VerifyActivePathWorksAsExpected()
     {
         var (manager, defaultConfiguration) = Utils.CreateCoreConfigurationManager(true);

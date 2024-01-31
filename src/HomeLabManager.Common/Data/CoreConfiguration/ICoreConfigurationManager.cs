@@ -38,6 +38,13 @@ public interface ICoreConfigurationManager
     public IReadOnlyList<(string Name, bool IsActive)> GetAllCoreConfigurations();
 
     /// <summary>
+    /// Delete th passed in configuration.
+    /// </summary>
+    /// <param name="configuration">Configuration to delete.</param>
+    /// <remarks>Deleting the currently active configuration is forbidden.</remarks>
+    public void DeleteCoreConfiguration(CoreConfigurationDto configuration);
+
+    /// <summary>
     /// Path to the active core configuration file.
     /// </summary>
     public string ActiveCoreConfigPath { get; }
