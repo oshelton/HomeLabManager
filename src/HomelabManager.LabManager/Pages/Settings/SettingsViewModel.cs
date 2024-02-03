@@ -33,46 +33,6 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         _disposables = new CompositeDisposable();
 
-        var builder = new ValidationBuilder<SettingsViewModel>();
-
-        builder.RuleFor(vm => vm.HomeLabRepoDataPath)
-            .WithPropertyCascadeMode(CascadeMode.Stop)
-            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application cannot work as expected.")
-            .Must(value => Directory.Exists(value), ValidationMessageType.Error).WithMessage("This should point to a directory.").Throttle(200)
-            .Must(value => Repository.IsValid(value), ValidationMessageType.Error).WithMessage("This is not a Git Working Copy; some features will not work properly.").Throttle(1000);
-
-        builder.RuleFor(vm => vm.GitConfigFilePath)
-            .WithPropertyCascadeMode(CascadeMode.Stop)
-            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty change tracking will not be able to work as expected.")
-            .Must(value => File.Exists(value), ValidationMessageType.Error).WithMessage("This must point to a file that exists.").Throttle(200);
-
-        builder.RuleFor(vm => vm.GithubUserName)
-            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
-
-        builder.RuleFor(vm => vm.GithubPat)
-            .NotEmpty(ValidationMessageType.Warning).WithMessage("If this is empty the application will be unable to push changes to GitHub.");
-
-        Validator = builder.Build(this);
-
-        // Set up observable to monitor for validation issues.
-        _hasChanges = this.WhenAnyValue(x => x.CurrentConfigurationIsActive, x => x.HomeLabRepoDataPath, x => x.GitConfigFilePath, x => x.GithubUserName, x => x.GithubPat,
-            (isActive, repoPath, gitPath, userName, pat) =>
-            {
-                return new TrackedPropertyState()
-                {
-                    IsActive = isActive,
-                    HomeLabRepoDataPath = repoPath,
-                    GitConfigFilePath = gitPath,
-                    GithubUserName = userName,
-                    GithubPat = pat
-                };
-            })
-            .Throttle(TimeSpan.FromSeconds(0.5))
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Select(state => !state.Equals(this._initialState))
-            .ToProperty(this, nameof(HasChanges))
-            .DisposeWith(_disposables);
-
         // Handle switching the currently selected configuration.
         this.WhenAnyValue(x => x.CurrentCoreConfigurationName)
             .Skip(1)
@@ -84,20 +44,14 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
                 HandleSelectedConfigurationChanged(coreConfig);
             }).DisposeWith(_disposables);
 
-        // Set up an observable to check when content has actually changed and there are no errors.
-        _canSave = this.WhenAnyValue(x => x.HasErrors, x => x.HasChanges,
-            (hasErrors, hasChanges) => !hasErrors && hasChanges)
-            .ToProperty(this, nameof(CanSave))
-            .DisposeWith(_disposables);
-
-        SaveCommand = ReactiveCommand.CreateFromTask(Save, this.WhenAnyValue(x => x.CanSave).ObserveOn(RxApp.MainThreadScheduler))
+        SaveCommand = ReactiveCommand.CreateFromTask(Save, this.WhenAnyValue(x => x.Fields.CanSave).ObserveOn(RxApp.MainThreadScheduler))
             .DisposeWith(_disposables);
         SaveCommand.IsExecuting.ToProperty(this, nameof(IsSaving), out _isSaving);
 
-        CancelCommand = ReactiveCommand.CreateFromTask(_navigationService.NavigateBack)
+        ResetCommand = ReactiveCommand.CreateFromTask(Reset, this.WhenAnyValue(x => x.Fields.HasChanges).ObserveOn(RxApp.MainThreadScheduler))
             .DisposeWith(_disposables);
 
-        MakeCurrentConfigurationActiveCommand = ReactiveCommand.Create(() => CurrentConfigurationIsActive = true, outputScheduler: RxApp.MainThreadScheduler)
+        MakeCurrentConfigurationActiveCommand = ReactiveCommand.Create(() => Fields.IsActive = true, outputScheduler: RxApp.MainThreadScheduler)
             .DisposeWith(_disposables);
 
         DeleteConfigurationCommand = ReactiveCommand.CreateFromTask(DeleteConfiguration);
@@ -123,7 +77,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     public override async Task<bool> TryNavigateAway()
     {
         var logger = LogManager.GetApplicationLogger();
-        if (!HasChanges || IsSaving)
+        if (!Fields.HasChanges || IsSaving)
         {
             return true;
         }
@@ -136,27 +90,29 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
-    public ReactiveCommand<Unit, Unit> CancelCommand { get; }
+    public ReactiveCommand<Unit, Unit> ResetCommand { get; }
 
     public ReactiveCommand<Unit, bool> MakeCurrentConfigurationActiveCommand { get; }
 
     public ReactiveCommand<Unit, Unit> DeleteConfigurationCommand { get; }
 
-    /// Whether or not this page has changes and is in a valid state to be saved.
-    public bool CanSave => _canSave.Value;
-
-    /// Whether or not this page has changes, regardless of whether or not they are valid.
-    public bool HasChanges => _hasChanges.Value;
-
+    /// <summary>
     /// Whether or not this page is currently saving data.
+    /// </summary>
     public bool IsSaving => _isSaving.Value;
 
+    /// <summary>
+    /// Names of all available configurations.
+    /// </summary>
     public IReadOnlyList<string> AllConfigurationNames
     {
         get => _allConfigurationNames;
         private set => this.RaiseAndSetIfChanged(ref _allConfigurationNames, value);
     }
 
+    /// <summary>
+    /// Name of the currently selected configuration.
+    /// </summary>
     public string CurrentCoreConfigurationName
     {
         get => _currentCoreConfigurationName;
@@ -165,7 +121,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             if (value == _currentCoreConfigurationName)
                 return;
 
-            if (HasChanges)
+            if (Fields?.HasChanges ?? false)
             {
                 async Task VerifyChangeDesired()
                 {
@@ -198,34 +154,13 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         }
     }
 
-    public bool CurrentConfigurationIsActive
+    /// <summary>
+    /// View Model backing the actual fields.
+    /// </summary>
+    public SettingsFieldsViewModel Fields
     {
-        get => _currentConfigurationIsActive;
-        set => this.RaiseAndSetIfChanged(ref _currentConfigurationIsActive, value);
-    }
-
-    public string HomeLabRepoDataPath
-    {
-        get => _homeLabRepoDataPath;
-        set => this.RaiseAndSetIfChanged(ref _homeLabRepoDataPath, value);
-    }
-
-    public string GitConfigFilePath
-    {
-        get => _gitConfigFilePath;
-        set => this.RaiseAndSetIfChanged(ref _gitConfigFilePath, value);
-    }
-
-    public string GithubUserName
-    {
-        get => _githubUserName;
-        set => this.RaiseAndSetIfChanged(ref _githubUserName, value);
-    }
-
-    public string GithubPat
-    {
-        get => _githubPat;
-        set => this.RaiseAndSetIfChanged(ref _githubPat, value);
+        get => _fields;
+        private set => this.RaiseAndSetIfChanged(ref _fields, value);
     }
 
     protected override void Dispose(bool isDisposing)
@@ -244,22 +179,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             throw new ArgumentNullException(nameof(config));
 
         _currentCoreConfiguration = config;
-
-        HomeLabRepoDataPath = config.HomeLabRepoDataPath;
-        CurrentConfigurationIsActive = config.IsActive;
-        GitConfigFilePath = config.GitConfigFilePath;
-        GithubUserName = config.GithubUserName;
-        GithubPat = config.GithubPat;
-
-        // Capture the initial state of the data.
-        _initialState = new TrackedPropertyState()
-        {
-            IsActive = config.IsActive,
-            HomeLabRepoDataPath = HomeLabRepoDataPath,
-            GitConfigFilePath = GitConfigFilePath,
-            GithubUserName = GithubUserName,
-            GithubPat = GithubPat
-        };
+        Fields = new SettingsFieldsViewModel(config);
     }
 
     /// <summary>
@@ -267,7 +187,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     /// </summary>
     private async Task Save()
     {
-        if (!HasChanges)
+        if (!Fields.HasChanges)
             throw new InvalidOperationException($"Core configuration {CurrentCoreConfigurationName} has no changes but we are trying to save anyway.");
 
         var (dialog, dialogTask) = _sharedDialogService.ShowSimpleSavingDataDialog("Saving Core Configuration Changes...");
@@ -276,19 +196,27 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         await Task.Run(() =>
         {
-            _coreConfigurationManager!.SaveCoreConfiguration(_currentCoreConfiguration with
-            {
-                IsActive = CurrentConfigurationIsActive,
-                HomeLabRepoDataPath = HomeLabRepoDataPath,
-                GitConfigFilePath = GitConfigFilePath,
-                GithubUserName = GithubUserName,
-                GithubPat = GithubPat
-            });
+            var mergedResult = Fields.MergeInChanges(_currentCoreConfiguration);
+            _coreConfigurationManager!.SaveCoreConfiguration(mergedResult);
+            _currentCoreConfiguration = mergedResult;
         }).ConfigureAwait(true);
 
-        dialog?.GetWindow().Close();
+        Fields = new SettingsFieldsViewModel(_currentCoreConfiguration);
 
-        await _navigationService!.NavigateBack().ConfigureAwait(false);
+        dialog?.GetWindow().Close();
+    }
+
+    /// <summary>
+    /// Reset the current configuration back to it's initial state.
+    /// </summary>
+    private async Task Reset()
+    {
+        if (!Fields.HasChanges)
+            throw new InvalidOperationException($"Core configuration {CurrentCoreConfigurationName} has no changes but we are trying to revert anyway.");
+
+        await _sharedDialogService.ShowSimpleYesNoDialog("This will revert any changes you have made.").ConfigureAwait(true);
+
+        Fields = new SettingsFieldsViewModel(_currentCoreConfiguration);
     }
 
     /// <summary>
@@ -324,30 +252,12 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
     private readonly ISharedDialogsService _sharedDialogService;
 
     private readonly CompositeDisposable _disposables;
-    private readonly ObservableAsPropertyHelper<bool> _canSave;
-    private readonly ObservableAsPropertyHelper<bool> _hasChanges;
     private readonly ObservableAsPropertyHelper<bool> _isSaving;
 
     private IReadOnlyList<(string Name, bool IsActive)> _allConfigurationInfos;
     private IReadOnlyList<string> _allConfigurationNames;
     private CoreConfigurationDto _currentCoreConfiguration;
     private string _currentCoreConfigurationName;
-    // private bool _isRenamingConfiguration;
+    private SettingsFieldsViewModel _fields;
     private bool _isResettingCurrentConfiguration;
-    private bool _currentConfigurationIsActive;
-    private string _homeLabRepoDataPath;
-    private string _gitConfigFilePath;
-    private string _githubUserName;
-    private string _githubPat;
-
-    private TrackedPropertyState? _initialState;
-
-    private struct TrackedPropertyState
-    {
-        public bool IsActive;
-        public string HomeLabRepoDataPath;
-        public string GitConfigFilePath;
-        public string GithubUserName;
-        public string GithubPat;
-    }
 }

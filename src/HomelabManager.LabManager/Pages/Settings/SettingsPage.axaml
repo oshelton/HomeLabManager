@@ -28,21 +28,20 @@
 					<controls:PageNavButton
 						Command="{Binding SaveCommand}"
 						Icon="FloppyDisc"
-						IsEnabled="{Binding HasChanges}"
 						Text="Save" />
 
 					<Border>
 						<materialIcons:MaterialIcon
 							Classes="ValidationError SmallBadge"
-							IsVisible="{Binding HasErrors}"
+							IsVisible="{Binding Fields.HasErrors}"
 							ToolTip.Tip="Validation errors must be addressed before data can be saved." />
 					</Border>
 				</Grid>
 				<controls:PageNavButton
-					Command="{Binding CancelCommand}"
+					Command="{Binding ResetCommand}"
 					Icon="Cancel"
 					IsOutline="True"
-					Text="Cancel" />
+					Text="Reset" />
 			</StackPanel>
 
 			<StackPanel Margin="0,4,0,0">
@@ -75,6 +74,7 @@
 						VerticalAlignment="Center"
 						Classes="Body1"
 						Foreground="Red"
+						IsVisible="{Binding Fields.IsActive}"
 						ToolTip.Tip="This is the current active configuration">
 						Active
 					</TextBlock>
@@ -84,7 +84,7 @@
 						Margin="4"
 						VerticalAlignment="Center"
 						Command="{Binding MakeCurrentConfigurationActiveCommand}"
-						IsVisible="{Binding !CurrentConfigurationIsActive}"
+						IsVisible="{Binding !Fields.IsActive}"
 						ToolTip.Tip="Make this configuration be the currently active one">
 						<TextBlock Classes="Body1" FontWeight="Bold">
 							Make Active
@@ -97,7 +97,7 @@
 						Margin="4"
 						Classes="Mini"
 						Command="{Binding DeleteConfigurationCommand}"
-						IsVisible="{Binding !CurrentConfigurationIsActive}"
+						IsVisible="{Binding !Fields.IsActive}"
 						ToolTip.Tip="Delete this core configuration">
 						<Border>
 							<materialIcons:MaterialIcon Kind="Delete" />
@@ -132,7 +132,7 @@
 				<ScrollViewer>
 					<StackPanel>
 						<formFields:FolderPickerFormField
-							FolderPath="{Binding HomeLabRepoDataPath}"
+							FolderPath="{Binding Fields.HomeLabRepoDataPath}"
 							Label="Home Lab Repo Data Path"
 							OpenFolderPickerButtonToolTip="Open a directory picker to set the repo directory.">
 							<formFields:FolderPickerFormField.InfoTip>
@@ -146,7 +146,7 @@
 						</formFields:FolderPickerFormField>
 
 						<formFields:FilePickerFormField
-							FilePath="{Binding GitConfigFilePath}"
+							FilePath="{Binding Fields.GitConfigFilePath}"
 							Label="Git Config File Path"
 							OpenFilePickerButtonToolTip="Open a file picker to specify the path to the git config file.">
 							<formFields:FilePickerFormField.InfoTip>
@@ -159,9 +159,9 @@
 						<formFields:BasicStringFormField
 							InfoTip="This is the User Name used when signing into Github."
 							Label="Github User Name"
-							StringValue="{Binding GithubUserName}" />
+							StringValue="{Binding Fields.GithubUserName}" />
 
-						<formFields:BasicStringFormField Label="Github PAT" StringValue="{Binding GithubPat}">
+						<formFields:BasicStringFormField Label="Github PAT" StringValue="{Binding Fields.GithubPat}">
 							<formFields:BasicStringFormField.InfoTip>
 								<TextBlock MaxWidth="384" TextWrapping="Wrap">
 									<Run>This is the Github PAT used when pushing up to Github.</Run>
