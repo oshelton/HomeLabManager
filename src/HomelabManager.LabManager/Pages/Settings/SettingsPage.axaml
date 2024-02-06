@@ -45,12 +45,12 @@
 			</StackPanel>
 
 			<StackPanel Margin="0,4,0,0">
-				<Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto, Auto">
+				<Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
 					<TextBlock
 						Margin="12"
 						VerticalAlignment="Center"
 						Classes="Body1">
-						Configurations:
+						Configuration:
 					</TextBlock>
 
 					<ComboBox
@@ -105,19 +105,8 @@
 					</materialControls:FloatingButton>
 
 					<materialControls:FloatingButton
-						Name="EditNameButton"
-						Grid.Column="4"
-						Margin="4"
-						Classes="Mini"
-						ToolTip.Tip="Update the name of this configuration">
-						<Border>
-							<materialIcons:MaterialIcon Kind="Pencil" />
-						</Border>
-					</materialControls:FloatingButton>
-
-					<materialControls:FloatingButton
 						Name="CreateConfigButton"
-						Grid.Column="5"
+						Grid.Column="4"
 						Margin="4"
 						Classes="Mini"
 						ToolTip.Tip="Create a new Core Configuration">
@@ -131,6 +120,11 @@
 
 				<ScrollViewer>
 					<StackPanel>
+						<formFields:BasicStringFormField
+							InfoTip="The name of this configuration."
+							Label="Configuration Name"
+							StringValue="{Binding Fields.Name}" />
+
 						<formFields:FolderPickerFormField
 							FolderPath="{Binding Fields.HomeLabRepoDataPath}"
 							Label="Home Lab Repo Data Path"

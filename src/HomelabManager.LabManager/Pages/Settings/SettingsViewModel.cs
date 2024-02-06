@@ -179,7 +179,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             throw new ArgumentNullException(nameof(config));
 
         _currentCoreConfiguration = config;
-        Fields = new SettingsFieldsViewModel(config);
+        Fields = new SettingsFieldsViewModel(config, _allConfigurationNames.Except(new[] { CurrentCoreConfigurationName }).ToArray());
     }
 
     /// <summary>
@@ -201,7 +201,9 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             _currentCoreConfiguration = mergedResult;
         }).ConfigureAwait(true);
 
-        Fields = new SettingsFieldsViewModel(_currentCoreConfiguration);
+        Fields = new SettingsFieldsViewModel(_currentCoreConfiguration, _allConfigurationNames.Except(new[] { CurrentCoreConfigurationName }).ToArray());
+        AllConfigurationNames = _coreConfigurationManager.GetAllCoreConfigurations().Select(x => x.Name).ToArray();
+        CurrentCoreConfigurationName = _currentCoreConfiguration.Name;
 
         dialog?.GetWindow().Close();
     }
@@ -216,7 +218,7 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         await _sharedDialogService.ShowSimpleYesNoDialog("This will revert any changes you have made.").ConfigureAwait(true);
 
-        Fields = new SettingsFieldsViewModel(_currentCoreConfiguration);
+        Fields = new SettingsFieldsViewModel(_currentCoreConfiguration, _allConfigurationNames.Except(new[] { CurrentCoreConfigurationName }).ToArray());
     }
 
     /// <summary>

@@ -19,12 +19,20 @@ namespace HomeLabManager.Manager.Pages.Settings
     /// </summary>
     public class SettingsFieldsViewModel : ValidatableViewModel
     {
-        public SettingsFieldsViewModel(CoreConfigurationDto config) 
+        public SettingsFieldsViewModel(CoreConfigurationDto config, IReadOnlyList<string> allOtherConfigurationNames) 
         {
             if (config is null)
                 throw new ArgumentNullException(nameof(config));
+            if (allOtherConfigurationNames is null)
+                throw new ArgumentNullException(nameof(allOtherConfigurationNames));
 
             var builder = new ValidationBuilder<SettingsFieldsViewModel>();
+
+            builder.RuleFor(vm => vm.Name)
+                .WithPropertyCascadeMode(CascadeMode.Stop)
+                .NotEmpty().WithMessage("Configuration name musst not be empty.")
+                .Throttle(500)
+                .Must(value => !allOtherConfigurationNames.Any(x => x.Equals(value, StringComparison.OrdinalIgnoreCase))).WithMessage("Configuration name must be unique.");
 
             builder.RuleFor(vm => vm.HomeLabRepoDataPath)
                 .WithPropertyCascadeMode(CascadeMode.Stop)
