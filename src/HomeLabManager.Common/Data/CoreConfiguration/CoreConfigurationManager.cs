@@ -121,7 +121,7 @@ public class CoreConfigurationManager : ICoreConfigurationManager
             var fileName = Path.GetFileName(x);
             var firstPeriodIndex = fileName.IndexOf(".", StringComparison.InvariantCultureIgnoreCase);
             return (fileName[..firstPeriodIndex], IsPathActiveConfigurationFile(x));
-        }).ToArray();
+        }).OrderBy(x => x.Item1).ToArray();
 
     /// <inheritdoc/>
     public void DeleteCoreConfiguration(CoreConfigurationDto configuration)

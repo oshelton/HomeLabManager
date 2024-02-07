@@ -109,6 +109,7 @@
 						Grid.Column="4"
 						Margin="4"
 						Classes="Mini"
+						Command="{Binding CreateConfigurationCommand}"
 						ToolTip.Tip="Create a new Core Configuration">
 						<Border>
 							<materialIcons:MaterialIcon Kind="PlusBold" />

@@ -55,6 +55,8 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
             .DisposeWith(_disposables);
 
         DeleteConfigurationCommand = ReactiveCommand.CreateFromTask(DeleteConfiguration);
+
+        CreateConfigurationCommand = ReactiveCommand.CreateFromTask(CreateConfiguration, this.WhenAnyValue(x => x.Fields.HasChanges).Select(x => !x).ObserveOn(RxApp.MainThreadScheduler));
     }
 
     public override string Title => "Settings";
@@ -88,13 +90,30 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         }
     }
 
+    /// <summary>
+    /// Command for saving a modified configuration.
+    /// </summary>
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
+    /// <summary>
+    /// Command for resetting changes to the currently selected Configuration.
+    /// </summary>
     public ReactiveCommand<Unit, Unit> ResetCommand { get; }
 
+    /// <summary>
+    /// Command for making the currently selected vonfiguration the active one.
+    /// </summary>
     public ReactiveCommand<Unit, bool> MakeCurrentConfigurationActiveCommand { get; }
 
+    /// <summary>
+    /// Command for deleting the currently selected Configuration.
+    /// </summary>
     public ReactiveCommand<Unit, Unit> DeleteConfigurationCommand { get; }
+
+    /// <summary>
+    /// Command for creating a new Configuration.
+    /// </summary>
+    public ReactiveCommand<Unit, Unit> CreateConfigurationCommand { get; }
 
     /// <summary>
     /// Whether or not this page is currently saving data.
@@ -194,15 +213,18 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
 
         LogManager.GetApplicationLogger().Information("Saving updated core configuration settings");
 
+        IReadOnlyList<string> updatedConfigurationList = null;
+
         await Task.Run(() =>
         {
             var mergedResult = Fields.MergeInChanges(_currentCoreConfiguration);
             _coreConfigurationManager!.SaveCoreConfiguration(mergedResult);
             _currentCoreConfiguration = mergedResult;
+            updatedConfigurationList = _coreConfigurationManager.GetAllCoreConfigurations().Select(x => x.Name).ToArray();
         }).ConfigureAwait(true);
 
         Fields = new SettingsFieldsViewModel(_currentCoreConfiguration, _allConfigurationNames.Except(new[] { CurrentCoreConfigurationName }).ToArray());
-        AllConfigurationNames = _coreConfigurationManager.GetAllCoreConfigurations().Select(x => x.Name).ToArray();
+        AllConfigurationNames = updatedConfigurationList;
         CurrentCoreConfigurationName = _currentCoreConfiguration.Name;
 
         dialog?.GetWindow().Close();
@@ -247,6 +269,25 @@ public sealed class SettingsViewModel : ValidatedPageBaseViewModel<SettingsViewM
         CurrentCoreConfigurationName = activeCoreConfiguration.Name;
 
         dialog?.GetWindow()?.Close();
+    }
+
+    private async Task CreateConfiguration()
+    {
+        
+
+        var newConfiguration = new CoreConfigurationDto()
+        {
+            Name = $"New Configuration {Guid.NewGuid()}",
+        };
+
+        await Task.Run(() =>
+        {
+            _coreConfigurationManager.SaveCoreConfiguration(newConfiguration);
+        }).ConfigureAwait(true);
+
+        Fields = new SettingsFieldsViewModel(newConfiguration, _allConfigurationNames);
+        AllConfigurationNames = AllConfigurationNames.Union(new[] { newConfiguration.Name }).ToArray();
+        CurrentCoreConfigurationName = newConfiguration.Name;
     }
 
     private readonly ICoreConfigurationManager _coreConfigurationManager;
