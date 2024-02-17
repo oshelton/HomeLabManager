@@ -1,5 +1,7 @@
 # Home Lab Manager
 
+> **Archived:** This project is no longer seeing active development. For the purposes of managing my homelab a combination of [Obsidian](https://obsidian.md/), [Obsidian DataView](https://github.com/blacksmithgu/obsidian-dataview), [Obsidian Metadata Menu](https://mdelobelle.github.io/metadatamenu/), and [XPipe](https://xpipe.io/) get me close enough to something that meets all of my needs without all of the ongoing maintenance and effort that creating my own application entails, and delays in getting things off the ground while I get things implemented.
+
 > **Reminder:** Do not push anything containing sensetive informations, user names, public IP Addresses, or other forms of credentials to this repo.
 
 This repo contains libraries and applications that I use to manage my soon to be further developed home lab.  These applications have the goal of making it easier to track the status of and be able to manage my home lab with software that isn't necesarily running on my actual home lab; because sometimes it's nice to know what's up when everything is on fire besides just an error page.
